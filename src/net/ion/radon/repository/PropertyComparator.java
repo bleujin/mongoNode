@@ -13,11 +13,11 @@ public class PropertyComparator<T extends Node> implements Comparator<T>{
 		orders.add(new OrderColumn(propId, order)) ;
 	}
 
-	public PropertyComparator ascending(String propId){
+	public PropertyComparator<T> ascending(String propId){
 		orders.add(new OrderColumn(propId, 1)) ;
 		return this;
 	}
-	public PropertyComparator descending(String propId){
+	public PropertyComparator<T> descending(String propId){
 		orders.add(new OrderColumn(propId, -1)) ;
 		return this;
 	}

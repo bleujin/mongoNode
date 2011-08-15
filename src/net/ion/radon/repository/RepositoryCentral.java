@@ -20,8 +20,14 @@ public class RepositoryCentral {
 		this.mongo = mongo;
 	}
 
+	public RepositoryCentral(String host, int port) throws UnknownHostException, MongoException {
+		load(host, port) ;
+		this.mongo = STORE.get(getKey(host, port)).mongo ;
+	}
+
+
 	public static RepositoryCentral testLoad() throws UnknownHostException, MongoException {
-		return load("61.250.201.78", 27017);
+		return load("localhost", 27017);
 	}
 
 	public static RepositoryCentral load(String host, int port) throws UnknownHostException, MongoException {
