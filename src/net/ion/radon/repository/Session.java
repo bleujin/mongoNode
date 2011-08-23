@@ -3,7 +3,6 @@ package net.ion.radon.repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
@@ -18,7 +17,7 @@ public class Session {
 	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
 
 	private Map<String, Node> modified = MapUtil.newMap();
-	private List<NodeResult> lastResult = ListUtil.newList() ;
+	private NodeResult lastResult = null;
 	private final RootNode root;
 
 	private Session(Repository repository, String wname) {
@@ -32,12 +31,15 @@ public class Session {
 		if (session == null) {
 			session = new Session(repository, wname);
 			CURRENT.set(session);
+		} else {
+			session.changeWorkspace(wname) ;
 		}
 		return session;
 	}
 
-	public void changeWorkspace(String wname) {
+	public Session changeWorkspace(String wname) {
 		this.workspace = repository.getWorkspace(wname);
+		return this ;
 	}
 
 
@@ -63,16 +65,15 @@ public class Session {
 		int index = modified.size();
 		
 		Node[] targets = modified.values().toArray(new Node[0]);
-		lastResult = ListUtil.newList();
 		for (Node node : targets) {
 			node.updateLastModified();
-			lastResult.add(repository.getWorkspace(node.getWorkspaceName()).save(node));
+			this.lastResult = repository.getWorkspace(node.getWorkspaceName()).save(node);
 		}
 		this.clear();
 		return index;
 	}
 	
-	public List<NodeResult> getLastResultInfo(){
+	public NodeResult getLastResultInfo(){
 		return lastResult ;
 	}
 
@@ -162,7 +163,7 @@ public class Session {
 
 
 	private boolean toReturn(NodeResult result) {
-		lastResult = ListUtil.create(result);
+		lastResult = result;
 		return result.getRowCount() > -1;
 	}
 	
@@ -183,11 +184,8 @@ public class Session {
 		return getReferenceManager().addReference(src, relType, target);
 	}
 	
-	void setLastResult(List<NodeResult> results) {
-		this.lastResult = results ;
-	}
 	void setLastResult(NodeResult result) {
-		setLastResult(ListUtil.create(result)) ;
+		this.lastResult = result ;
 	}
 
 

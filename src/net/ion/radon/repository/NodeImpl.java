@@ -108,7 +108,7 @@ public class NodeImpl implements Node {
 		Object result = nobject.get(propId);
 		
 		if (result instanceof DBObject){
-			return InnerNodeImpl.create(NodeObject.load((DBObject)result), propId, this) ;	
+			return InNodeImpl.create(NodeObject.load((DBObject)result), propId, this) ;	
 		}
 		return (Serializable) result;
 	}
@@ -401,7 +401,7 @@ public class NodeImpl implements Node {
 		}
 		NodeObject inner = NodeObject.create() ;
 		put(name, inner) ;
-		return InnerNodeImpl.create(inner, name, this);
+		return InNodeImpl.create(inner, name, this);
 	}
 	
 	public boolean setReference(String refType, AradonQuery preQuery, AradonQuery newQuery) {
@@ -415,6 +415,14 @@ public class NodeImpl implements Node {
 
 	public void updateLastModified() {
 		putProperty(PropertyId.reserved(LASTMODIFIED), System.currentTimeMillis()) ; ;
+	}
+
+	public InListNode inlist(String name) {
+		return InListNodeImpl.load(name, getSession(), getSession().createQuery().id(getIdentifier()), this);
+	}
+	
+	public boolean isSaved(){
+		return !session.getModified().contains(this) ;
 	}
 
 }

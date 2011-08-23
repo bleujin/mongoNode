@@ -16,7 +16,7 @@ import net.ion.radon.repository.Session;
 public class TestSimul extends TestAradon{
 
 	public void testname() throws Exception {
-		Session session = RepositoryCentral.testLoad().testLogin("test", "wname") ;
+		Session session = RepositoryCentral.testCreate().testLogin("wname") ;
 		List<Node> nodes = session.createQuery().find().toList(PageBean.ALL) ;
 		for (Node node :nodes) {
 			Debug.debug(node.toMap()) ;
@@ -25,7 +25,7 @@ public class TestSimul extends TestAradon{
 	
 	public void testStart() throws Exception {
 		
-		Session session = RepositoryCentral.testLoad().testLogin("test", "wname") ;
+		Session session = RepositoryCentral.testCreate().testLogin("wname") ;
 		session.dropWorkspace() ;
 		Node bleujin = session.newNode("bleujin") ;
 		bleujin.createChild("child").put("greeting", "hi").put("age", 20) ;

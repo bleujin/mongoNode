@@ -5,7 +5,7 @@ import java.util.Date;
 import com.mongodb.DBObject;
 
 import net.ion.framework.util.Debug;
-import net.ion.radon.repository.InnerNodeImpl;
+import net.ion.radon.repository.InNodeImpl;
 import net.ion.radon.repository.NodeObject;
 import net.ion.radon.repository.util.JSONUtil;
 import net.sf.json.JSONObject;

@@ -1,13 +1,12 @@
 package net.ion.radon.repository;
 
-import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections.Closure;
 
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
+
+import org.apache.commons.collections.Closure;
 
 public class TestUpdate extends TestBaseRepository{
 
@@ -67,6 +66,17 @@ public class TestUpdate extends TestBaseRepository{
 		assertEquals("seoul", newSession.createQuery().id(savedNode.getIdentifier()).findOne().getString("location")) ;	
 	}
 
+	public void testFindMultiUpdate() throws Exception {
+		Node savedNode = createTestNode() ;
+		
+		session.createQuery().eq("name", "bleujin").put("location", "seoul").update() ;
+		// confirm
+		session.logout() ;
+		Session newSession = rc.testLogin("test", WORKSPACE_NAME) ;
+		assertEquals("bleujin", newSession.createQuery().id(savedNode.getIdentifier()).findOne().getString("name")) ;
+		assertEquals("seoul", newSession.createQuery().id(savedNode.getIdentifier()).findOne().getString("location")) ;	
+	}
+
 	
 	public void testNotFindUpdate() throws Exception {
 		Node savedNode = createTestNode() ;
@@ -85,8 +95,9 @@ public class TestUpdate extends TestBaseRepository{
 		createTestNode() ;
 		createTestNode() ;
 		
-		Map map = MapUtil.create("location", "seoul");
-		session.createQuery().eq("name", "bleujin").update(map) ;
+		NodeResult result = session.createQuery().eq("name", "bleujin").put("location", "seoul").update() ;
+		
+		assertEquals(true, result.getErrorMessage() == null);
 		
 		NodeCursor cursor =  createQuery().eq("name", "bleujin").find();
 		cursor.each(PageBean.ALL, new Closure(){
@@ -101,8 +112,8 @@ public class TestUpdate extends TestBaseRepository{
 	public void testAfterUpdate() throws Exception {
 		testMultiUpdate() ;
 		
-		List<NodeResult> results = session.getLastResultInfo() ;
-		assertEquals(2, results.size()) ;
+		NodeResult results = session.getLastResultInfo() ;
+		assertEquals(true, results.getRowCount() > 0); 
 	}
 	
 	public void testRemove() throws Exception {

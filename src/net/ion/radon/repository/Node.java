@@ -69,6 +69,10 @@ public interface Node extends IPropertyFamily, INode {
 	public long getLastModified();
 
 	public void updateLastModified();
+
+	public InListNode inlist(String name);
+
+	public boolean isSaved();
 	
 }
 
@@ -212,6 +216,10 @@ class RootNode implements Node {
 		throw new IllegalArgumentException("root node is read only") ;
 	}
 
+	public InListNode inlist(String name) {
+		throw new IllegalArgumentException("root node is read only") ;
+	}
+
 	public boolean isMatchEncrypted(String key, String value) {
 		return false;
 	}
@@ -243,5 +251,9 @@ class RootNode implements Node {
 
 	public void updateLastModified() {
 		; // no action
+	}
+
+	public boolean isSaved() {
+		return true;
 	}
 }

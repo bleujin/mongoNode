@@ -9,7 +9,7 @@ import net.ion.radon.repository.Node;
 import net.ion.radon.repository.TestBaseRepository;
 import net.sf.json.JSONObject;
 
-public class TestInQuerySort extends  TestBaseInQuery {
+public class TestInListQuerySort extends  TestBaseInListQuery {
 	
 	public void testPath() throws Exception {
 		Node node = createNode();

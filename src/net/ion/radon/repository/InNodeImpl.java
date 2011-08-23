@@ -20,21 +20,21 @@ import net.sf.json.JSONObject;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 
-public class InnerNodeImpl implements InNode {
+public class InNodeImpl implements InNode {
 
 	private static final long serialVersionUID = 7569283280889592633L;
 	private NodeObject nobject;
 	private String pname;
 	private Node parent;
 
-	private InnerNodeImpl(NodeObject nobject, String pname, Node parent) {
+	private InNodeImpl(NodeObject nobject, String pname, Node parent) {
 		this.nobject = nobject;
 		this.pname = pname;
 		this.parent = parent;
 	}
 
 	static InNode create(NodeObject inner, String pname, Node parent) {
-		return new InnerNodeImpl(inner, pname, parent);
+		return new InNodeImpl(inner, pname, parent);
 	}
 
 	public InNode inner(String name) {
@@ -43,7 +43,7 @@ public class InnerNodeImpl implements InNode {
 		}
 		NodeObject inner = NodeObject.create();
 		put(name, inner);
-		return InnerNodeImpl.create(inner, name, parent);
+		return InNodeImpl.create(inner, name, parent);
 	}
 
 	public InNode append(String key, Object val) {

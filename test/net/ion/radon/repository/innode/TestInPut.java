@@ -2,7 +2,7 @@ package net.ion.radon.repository.innode;
 
 import net.ion.radon.repository.Node;
 
-public class TestInPut extends TestBaseInQuery{
+public class TestInPut extends TestBaseInListQuery{
 
 	public void testPath() throws Exception {
 		Node node = makeNode();

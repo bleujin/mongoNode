@@ -16,9 +16,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 public class PropertyQuery implements IPropertyFamily{
-
 	
 	private NodeObject nobject ;
+	public final static PropertyQuery EMPTY = new PropertyQuery(NodeObject.create()) ;
+	
 	private PropertyQuery(NodeObject nobject) {
 		this.nobject = nobject ;
 	}
@@ -130,8 +131,13 @@ public class PropertyQuery implements IPropertyFamily{
 		return this;
 	}
 	
-	public PropertyQuery ne(String key, String value) {
+	public PropertyQuery ne(String key, Object value) {
 		nobject.put(key,  new BasicDBObject("$ne", value));
+		return this ;
+	}
+
+	public PropertyQuery eq(String key, Object value) {
+		nobject.put(key,  value);
 		return this ;
 	}
 

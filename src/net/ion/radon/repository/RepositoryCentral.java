@@ -2,6 +2,7 @@ package net.ion.radon.repository;
 
 import java.net.UnknownHostException;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
@@ -13,47 +14,62 @@ import com.mongodb.MongoException;
 
 public class RepositoryCentral {
 
-	private static Map<String, RepositoryCentral> STORE = MapUtil.newMap();
 	private Mongo mongo;
+	private String currentDBName = "test";
 
-	private RepositoryCentral(Mongo mongo) {
-		this.mongo = mongo;
+	public RepositoryCentral(String host, int port) throws UnknownHostException, MongoException{
+		this(host, port, "test") ;
 	}
 
-	public RepositoryCentral(String host, int port) throws UnknownHostException, MongoException {
-		load(host, port) ;
-		this.mongo = STORE.get(getKey(host, port)).mongo ;
+	public RepositoryCentral(String host, int port, String defaultDBName) throws UnknownHostException, MongoException{
+		this.mongo = loadMongo(host, port) ;
+		this.currentDBName = defaultDBName ;
 	}
 
-
-	public static RepositoryCentral testLoad() throws UnknownHostException, MongoException {
-		return load("localhost", 27017);
-	}
-
-	public static RepositoryCentral load(String host, int port) throws UnknownHostException, MongoException {
-		RepositoryCentral rc = STORE.get(getKey(host, port));
-
-		synchronized (RepositoryCentral.class) {
-			if (rc == null) {
-				final RepositoryCentral newRepo = new RepositoryCentral(new Mongo(host, port));
-				STORE.put(getKey(host, port), newRepo) ;
-				rc = newRepo ;
-			}
+	private static Map<String, Mongo> STORE = MapUtil.newMap();
+	private synchronized static Mongo loadMongo(String host, int port) throws UnknownHostException, MongoException {
+		Mongo m = STORE.get(getKey(host, port)) ;
+		if (m == null){
+			m  = new Mongo(host, port) ;
+			STORE.put(getKey(host, port), m) ;
 		}
-
-		return rc;
+		return m;
 	}
 
+	public static RepositoryCentral testCreate() throws UnknownHostException, MongoException {
+		return create("61.250.201.78", 27017);
+	}
+
+	public static RepositoryCentral testCreate(String dbName) throws UnknownHostException, MongoException {
+		return create("61.250.201.78", 27017).changeDB(dbName);
+	}
+	
+	public static RepositoryCentral create(String host, int port) throws UnknownHostException, MongoException {
+		return new RepositoryCentral(host, port);
+	}
+	
+
+	Mongo getMongo(){
+		return mongo ;
+	}
+	
 	private static String getKey(String host, int port) {
 		return host + "/" + port;
 	}
 
+	@Deprecated
 	public Session testLogin(String dbName, String defaultWorkspace) {
+		this.currentDBName = dbName ;
 		return login(dbName, defaultWorkspace, new SimpleCredential());
 	}
 	
+	public RepositoryCentral changeDB(String dbName){
+		this.currentDBName = dbName ;
+		return this ;
+	}
+	
 	public Session testLogin(String wname) {
-		return testLogin("test", wname) ;
+		return testLogin(currentDBName, wname) ;
 	}
 
 	public Session login(String dbName, String defaultWorkspace, ICredential credential) {
@@ -61,21 +77,31 @@ public class RepositoryCentral {
 		return Session.create(repository, defaultWorkspace);
 	}
 
+	public void unload(){
+		String key = "";
+		for (Entry<String, Mongo> entry : STORE.entrySet() ) {
+			if (mongo == entry.getValue()){
+				key = entry.getKey() ;
+				break ;
+			}
+		}
+		STORE.remove(key) ;
+		mongo.close() ;
+	}
+	
 	public void shutDown() {
 		try {
 			Debug.warn("Request Mongo ShutDown....");
-			new Mongo().getDB("admin").command(new BasicDBObject("shutdown", 1));
+			mongo.getDB("admin").command(new BasicDBObject("shutdown", 1));
 			Debug.warn("Mongo ShutDown....");
 		} catch (MongoException ignore) {
-			Debug.debug(ignore.getMessage());
-		} catch (UnknownHostException ignore) {
 			Debug.debug(ignore.getMessage());
 		}
 	}
 
 	public static void main(String[] args) {
 		try {
-			RepositoryCentral.testLoad().shutDown();
+			// RepositoryCentral.testLoad().shutDown();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

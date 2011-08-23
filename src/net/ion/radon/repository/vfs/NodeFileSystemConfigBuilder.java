@@ -61,7 +61,7 @@ public final class NodeFileSystemConfigBuilder extends FileSystemConfigBuilder {
 			throw new IllegalArgumentException("not setted server address..") ;
 		}
 		
-		return RepositoryCentral.load(address, port) ;
+		return RepositoryCentral.create(address, port) ;
 		
 	}
 

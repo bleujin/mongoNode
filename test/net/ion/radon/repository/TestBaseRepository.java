@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import net.ion.radon.repository.myapi.AradonQuery;
 import junit.framework.TestCase;
 
 public class TestBaseRepository  extends TestCase{
@@ -13,7 +12,7 @@ public class TestBaseRepository  extends TestCase{
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		rc = RepositoryCentral.load("61.250.201.78", 27017) ;
+		rc = RepositoryCentral.create("127.0.0.1", 27017) ;
 		session = rc.testLogin("test", WORKSPACE_NAME) ;
 		session.dropWorkspace();
 		session.getReferenceManager().reset() ;

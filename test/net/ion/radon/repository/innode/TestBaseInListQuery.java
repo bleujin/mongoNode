@@ -4,7 +4,7 @@ import net.ion.radon.repository.Node;
 import net.ion.radon.repository.TestBaseRepository;
 import net.sf.json.JSONObject;
 
-public class TestBaseInQuery extends TestBaseRepository{
+public class TestBaseInListQuery extends TestBaseRepository{
 	
 	protected Node makeNode() {
 		Node node = session.newNode() ;
@@ -25,10 +25,22 @@ public class TestBaseInQuery extends TestBaseRepository{
 		Node node = session.newNode() ;
 		for (int i = 0; i < 5; i++) {
 			JSONObject jo = makeSampleJSON(i) ;
-			node.inner("people").append(jo) ;
+			node.inlist("people").push(jo) ;
 		}
 		session.commit() ;
 		return node ;
+	}
+	
+	protected int createNodes() {
+		for (int p = 0; p < 3; p++) {
+			Node node = session.newNode() ;
+			node.put("oindex", p) ;
+			for (int i = 0; i < 5; i++) {
+				JSONObject jo = makeSampleJSON(i) ;
+				node.inlist("people").push(jo) ;
+			}
+		}
+		return session.commit() ;
 	}
 	
 

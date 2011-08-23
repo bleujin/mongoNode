@@ -1,17 +1,7 @@
 package net.ion.radon.repository;
 
-import java.util.List;
-
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.Debug;
-import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.myapi.AradonQuery;
-
-import org.bson.types.ObjectId;
-
-import com.mongodb.Mongo;
-
-import junit.framework.TestCase;
 
 public class TestUse extends TestBaseRepository{
 	
@@ -119,8 +109,8 @@ public class TestUse extends TestBaseRepository{
 		session.newNode("name");
 		session.commit();
 		
-		assertTrue(session.getLastResultInfo().get(0).getRowCount() >= 0) ;
-		Debug.debug(session.getLastResultInfo().get(0).isLazy()) ;
+		assertTrue(session.getLastResultInfo().getRowCount() >= 0) ;
+		Debug.debug(session.getLastResultInfo().isLazy()) ;
 	}
 	
 	public void testSetName() throws Exception {

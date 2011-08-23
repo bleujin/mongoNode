@@ -5,12 +5,12 @@ import static net.ion.radon.repository.NodeConstants.ID;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.types.ObjectId;
-
 import net.ion.framework.db.RepositoryException;
-import net.ion.framework.util.ListUtil;
+import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.AradonQuery;
+
+import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
@@ -21,6 +21,7 @@ public class SessionQuery {
 	
 	private PropertyQuery inner = PropertyQuery.create();
 	private PropertyFamily sort = PropertyFamily.create() ;
+	private Map<String, Object> modValues = MapUtil.newMap() ;
 
 	private SessionQuery(Session session){
 		this.session = session ;
@@ -72,13 +73,9 @@ public class SessionQuery {
 	}
 
 	public int remove(){
-		NodeCursor nc = find() ;
-		List<NodeResult> results = ListUtil.newList() ;
-		while(nc.hasNext()) {
-			results.add(workspace.remove(nc.next())) ;
-		}
-		session.setLastResult(results) ;
-		return results.size();
+		NodeResult result = workspace.removeQuery(inner) ;
+		session.setLastResult(result) ;
+		return result.getRowCount();
 	}
 
 	public SessionQuery aradonGroup(String groupid){
@@ -213,9 +210,20 @@ public class SessionQuery {
 		return result != NodeResult.NULL;
 	}
 
-	public void update(Map map) {
-		List<NodeResult> results = workspace.update(inner, map) ;
-		session.setLastResult(results) ;
+	public PropertyQuery getQuery(){
+		return inner ;
+	}
+
+	
+	public SessionQuery put(String path, Object value) {
+		modValues.put(path, value) ;
+		return this;
+	}
+
+	public NodeResult update(){
+		NodeResult nodeResult = workspace.update(inner, modValues);
+		session.setLastResult(nodeResult) ;
+		return nodeResult ;
 	}
 	
 	public Node findOneAtRepository(String groupid, Object uid) {
@@ -225,6 +233,10 @@ public class SessionQuery {
 			if (node != null) return node ;
 		}
 		return null;
+	}
+
+	public InListQueryNode inlist(String field) {
+		return InListQueryNode.create(field, session, this.inner) ;
 	}
 
 

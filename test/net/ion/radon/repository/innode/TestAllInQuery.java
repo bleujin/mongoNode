@@ -12,9 +12,9 @@ public class TestAllInQuery extends TestCase{
 		
 		
 		suite.addTestSuite(TestInPut.class) ;
-		suite.addTestSuite(TestInFilter.class) ;
-		suite.addTestSuite(TestInQuerySort.class) ;
-		suite.addTestSuite(TestInMDL.class) ;
+		suite.addTestSuite(TestInListQuery.class) ;
+		suite.addTestSuite(TestInListQuerySort.class) ;
+		suite.addTestSuite(TestInListMDL.class) ;
 		
 		return suite ;
 		

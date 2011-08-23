@@ -22,7 +22,6 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 
@@ -186,19 +185,31 @@ public class Workspace {
 	}
 	
 
-	List<NodeResult> update(IPropertyFamily query, Map<String, ?> values) {
-		List<NodeResult> resultList = ListUtil.newList();
+	NodeResult update(IPropertyFamily query, Map<String, ?> values) {
+		DBObject mod = new BasicDBObject() ;
+		mod.put("$set", new BasicDBObject(values)) ;
 		
-		DBCursor dc = collection.find(query.getDBObject()) ;
-		while(dc.hasNext()) {
-			DBObject dbo = dc.next() ;
-			for (Entry<String, ?> entry : values.entrySet()) {
-				dbo.put(entry.getKey(), entry.getValue()) ;
-			}
-			resultList.add(NodeResult.create(collection.save(dbo)));
-		}
-		return resultList;
+		WriteResult result = collection.updateMulti(query.getDBObject(), mod) ;
+		return NodeResult.create(result) ;
 	}
+	
+	NodeResult pull(PropertyQuery query, Map<String, ?> values) {
+		DBObject mod = new BasicDBObject() ;
+		mod.put("$pull", new BasicDBObject(values)) ;
+		
+		WriteResult result = collection.updateMulti(query.getDBObject(), mod) ;
+		return NodeResult.create(result) ;
+	}
+
+	NodeResult push(PropertyQuery query, Map<String, ?> values) {
+		DBObject mod = new BasicDBObject() ;
+		mod.put("$push", values) ;
+		
+		WriteResult result = collection.updateMulti(query.getDBObject(), mod) ;
+		return NodeResult.create(result) ;
+	}
+
+
 
 	Node merge(IPropertyFamily query, Node modNode) {
 		DBObject find = collection.findOne(query.getDBObject());
@@ -270,6 +281,7 @@ public class Workspace {
 	List<DBObject> getIndexInfo() {
 		return collection.getIndexInfo();
 	}
+
 
 
 	

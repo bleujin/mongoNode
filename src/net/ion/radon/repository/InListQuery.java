@@ -28,7 +28,7 @@ import org.bson.types.BasicBSONList;
 
 import com.mongodb.DBObject;
 
-public class InQuery {
+public class InListQuery {
 
 	private final NodeObject nobject;
 	private final String pname ;
@@ -38,73 +38,70 @@ public class InQuery {
 	private List<NodeSort> sorts = ListUtil.newList() ;
 	private Map<String, Object> modValues = MapUtil.newMap() ;
 	
-	public InQuery(NodeObject nobject, String pname, Node parent) {
+	private InListQuery(NodeObject nobject, String pname, Node parent) {
 		this.nobject = nobject ;
 		this.pname = pname ;
 		this.parent = parent ;
 	}
-
 	
-	
-	
-	public InQuery eq(String path, Object value) {
+	public InListQuery eq(String path, Object value) {
 		return addFilter(EqualFilter.create(path, value));
 	}
-	public InQuery ne(String path, Object value) {
+	public InListQuery ne(String path, Object value) {
 		return addFilter(NotEqualFilter.create(path, value));
 	}
 
-	public InQuery gt(String path, Object value) {
+	public InListQuery gt(String path, Object value) {
 		return addFilter(GreaterFilter.create(path, value));
 	}
-	public InQuery gte(String path, Object value) {
+	public InListQuery gte(String path, Object value) {
 		return addFilter(GreaterThanFilter.create(path, value));
 	}
-	public InQuery lt(String path, Object value) {
+	public InListQuery lt(String path, Object value) {
 		return addFilter(LessFilter.create(path, value));
 	}
-	public InQuery lte(String path, Object value) {
+	public InListQuery lte(String path, Object value) {
 		return addFilter(LessThanFilter.create(path, value));
 	}
-	public InQuery between(String path, Object from, Object to) {
+	public InListQuery between(String path, Object from, Object to) {
 		return addFilter(BetweenFilter.create(path, from, to));
 	}
-	public InQuery in(String path, Object[] values) {
+	public InListQuery in(String path, Object[] values) {
 		return addFilter(InFilter.create(path, values));
 	}
-	public InQuery nin(String path, Object[] values) {
+	public InListQuery nin(String path, Object[] values) {
 		return addFilter(NotInFilter.create(path, values));
 	}
-	public InQuery exist(String path) {
+	public InListQuery exist(String path) {
 		return addFilter(ExistFilter.create(path));
 	}
-	public InQuery notExist(String path) {
+	public InListQuery notExist(String path) {
 		return addFilter(NotExistFilter.create(path));
 	}
-	public InQuery and(InNodeFilter... qs){
+	public InListQuery and(InNodeFilter... qs){
 		return addFilter(AndFilter.create(qs)) ;
 	}
-	public InQuery or(InNodeFilter... qs){
+	public InListQuery or(InNodeFilter... qs){
 		return addFilter(OrFilter.create(qs)) ;
 	}
 	
 
 	
 	
-	private InQuery addFilter(InNodeFilter filter) {
+	private InListQuery addFilter(InNodeFilter filter) {
 		filters.add(filter);
 		return this ;
 	}
-	
 
-	
-	public InQuery put(String path, Object value) {
+	public InListQuery put(String path, Object value) {
 		modValues.put(path, value) ;
 		return this;
 	}
 
-	static InQuery create(NodeObject nobject, String pname, Node parent) {
-		return new InQuery(nobject, pname, parent);
+	
+	
+	static InListQuery create(NodeObject nobject, String pname, Node parent) {
+		return new InListQuery(nobject, pname, parent);
 	}
 
 	public InNode findOne() {
@@ -122,12 +119,12 @@ public class InQuery {
 		return myfind(page);
 	}
 	
-	public InQuery ascending(String path) {
+	public InListQuery ascending(String path) {
 		sorts.add(NodeSort.create(path, true)) ;
 		return this ;
 	}
 	
-	public InQuery descending(final String path) {
+	public InListQuery descending(final String path) {
 		sorts.add(NodeSort.create(path, false)) ;
 		return this ;
 	}
@@ -166,6 +163,7 @@ public class InQuery {
 	
 	private List<InNode> myfind(PageBean page){
 		List<InNode> result = ListUtil.newList() ;
+		
 		for (DBObject dbo : ((BasicBSONList)nobject.getDBObject()).toArray(new DBObject[0])) {
 			NodeObject no = NodeObject.load(dbo) ;
 			boolean isSatisfy = true ;

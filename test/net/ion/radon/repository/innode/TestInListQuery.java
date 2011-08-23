@@ -4,7 +4,7 @@ import net.ion.radon.repository.Node;
 import net.ion.radon.repository.TestBaseRepository;
 import net.sf.json.JSONObject;
 
-public class TestInFilter extends  TestBaseInQuery{
+public class TestInListQuery extends  TestBaseInListQuery{
 
 	public void testEqualFilter() throws Exception {
 		createNode() ;

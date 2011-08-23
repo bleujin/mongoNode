@@ -19,6 +19,7 @@ public class NodeObject implements Serializable, IPropertyFamily {
 	private static final long serialVersionUID = -321332758287996204L;
 	private DBObject inner ;
 
+	final static NodeObject BLANK_INNODE = NodeObject.load(new BasicDBList()) ; 
 	
 	private NodeObject(){
 		inner = new BasicDBObject() ;
