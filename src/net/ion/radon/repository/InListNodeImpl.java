@@ -55,11 +55,11 @@ public class InListNodeImpl implements InListNode{
 		DBObject dbo = inode.getDBObject() ;
 		
 		if (dbo instanceof BasicBSONList) {
-			((BasicBSONList) dbo).add(new BasicDBObject(values)) ;
+			((BasicBSONList) dbo).add(NodeObject.load(values).getDBObject()) ;
 			parent.put(this.field, dbo) ;
 		} else if (dbo.keySet().size() == 0) {
 			BasicDBList list = new BasicDBList() ;
-			list.add(new BasicDBObject(values));
+			list.add(NodeObject.load(values).getDBObject());
 			dbo = list ;
 			parent.put(this.field, dbo);
 		} else {

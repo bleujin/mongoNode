@@ -13,7 +13,6 @@ import net.ion.radon.impl.util.DebugPrinter;
 import net.ion.radon.repository.myapi.ICursor;
 import net.ion.radon.repository.myapi.INodeCursor;
 import net.ion.radon.repository.orm.AbstractORM;
-import net.ion.radon.repository.orm.People;
 
 import org.apache.commons.beanutils.ConstructorUtils;
 import org.apache.commons.collections.Closure;
@@ -40,7 +39,7 @@ public class NodeCursor implements ICursor, INodeCursor {
 	}
 
 	public Node next() {
-		return NodeImpl.load(cursor.next());
+		return NodeImpl.load(workspace.getName(), cursor.next());
 	}
 
 	public int count() {
@@ -98,7 +97,7 @@ public class NodeCursor implements ICursor, INodeCursor {
 
 		List<Node> result = new ArrayList<Node>();
 		while (limit-- > 0 && cursor.hasNext()) {
-			result.add(NodeImpl.load(cursor.next()));
+			result.add(NodeImpl.load(workspace.getName(), cursor.next()));
 		}
 
 		return result;

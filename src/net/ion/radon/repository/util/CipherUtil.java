@@ -1,4 +1,4 @@
-package net.ion.radon.repository;
+package net.ion.radon.repository.util;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;

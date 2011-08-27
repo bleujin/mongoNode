@@ -14,6 +14,7 @@ import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.NumberUtil;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.util.CipherUtil;
 import net.ion.radon.repository.util.JSONUtil;
 import net.sf.json.JSONObject;
 

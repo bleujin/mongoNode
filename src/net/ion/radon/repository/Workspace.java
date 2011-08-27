@@ -63,7 +63,7 @@ public class Workspace {
 		BasicDBList list = (BasicDBList) collection.group(keys.getDBObject(), conds.getDBObject(), initial.getDBObject(), reduce);
 		List<Node> nodes = ListUtil.newList();
 		for(Object obj : list){
-			nodes.add(NodeImpl.load((DBObject) obj));
+			nodes.add(NodeImpl.load(collection.getName(), (DBObject) obj));
 		}
 		return nodes;
 	}
@@ -113,14 +113,14 @@ public class Workspace {
 		final DBObject dbo = collection.findAndRemove(pfQuery.getDBObject());
 		if (dbo == null)
 			return null;
-		return NodeImpl.load(dbo);
+		return NodeImpl.load(collection.getName(), dbo);
 	}
 
 	NodeResult findAndOverwrite(IPropertyFamily query, Map<String, ?> props) {
 		DBObject find = collection.findOne(query.getDBObject());
 		if (find == null) return NodeResult.NULL;
 		
-		NodeImpl findNode = NodeImpl.load(find);
+		NodeImpl findNode = NodeImpl.load(collection.getName(), find);
 		findNode.clearProp(false);
 		
 		for (Entry<String, ?> entry : props.entrySet()) {
@@ -219,7 +219,7 @@ public class Workspace {
 				find.put(entry.getKey(), entry.getValue());
 			}
 			collection.save(find);
-			return NodeImpl.load(find);
+			return NodeImpl.load(collection.getName(), find);
 		} else {
 			collection.save(modNode.getDBObject()) ;
 			return modNode ;
@@ -229,7 +229,7 @@ public class Workspace {
 		final DBObject one = collection.findOne(af.getDBObject());
 		if (one == null)
 			return null;
-		return NodeImpl.load( one);
+		return NodeImpl.load(collection.getName(),  one);
 	}
 	
 	Node findByPath(String path) {
@@ -271,7 +271,7 @@ public class Workspace {
 	}
 	
 	Node getNodeById(String objectId) {
-		return NodeImpl.load(collection.findOne(PropertyQuery.createById(objectId).getDBObject()));
+		return NodeImpl.load(collection.getName(), collection.findOne(PropertyQuery.createById(objectId).getDBObject()));
 	}
 	
 	ReferenceManager getReferenceManager() {

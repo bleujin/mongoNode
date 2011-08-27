@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.db.procedure.IStringObject;
 import net.ion.framework.util.DateUtil;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.HashFunction;
@@ -29,6 +30,7 @@ import net.ion.framework.util.NumberUtil;
 import net.ion.framework.util.ObjectUtil;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.myapi.AradonQuery;
+import net.ion.radon.repository.util.CipherUtil;
 
 import org.bson.types.ObjectId;
 
@@ -74,8 +76,8 @@ public class NodeImpl implements Node {
 		return loadedNode;
 	}
 
-	static NodeImpl load(DBObject dbo) {
-		return load(Session.getCurrent().getCurrentWorkspaceName(), NodeObject.load(dbo));
+	static NodeImpl load(String workspaceName, DBObject dbo) {
+		return load(workspaceName, NodeObject.load(dbo));
 	}
 
 	private static boolean isSmallAlphaNumUnderBarComma(String str) {
@@ -163,6 +165,12 @@ public class NodeImpl implements Node {
 		return putProperty(PropertyId.create(key), val);
 	}
 
+	public synchronized Node put(String key, IStringObject is) {
+		if (is == null) return put(key, (Object)is) ;
+		return put(key, is.getString());
+	}
+
+	
 	private synchronized Node putProperty(PropertyId propId, Object val) {
 		nobject.putProperty(propId, val);
 		getSession().notify(this, NodeEvent.UPDATE);

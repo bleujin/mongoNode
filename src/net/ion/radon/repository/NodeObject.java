@@ -3,6 +3,7 @@ package net.ion.radon.repository;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.StringUtil;
@@ -38,6 +39,14 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		NodeObject newObject = create() ;
 		newObject.put(key, value) ;
 		
+		return newObject;
+	}
+
+	public static NodeObject load(Map<String, ?> values) {
+		NodeObject newObject = new NodeObject() ;
+		for(Entry<String, ?> entry : values.entrySet()){
+			newObject.put(entry.getKey(), entry.getValue()) ;
+		}
 		return newObject;
 	}
 	

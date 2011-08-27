@@ -13,7 +13,7 @@ public class InListQueryNode {
 	private PropertyQuery outquery ;
 	
 	private InListQueryNode(String field, Session session, PropertyQuery outquery) {
-		this.field = field ;
+		this.field = field.toLowerCase() ;
 		this.session = session ;
 		this.outquery = outquery ;
 	}
@@ -40,7 +40,7 @@ public class InListQueryNode {
 
 	public NodeResult push(Map<String, ?> values) {
 		BasicDBObject dbo = new BasicDBObject() ;
-		dbo.put(field, values) ;
+		dbo.put(field, NodeObject.load(values).getDBObject()) ;
 		
 		return session.getCurrentWorkspace().push(outquery, dbo) ;
 	}
