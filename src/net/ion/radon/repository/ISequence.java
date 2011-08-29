@@ -2,6 +2,7 @@ package net.ion.radon.repository;
 
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.ion.framework.util.MapUtil;
 
@@ -14,26 +15,27 @@ public class ISequence {
 	private Workspace workspace  ;
 	private String seqId ;
 	private Node seqNode ;
-	private Vector<Long> stack = new Vector<Long>(); 
 	private int cacheCount = DEFAULT_CACHE_COUNT;
 	private static final int DEFAULT_CACHE_COUNT = 10;
 	private final String PROP_ID = "seq";
-	private volatile long currVal = 0; 
+	private AtomicLong currVal ; 
+	private AtomicLong cacheLimit ;
 
 	private ISequence(Workspace workspace, String seqId) {
 		this.workspace = workspace ;
 		this.seqId = seqId ;
 		this.seqNode = findNode();
+		this.currVal = new AtomicLong(Long.parseLong(seqNode.getString(PROP_ID))) ;
+		this.cacheLimit = new AtomicLong(this.currVal.get() + cacheCount) ;
 	}
 
 	private Node findNode() {
 		Node result =  workspace.findByPath("/" + this.seqId);
 		if(result == null){
 			result = workspace.newNode(seqId);
-			result.put(PROP_ID, 0);
+			result.put(PROP_ID, 0L);
 			workspace.save(result) ;
 		}
-		this.currVal = currVal() ;
 		return result ;
 	}
 
@@ -55,13 +57,13 @@ public class ISequence {
 	}
 	
 	public long currVal() {
-		return currVal ;
+		return currVal.get() ;
 	}
 
 	public synchronized void reset() {
 		seqNode.put(PROP_ID, 0L) ;
-		stack.clear() ;
-		this.currVal = 0L ;
+		this.currVal = new AtomicLong() ;
+		this.cacheLimit = new AtomicLong(cacheCount) ;
 		save();
 	}
 
@@ -70,17 +72,15 @@ public class ISequence {
 	}
 
 	public synchronized long nextVal() {
-		if (stack.isEmpty()) {
-			final long currVal = currVal();
-			seqNode.put(PROP_ID, currVal + cacheCount) ;
-			for (int i = 1; i <= cacheCount; i++) {
-				stack.add(currVal + i) ;
+		if (currVal.get() >= cacheLimit.get()) {
+			for (int i = 0; i < cacheCount; i++) {
+				cacheLimit.incrementAndGet() ;
 			}
+			seqNode.put(PROP_ID, currVal.get() + cacheCount) ;
 			save();
 			return nextVal() ;
 		} else {
-			this.currVal = stack.remove(0) ;
-			return this.currVal ;
+			return this.currVal.incrementAndGet() ;
 		}
 	}
 
@@ -88,8 +88,8 @@ public class ISequence {
 		return cacheCount ;
 	}
 	
-	int getCacheRemained() {
-		return stack.size() ;
+	long getCacheRemained() {
+		return cacheLimit.get() - currVal.get() ;
 	}
 	
 	
