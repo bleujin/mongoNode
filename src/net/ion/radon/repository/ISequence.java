@@ -18,7 +18,7 @@ public class ISequence {
 	private int cacheCount = DEFAULT_CACHE_COUNT;
 	private static final int DEFAULT_CACHE_COUNT = 10;
 	private final String PROP_ID = "seq";
-	private long currVal = 0; 
+	private volatile long currVal = 0; 
 
 	private ISequence(Workspace workspace, String seqId) {
 		this.workspace = workspace ;
