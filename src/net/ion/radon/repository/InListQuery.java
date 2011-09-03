@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.ListUtil;
-import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.innode.AndFilter;
 import net.ion.radon.repository.innode.BetweenFilter;
@@ -36,8 +36,7 @@ public class InListQuery {
 
 	private List<InNodeFilter> filters = ListUtil.newList() ;
 	private List<NodeSort> sorts = ListUtil.newList() ;
-	private Map<String, Object> modValues = MapUtil.newMap() ;
-	
+
 	private InListQuery(NodeObject nobject, String pname, Node parent) {
 		this.nobject = nobject ;
 		this.pname = pname ;
@@ -93,12 +92,6 @@ public class InListQuery {
 		return this ;
 	}
 
-	public InListQuery put(String path, Object value) {
-		modValues.put(path, value) ;
-		return this;
-	}
-
-	
 	
 	static InListQuery create(NodeObject nobject, String pname, Node parent) {
 		return new InListQuery(nobject, pname, parent);
@@ -142,23 +135,23 @@ public class InListQuery {
 		return count ;
 	}
 
-	public int update() {
+	public int update(ChainMap cmap) {
+		return update(cmap.toMap()) ;
+	}
+	
+	public int update(Map<String, Object> modValues) {
 		List<InNode> founds = find() ;
 		for (InNode inode : founds) {
 			for (Entry<String, Object> entry : modValues.entrySet()) {
 				inode.put(entry.getKey(), entry.getValue()) ;
 			}
 		}
+		
+//		parent.getSession().createQuery().id(parent.getIdentifier()).inlist(this.pname).push(modValues) ;
 		parent.getSession().notify(parent, NodeEvent.UPDATE);
-		modValues.clear() ;
 		return founds.size() ;
 	}
 
-	
-
-	
-	
-	
 	
 	
 	private List<InNode> myfind(PageBean page){

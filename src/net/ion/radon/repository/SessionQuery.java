@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
-import net.ion.framework.util.MapUtil;
+import net.ion.framework.util.ChainMap;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.AradonQuery;
 
@@ -21,7 +21,6 @@ public class SessionQuery {
 	
 	private PropertyQuery inner = PropertyQuery.create();
 	private PropertyFamily sort = PropertyFamily.create() ;
-	private Map<String, Object> modValues = MapUtil.newMap() ;
 
 	private SessionQuery(Session session){
 		this.session = session ;
@@ -214,13 +213,11 @@ public class SessionQuery {
 		return inner ;
 	}
 
-	
-	public SessionQuery put(String path, Object value) {
-		modValues.put(path, value) ;
-		return this;
+	public NodeResult update(ChainMap modValues){
+		return update(modValues.toMap()) ;
 	}
 
-	public NodeResult update(){
+	public NodeResult update(Map<String, ?> modValues){
 		NodeResult nodeResult = workspace.update(inner, modValues);
 		session.setLastResult(nodeResult) ;
 		return nodeResult ;

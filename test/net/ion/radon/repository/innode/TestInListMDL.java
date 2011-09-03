@@ -1,14 +1,11 @@
 package net.ion.radon.repository.innode;
 
-import java.util.Collections;
 import java.util.List;
 
-import net.ion.framework.util.Debug;
+import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
-import net.ion.radon.repository.TestBaseRepository;
-import net.sf.json.JSONObject;
 
 public class TestInListMDL extends  TestBaseInListQuery{
 	
@@ -66,6 +63,32 @@ public class TestInListMDL extends  TestBaseInListQuery{
 		assertEquals(2, newFound.inner("people").createQuery().eq("index", 4).find().size()) ;
 	}
 	
+	public void testInListNodeUpdate() throws Exception {
+		createNode();
+		Node found = session.createQuery().findOne() ;
+		found.inlist("people").createQuery().gte("index", 3).update(MapUtil.chainMap().put("coffie", "top").put("index", 4)) ;
+		
+		assertEquals(2, found.inlist("people").createQuery().exist("coffie").find().size()) ;
+		session.commit() ;
+		
+		Node newFound = session.createQuery().findOne() ;
+		assertEquals(2, newFound.inlist("people").createQuery().exist("coffie").find().size()) ;
+		assertEquals(2, newFound.inlist("people").createQuery().eq("index", 4).find().size()) ;
+	}
+
+	public void testPush() throws Exception {
+		session.newNode() ;
+		session.commit() ;
+		
+		Node newNode = session.createQuery().findOne() ;
+		newNode.inlist("message").push(MapUtil.<String, Object>chainMap().put("greeting", "red").toMap());
+		session.commit() ;
+
+		newNode.inlist("message").push(MapUtil.<String, Object>chainMap().put("greeting", "red").toMap());
+		session.commit() ;
+
+		assertEquals(2, session.createQuery().findOne().inlist("message").createQuery().find().size()) ;
+	}
 	
 
 

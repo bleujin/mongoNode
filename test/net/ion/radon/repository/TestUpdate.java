@@ -69,7 +69,7 @@ public class TestUpdate extends TestBaseRepository{
 	public void testFindMultiUpdate() throws Exception {
 		Node savedNode = createTestNode() ;
 		
-		session.createQuery().eq("name", "bleujin").put("location", "seoul").update() ;
+		session.createQuery().eq("name", "bleujin").update(MapUtil.chainMap().put("location", "seoul")) ;
 		// confirm
 		session.logout() ;
 		Session newSession = rc.testLogin("test", WORKSPACE_NAME) ;
@@ -95,7 +95,7 @@ public class TestUpdate extends TestBaseRepository{
 		createTestNode() ;
 		createTestNode() ;
 		
-		NodeResult result = session.createQuery().eq("name", "bleujin").put("location", "seoul").update() ;
+		NodeResult result = session.createQuery().eq("name", "bleujin").update(MapUtil.chainMap().put("location", "seoul")) ;
 		
 		assertEquals(true, result.getErrorMessage() == null);
 		

@@ -4,6 +4,7 @@ import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Node;
+import net.ion.radon.repository.NodeResult;
 import net.ion.radon.repository.PropertyQuery;
 
 public class TestInListNodeQuery extends TestBaseInListQuery{
@@ -52,7 +53,9 @@ public class TestInListNodeQuery extends TestBaseInListQuery{
 		
 		assertEquals(1, session.createQuery().eq("name", "bleujin").findOne().inlist("greeting").createQuery().find().size()) ;
 		assertEquals(1, session.createQuery().eq("name", "hero").findOne().inlist("greeting").createQuery().find().size()) ;
+		Debug.debug(1, session.createQuery().eq("name", "hero").findOne().inlist("greeting").createQuery().findOne().get("eng")) ;
 	}
+	
 	
 	public void testCaseInSensitive() throws Exception {
 		session.newNode().put("name", "bleujin") ;
@@ -62,11 +65,10 @@ public class TestInListNodeQuery extends TestBaseInListQuery{
 		session.createQuery().inlist("Greeting").push(MapUtil.create("ENG", "hello")) ;
 
 		assertEquals(1, session.createQuery().eq("name", "bleujin").findOne().inlist("greeting").createQuery().find().size()) ;
-		assertEquals(1, session.createQuery().eq("name", "bleujin").findOne().inlist("GrEEting").createQuery().find().size()) ;
+		assertEquals(1, session.createQuery().eq("name", "bleujin").findOne().inlist("Greeting").createQuery().find().size()) ;
 		Debug.debug(session.createQuery().eq("name", "bleujin").findOne().inlist("Greeting").createQuery().findOne()) ;
 		assertEquals("hello", session.createQuery().eq("name", "bleujin").findOne().inlist("Greeting").createQuery().findOne().getString("Eng")) ;
 	}
-	
 	
 	
 	public void testDepth() throws Exception {
@@ -78,6 +80,17 @@ public class TestInListNodeQuery extends TestBaseInListQuery{
 		Node node = session.createQuery().findOne() ;
 		assertEquals("bleujin", node.inlist("person").createQuery().findOne().get("name")) ;
 		assertEquals("seoul", node.inlist("person").createQuery().findOne().get("address.city")) ;
+		
+	}
+	
+	public void testInListUpdate() throws Exception {
+		session.newNode().put("name", "bleujin") ;
+		session.commit() ;
+		NodeResult result = session.createQuery().eq("name", "bleujin").update(MapUtil.chainMap().put("working", true)) ;
+		
+		Debug.line(result, result.getRowCount(), result.getErrorMessage()) ;
+		
+		session.createQuery().find().debugPrint(PageBean.ALL) ;
 		
 	}
 	
