@@ -161,9 +161,10 @@ public class PropertyQuery implements IPropertyFamily{
 		return this ;
 	}
 	
-	public PropertyQuery between(String key, String openValue, String closeValue) {
-		nobject.put(key, new BasicDBObject("$gt", openValue)) ;
-		nobject.put(key, new BasicDBObject("$lt", closeValue)) ;
+	public PropertyQuery between(String key, Object openValue, Object closeValue) {
+		BasicDBObject dbo = new BasicDBObject("$gte", openValue) ;
+		dbo.put("$lte", closeValue) ;
+		nobject.put(key, dbo) ;
 		return this;
 	}
 
@@ -176,6 +177,11 @@ public class PropertyQuery implements IPropertyFamily{
 	
 	public PropertyQuery isNotExist(String key) {
 		nobject.put(key, new BasicDBObject("$exists", false)) ;
+		return this ;
+	}
+
+	public PropertyQuery where(String where) {
+		nobject.put("$where", where) ;
 		return this ;
 	}
 

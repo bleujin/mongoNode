@@ -1,5 +1,6 @@
 package net.ion.radon.repository;
 
+import net.ion.framework.util.DateUtil;
 import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
 
@@ -114,6 +115,88 @@ public class TestQueryOperator extends TestBaseRepository {
 		SessionQuery query = createQuery().regEx("path", "^\\/\\w*$");
 		Debug.debug(query) ;
 		query.find().debugPrint(PageBean.ALL) ;
+		
+	}
+	
+	public void testBetween() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("age", 20) ;
+		session.commit() ;
+		
+		assertEquals(1, session.createQuery().lt("age", 30).find().count()) ;
+		assertEquals(0, session.createQuery().lt("age", 19).find().count()) ;
+		
+		assertEquals(0, session.createQuery().gt("age", 30).find().count()) ;
+		assertEquals(1, session.createQuery().gt("age", 19).find().count()) ;
+
+		assertEquals(0, session.createQuery().lte("age", 19).find().count()) ;
+		assertEquals(1, session.createQuery().lte("age", 20).find().count()) ;
+		assertEquals(1, session.createQuery().lte("age", 21).find().count()) ;
+		
+		assertEquals(1, session.createQuery().gte("age", 19).find().count()) ;
+		assertEquals(1, session.createQuery().gte("age", 20).find().count()) ;
+		assertEquals(0, session.createQuery().gte("age", 21).find().count()) ;
+		
+		assertEquals(1, session.createQuery().where("this.age < 25").find().count()) ;
+		assertEquals(1, session.createQuery().where("this.age > 19").find().count()) ;
+		// assertEquals(1, session.createQuery().where("this.age > 19 and this.age < 25").find().count()) ; .. is not permitted. use and operator
+
+		
+		assertEquals(1, session.createQuery().between("age", 20, 25).find().count()) ;
+		assertEquals(1, session.createQuery().between("age", 19, 25).find().count()) ;
+		assertEquals(0, session.createQuery().between("age", 17, 19).find().count()) ;
+//		assertEquals(0, session.createQuery().between("age", 24, 25).find().count()) ;
+
+	}
+	
+	public void testWhere() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("age", 20) ;
+		session.commit() ;
+
+		assertEquals(0, session.createQuery().where("this.age < 20").find().count()) ;
+		assertEquals(0, session.createQuery().where("this.age < this.age").find().count()) ;
+		assertEquals(1, session.createQuery().where("this.age <= this.age").find().count()) ;
+		assertEquals(0, session.createQuery().where("this.age > this.age").find().count()) ;
+		assertEquals(1, session.createQuery().where("this.age >= this.age").find().count()) ;
+
+		assertEquals(0, session.createQuery().where("this.age != this.age").find().count()) ;
+	}
+	
+	public void testBetween2() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("age", 20) ;
+		session.commit() ;
+
+		assertEquals(0, session.createQuery().between("age", 24, 25).find().count()) ;
+	}
+	
+	public void testDate() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("birthDate", DateUtil.stringToDate("20100101-000000")) ;
+		session.commit() ;
+		
+		session.createQuery().between("birthDate", DateUtil.stringToDate("20111111-000000"), DateUtil.stringToDate("20121111-000000")).find().debugPrint(PageBean.ALL) ;
+		Debug.line() ;
+		session.createQuery().gt("birthDate", DateUtil.stringToDate("20111111-000000")).lt("birthDate", DateUtil.stringToDate("20121111-000000")).find().debugPrint(PageBean.ALL) ;
+	}
+
+	public void testDateLessThen() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("birthDate", DateUtil.stringToDate("20120101-000000")) ;
+		session.commit() ;
+		
+		assertEquals(0, session.createQuery().lt("birthDate", DateUtil.stringToDate("20111111-000000")).find().count()) ;
+		assertEquals(1, session.createQuery().lt("birthDate", DateUtil.stringToDate("20131111-000000")).find().count()) ;
+	}
+
+	public void testDateGreaterThen() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("birthDate", DateUtil.stringToDate("20120101-000000")) ;
+		session.commit() ;
+		
+		assertEquals(1, session.createQuery().gt("birthDate", DateUtil.stringToDate("20111111-000000")).find().count()) ;
+		assertEquals(0, session.createQuery().gt("birthDate", DateUtil.stringToDate("20131111-000000")).find().count()) ;
 		
 	}
 

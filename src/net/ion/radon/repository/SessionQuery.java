@@ -117,8 +117,7 @@ public class SessionQuery {
 	}
 
 	public SessionQuery between(String key, Object open, Object close ){
-		inner.gte(key, open);
-		inner.lte(key, close);
+		inner.between(key, open, close);
 		return this;
 	}
 	public SessionQuery gte(String key, Object value) { // key >= val
@@ -234,6 +233,11 @@ public class SessionQuery {
 
 	public InListQueryNode inlist(String field) {
 		return InListQueryNode.create(field, session, this.inner) ;
+	}
+
+	public SessionQuery where(String where ){
+		inner.where(where);
+		return this;
 	}
 
 
