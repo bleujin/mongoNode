@@ -68,8 +68,6 @@ public interface Node extends IPropertyFamily, INode {
 
 	public long getLastModified();
 
-	public void updateLastModified();
-
 	public InListNode inlist(String name);
 
 	public boolean isSaved();

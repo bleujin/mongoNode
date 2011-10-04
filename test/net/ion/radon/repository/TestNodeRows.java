@@ -4,13 +4,9 @@ import java.sql.Date;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.List;
 
-import net.ion.framework.db.IONXmlWriter;
 import net.ion.framework.db.Rows;
 import net.ion.framework.db.procedure.Queryable;
-import net.ion.framework.util.Debug;
-import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.myapi.ICursor;
 
@@ -85,9 +81,6 @@ public class TestNodeRows extends TestBaseRepository {
 		assertEquals(3, rows.getRowCount());
 	}
 
-	
-	
-	
 	private Node makeRows() {
 		Node parent = session.newNode("hello");
 		parent.createChild("child1").put("key", "child1");
@@ -144,8 +137,6 @@ public class TestNodeRows extends TestBaseRepository {
 		assertEquals(5, rows.getMetaData().getColumnCount());
 		assertEquals("deptno",rows.getMetaData().getColumnName(3));
 		
-		Debug.debug(rows) ;
-		
 		assertEquals(20, rows.firstRow().getObject("deptno")) ;
 		assertEquals(20, rows.firstRow().getObject("dno")) ;
 	}
@@ -162,7 +153,7 @@ public class TestNodeRows extends TestBaseRepository {
 		NodeColumns columns = NodeColumns.create(Column.parse("key mykey"), Column.nvl("p1", "p2", "p"), Column.constant(1, "c"));
 		Rows rows = NodeRows.createByCursor(Queryable.Fake, session.createQuery().find(), columns) ;
 	
-		Debug.debug(rows) ;
+		assertEquals(3, rows.getRowCount()) ;
 	}
 	
 	public void testColumn() throws Exception {

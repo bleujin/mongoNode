@@ -143,7 +143,6 @@ public final class NodeFileObject extends AbstractFileObject {
 	}
 
 	protected boolean doSetLastModTime(long modtime) throws Exception {
-		currentNode.updateLastModified() ;
 		return true;
 	}
 

@@ -1,11 +1,9 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 import net.ion.radon.repository.myapi.ICursor;
 
 public class TestRootNode extends TestBaseRepository{
 
-	
 	public void testGet() throws Exception {
 		Node root = session.getRoot() ;
 		
@@ -35,6 +33,5 @@ public class TestRootNode extends TestBaseRepository{
 		
 		assertEquals(true, node == session.getRoot()) ;
 	}
-	
 	
 }

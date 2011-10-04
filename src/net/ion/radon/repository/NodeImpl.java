@@ -15,19 +15,18 @@ import static net.ion.radon.repository.NodeConstants.UID;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.db.procedure.IStringObject;
-import net.ion.framework.util.DateUtil;
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.HashFunction;
 import net.ion.framework.util.NumberUtil;
-import net.ion.framework.util.ObjectUtil;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.util.CipherUtil;
@@ -39,6 +38,7 @@ import com.mongodb.DBObject;
 
 public class NodeImpl implements Node {
 
+	private static final long serialVersionUID = -9085850570829905483L;
 	private transient Session session ;
 	private NodeObject nobject;
 	private String workspaceName;
@@ -60,6 +60,7 @@ public class NodeImpl implements Node {
 
 		result.nobject.put(PATH, makePath(parentPath, name));
 		result.nobject.put(NAME, name);
+		result.setAradonId("__empty", result.getIdentifier()) ;
 
 		result.notify(NodeEvent.CREATE);
 		return result;
@@ -77,6 +78,7 @@ public class NodeImpl implements Node {
 	}
 
 	static NodeImpl load(String workspaceName, DBObject dbo) {
+		if (dbo == null) return null ;
 		return load(workspaceName, NodeObject.load(dbo));
 	}
 
@@ -102,7 +104,11 @@ public class NodeImpl implements Node {
 
 
 	public Session getSession() {
-		return ObjectUtil.coalesce(session, Session.getCurrent());
+		if (session != null){
+			return session ;
+		} else {
+			return Session.getCurrent() ;
+		}
 	}
 
 	// @TODO if prop has '.' 
@@ -128,7 +134,6 @@ public class NodeImpl implements Node {
 	
 	private Serializable getByType(String propId) {
 		ReferenceTaragetCursor cursor = getSession().createRefQuery().to(this, StringUtil.substringBefore(propId, ".")).find();
-		Debug.line(cursor.count());
 		Node refNode = cursor.next();
 		return refNode.get(StringUtil.substringAfterLast(propId, "."));
 	}
@@ -162,15 +167,9 @@ public class NodeImpl implements Node {
 	}
 
 	public synchronized Node put(String key, Object val) {
-		return putProperty(PropertyId.create(key), val);
+		return putProperty(PropertyId.create(key), (val != null && val instanceof IStringObject) ? ((IStringObject)val).getString() : val );
 	}
 
-	public synchronized Node put(String key, IStringObject is) {
-		if (is == null) return put(key, (Object)is) ;
-		return put(key, is.getString());
-	}
-
-	
 	private synchronized Node putProperty(PropertyId propId, Object val) {
 		nobject.putProperty(propId, val);
 		getSession().notify(this, NodeEvent.UPDATE);
@@ -197,7 +196,7 @@ public class NodeImpl implements Node {
 		}
 
 		if (_dbo.get(CREATED) == null) {
-			setCreated(Calendar.getInstance());
+			setCreated(GregorianCalendar.getInstance());
 		}
 
 		if (_dbo.get(OWNER) == null) {
@@ -207,9 +206,8 @@ public class NodeImpl implements Node {
 	}
 
 	private void setCreated(Calendar c) {
-		putProperty(PropertyId.reserved(LASTMODIFIED), System.currentTimeMillis()) ;
-		putProperty(PropertyId.reserved(CREATED), DateUtil.calendarToString(c));
-		putProperty(PropertyId.reserved(TIMEZONE), c.getTimeZone().getID());
+		putProperty(PropertyId.reserved(CREATED), c.getTimeInMillis());
+		putProperty(PropertyId.reserved(TIMEZONE), TimeZone.getDefault().toString());
 	}
 
 	private void setOwner(String owner) {
@@ -418,11 +416,8 @@ public class NodeImpl implements Node {
 	}
 
 	public long getLastModified() {
-		return  Long.valueOf(getString(LASTMODIFIED)) ;
-	}
-
-	public void updateLastModified() {
-		putProperty(PropertyId.reserved(LASTMODIFIED), System.currentTimeMillis()) ; ;
+		final String str = StringUtil.toString(get(LASTMODIFIED));
+		return NumberUtil.isNumber(str) ? Long.parseLong(str) : 0L;
 	}
 
 	public InListNode inlist(String name) {
@@ -432,7 +427,6 @@ public class NodeImpl implements Node {
 	public boolean isSaved(){
 		return !session.getModified().contains(this) ;
 	}
-
 }
 
 class MyBasicDBList extends BasicDBList implements Comparable {

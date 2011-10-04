@@ -63,7 +63,6 @@ class NodeFileData implements Serializable {
 
 		JSONObject jsonObject = NodeFileUtil.toJSONObject(getBuffer());
 		Node node = session.mergePath(name.getNodePath(), jsonObject) ;
-		node.updateLastModified();
 		session.commit();
 		this.buffer = new byte[0] ;
 	}

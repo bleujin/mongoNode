@@ -10,7 +10,7 @@ import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.myapi.ICursor;
 
-public class TestNodeReference extends TestBaseRepository {
+public class TestAdvanceRelation extends TestBaseRepository {
 	
 	
 	@Override
@@ -89,7 +89,7 @@ public class TestNodeReference extends TestBaseRepository {
 		bleujin.addReference("dept", AradonQuery.newByGroupId("dept", "dev")) ;
 		session.commit() ;
 		
-		Node findDept = session.createQuery().findOneAtRepository("dept", "dev") ;
+		Node findDept = session.createQuery().findOneInDB("dept", "dev") ;
 		
 		session.changeWorkspace("eworkspace") ;
 		

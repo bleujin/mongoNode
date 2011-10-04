@@ -6,8 +6,6 @@ import net.ion.radon.core.PageBean;
 
 public class TestSequence extends TestBaseRepository{
 
-	
-	
 	public void testInit() throws Exception {
 		ISequence seq = session.getSequence("test", "bleujin");
 		seq.reset() ;
@@ -40,7 +38,6 @@ public class TestSequence extends TestBaseRepository{
 		}
 	}
 
-	
 	public void testUse() throws Exception {
 		session.changeWorkspace("my") ;
 		session.dropWorkspace() ;
@@ -53,8 +50,24 @@ public class TestSequence extends TestBaseRepository{
 		assertEquals(1, session.createQuery().find().count() );
 
 		assertEquals(true, session.changeWorkspace("_sequence").createQuery().findByPath("/my_num") != null) ;
-
 	}
 	
+	
+	public void xtestCacheLimit() throws Exception {
+		session.changeWorkspace("my") ;
+		session.dropWorkspace() ;
+		
+		ISequence seq = session.getSequence("my", "test") ;
+		
+		for (int i = 0; i < 5 ; i++) {
+			Debug.line(seq.nextVal()) ;
+		}
+	}
+
+	
+	public void xtestGetCache() throws Exception {
+		ISequence seq = session.getSequence("my", "test") ;
+		Debug.line(seq.currVal()) ;
+	}
 	
 }

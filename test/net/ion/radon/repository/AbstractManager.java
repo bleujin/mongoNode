@@ -30,7 +30,8 @@ public abstract class AbstractManager<T extends AbstractORM> {
 	public T findById(T p) {
 		try {
 			IDRow<T> idRow = getIDRow(p);
-			Node node = session.createQuery().findOneAtRepository(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());
+			
+			Node node = session.createQuery().findOneInDB(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());
 
 			Class<? extends AbstractORM> clz = p.getClass();
 			AbstractORM result = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
@@ -50,7 +51,7 @@ public abstract class AbstractManager<T extends AbstractORM> {
 	public boolean save(T p) {
 		IDRow<T> idRow = getIDRow(p);
 
-		Node foundNode = session.createQuery().findOneAtRepository(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());
+		Node foundNode = session.createQuery().findOneInDB(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());
 		if (foundNode == null) {
 			foundNode = NodeImpl.create(wsname, p.getNodeObject(), idRow.getGroupNm(), p.getString(idRow.getKey()));
 			foundNode.setAradonId(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());

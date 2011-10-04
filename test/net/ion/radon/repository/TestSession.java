@@ -2,38 +2,38 @@ package net.ion.radon.repository;
 
 import java.net.UnknownHostException;
 
-import junit.framework.TestCase;
-
 import org.bson.types.ObjectId;
 
 import com.mongodb.MongoException;
 
+import junit.framework.TestCase;
+
 public class TestSession extends TestCase{
 	
-	
-	public void testLoadRepository() throws Exception {
-
-		RepositoryCentral rc1 = RepositoryCentral.create("61.250.201.78", 27017) ;
-		RepositoryCentral rc2 = RepositoryCentral.create("61.250.201.78", 27017) ;
+	public void testParentChild2() throws Exception {
+		RepositoryCentral rc = RepositoryCentral.testCreate() ;
+		Session session =  rc.testLogin("abcd") ;
+		Node work1 = session.newNode();
+		work1.put("name", "bleu");
 		
-		assertTrue(rc1.getMongo() == rc2.getMongo()) ;
+		assertTrue(session == work1.getSession());
 	}
-	
-	public void testSession() throws Exception {
 
-		RepositoryCentral rc = RepositoryCentral.create("61.250.201.78", 27017) ;
-		Session session1 =  rc.testLogin("test", "abcd") ;
-		Session session2 =  rc.testLogin("test", "abcd") ;
+	public void testSameSessionInSameThread() throws Exception {
+
+		RepositoryCentral rc = RepositoryCentral.testCreate() ;
+		Session session1 =  rc.testLogin("abcd") ;
+		Session session2 =  rc.testLogin("abcd") ;
 		
 		assertTrue(session1 == session2) ;
 	}
 	
 	public void testSessionLogout() throws Exception {
 
-		RepositoryCentral rc = RepositoryCentral.create("61.250.201.78", 27017) ;
-		Session session1 =  rc.testLogin("test", "abcd") ;
+		RepositoryCentral rc = RepositoryCentral.testCreate() ;
+		Session session1 =  rc.testLogin("abcd") ;
 		session1.logout() ;
-		Session session2 =  rc.testLogin("test", "abcd") ;
+		Session session2 =  rc.testLogin("abcd") ;
 		
 		assertTrue(session1 != session2) ;
 	}

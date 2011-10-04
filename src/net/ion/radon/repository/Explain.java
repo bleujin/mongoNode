@@ -1,5 +1,7 @@
 package net.ion.radon.repository;
 
+import net.ion.framework.util.StringUtil;
+
 import com.mongodb.DBObject;
 
 public class Explain {
@@ -22,8 +24,8 @@ public class Explain {
 	}
 
 	public String useIndexName() {
-		return dbo.get("cursor").toString();
+		return StringUtil.substringAfter(dbo.get("cursor").toString(), " ");
 	}
-	
+
 
 }

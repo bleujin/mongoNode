@@ -10,25 +10,30 @@ import org.bson.types.ObjectId;
 
 public class TestWorkspace extends TestBaseRepository{
 	
-	public void testConnect() throws Exception {
-
-		Node node = session.newNode("bleujin") ;
-		node.setAradonId("test", "bleujin") ;
-		node.put("name", "bleujin") ;
-		node.put("address", "seoul") ;
+	
+	public void testWorkspace2() throws Exception {
 		
-		NodeCursor nc = session.createQuery().find() ;
-		NodeScreen ns = nc.screen(PageBean.create(10, 1)) ;
+		Node work1 = session.newNode();
+		work1.put("name", "bleu");
+
+		session.changeWorkspace(WORKSPACE_NAME + "1");
+		session.dropWorkspace();
+		
+		Node work2 = session.newNode();
+		work2.put("name", "heeya");
 		
 		session.commit();
-		Debug.debug(ns.getPageMap()) ;
+		
+		session.changeWorkspace(WORKSPACE_NAME);
+		Node result = session.createQuery().id(work1.getIdentifier()).findOne();
+		assertEquals("bleu", result.getString("name"));
+		
+		session.changeWorkspace(WORKSPACE_NAME + "1");
+		result = session.createQuery().id(work2.getIdentifier()).findOne();
+		assertEquals("heeya", result.getString("name"));
 	}
 	
-	public void testFind() throws Exception {
-		Node find = session.createQuery().aradonGroupId(NodeConstants.ID, new ObjectId("4d899294ad9f4bb963749534")).findOne() ;
-		
-		Debug.debug(find) ;
-	}
+	
 	
 	public void testReference() throws Exception {
 		
@@ -48,7 +53,6 @@ public class TestWorkspace extends TestBaseRepository{
 		final ReferenceTaragetCursor findReference = session.createRefQuery().from(newNode).find();
 		Debug.debug(findReference.size()) ;
 		List<Node> nodes = findReference.toList(PageBean.ALL) ;
-		Debug.debug(nodes.get(0)) ;
 		
 	}
 	
@@ -67,54 +71,17 @@ public class TestWorkspace extends TestBaseRepository{
 	
 	public void testConplict() throws Exception {
 		
-		session.newNode("name");
+		session.newNode("bleujin").put("name", "bleujin");
 		session.commit();
 		
 		try{
-			session.newNode("name") ;
+			session.newNode("bleujin").put("name", "hero") ;
+			int count = session.commit() ;
+			
 			fail();
 		}catch(RepositoryException e){
 		}
 	}
-	
-	public void testPath() throws Exception {
-		Node newNode = session.newNode("name") ;
-		assertEquals("/name", newNode.getPath()) ;
-		
-		Node child = newNode.createChild("child") ;
-		assertEquals("/name/child", child.getPath()) ;
-		
-		
-		try {
-			newNode.createChild("/child") ;
-			fail() ;
-		} catch(IllegalArgumentException ignore) {
-		}
-	}
-
-	
-	public void testFindByPath() throws Exception {
-		
-		Node newNode = session.newNode("name") ;
-		
-		
-		Node child = newNode.createChild("child") ;
-		child.append("name", "bleujin") ;
-		session.commit();
-		
-		Node load = session.createQuery().findByPath("/name/child") ;
-		assertEquals("bleujin", load.getString("name")) ;
-		
-		
-		Node gchild = load.createChild("gchild") ;
-		gchild.append("name", "hero") ;
-		session.commit();
-		
-		Node gload = session.createQuery().findByPath("/name/child/gchild") ;
-		assertEquals("hero", gload.getString("name")) ;
-		
-	}
-	
 	public void testWorkspace() throws Exception {
 		Node newNode = session.newNode("name") ;
 		Node child = newNode.createChild("child") ;
@@ -144,6 +111,9 @@ public class TestWorkspace extends TestBaseRepository{
 		assertEquals("heeya", load1.getString("name")) ;
 		
 	}
+	
+
+	
 	
 	
 	

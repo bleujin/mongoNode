@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import com.mongodb.DBObject;
 
 public class ReferenceNode {
 
@@ -22,8 +21,8 @@ public class ReferenceNode {
 	}
 
 	public AradonId getSourceAradonId() {
-		DBObject dbo = (DBObject) refNode.get(ReferenceManager.SRC_ARADON);
-		return AradonId.load(dbo);
+		InNode innode = (InNode) refNode.get(ReferenceManager.SRC_ARADON);
+		return AradonId.load(innode.getDBObject());
 
 	}
 

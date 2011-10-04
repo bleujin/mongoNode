@@ -37,11 +37,11 @@ public class RepositoryCentral {
 	}
 
 	public static RepositoryCentral testCreate() throws UnknownHostException, MongoException {
-		return create("61.250.201.78", 27017);
+		return create("127.0.0.1", 27017);
 	}
 
 	public static RepositoryCentral testCreate(String dbName) throws UnknownHostException, MongoException {
-		return create("61.250.201.78", 27017).changeDB(dbName);
+		return create("127.0.0.1", 27017).changeDB(dbName);
 	}
 	
 	public static RepositoryCentral create(String host, int port) throws UnknownHostException, MongoException {

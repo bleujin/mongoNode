@@ -1,12 +1,14 @@
 package net.ion.radon.repository;
 
 import static net.ion.radon.repository.NodeConstants.ID;
+import static net.ion.radon.repository.NodeConstants.PATH;
 
 import java.util.List;
 import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.ChainMap;
+import net.ion.framework.util.StringUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.AradonQuery;
 
@@ -31,9 +33,9 @@ public class SessionQuery {
 		return new SessionQuery(session);
 	}
 	
-	public NodeCursor findByAradonId(String groupId, Object uid){
+	public Node findByAradonId(String groupId, Object uid){
 		inner.put(AradonQuery.newByGroupId(groupId, uid)) ;
-		return find() ;
+		return findOne() ;
 	}
 	
 	public Node findByPath(String path) {
@@ -44,30 +46,38 @@ public class SessionQuery {
 				return node;
 			}
 		}
-
-		return workspace.findByPath(newPath);
+		
+		return workspace.findOne(PropertyQuery.create(PATH, newPath), Columns.ALL);
 	}
 	
 	boolean existByPath(String path) {
-		Node target = null ;
 		String newPath = (path != null && path.startsWith("/")) ? path : "/" + path ;
-		if ("/".equals(newPath)) target = session.getRoot() ;
-		target = workspace.findByPath(newPath);
-
-		return target != null;
+		if ("/".equals(newPath)) return true ;
+		return workspace.find(PropertyQuery.create(PATH, newPath), Columns.append().add(NodeConstants.NAME)).count() > 0;
 	}
 	
 	
 	public NodeCursor find() throws RepositoryException {
-		return workspace.find(inner).sort(sort);
+		return workspace.find(inner, Columns.ALL).sort(sort);
 	}
+
+	public NodeCursor find(Columns columns) throws RepositoryException{
+		return workspace.find(inner, columns).sort(sort);
+	}
+
+
+
 	
 	public Node findOne() throws RepositoryException {
-		return workspace.findOne(inner);
+		return workspace.findOne(inner, Columns.ALL);
 	}
+
+	public Node findOne(Columns exclude) {
+		return workspace.findOne(inner, exclude);
+	}
+
 	
 	public boolean existNode(){
-		
 		return find().count() > 0;
 	}
 
@@ -120,6 +130,12 @@ public class SessionQuery {
 		inner.between(key, open, close);
 		return this;
 	}
+	
+	public SessionQuery where(String where ){
+		inner.where(where);
+		return this;
+	}
+	
 	public SessionQuery gte(String key, Object value) { // key >= val
 		inner.gte(key, value) ;
 		return this ;
@@ -167,7 +183,6 @@ public class SessionQuery {
 		return this ;
 	}
 	
-	@Override
 	public String toString() {
 		return inner.toString();
 	}
@@ -197,15 +212,13 @@ public class SessionQuery {
 	}
 
 	public boolean overwriteOne(Map<String, ?> map) {
-		NodeResult result = workspace.findAndOverwrite(inner, map);
-		session.setLastResult(result) ;
+		NodeResult result = updateLastResult(workspace.findAndOverwrite(inner, map));
 		return result != NodeResult.NULL;
 	}
 	
 	public boolean updateOne(Map<String, ?> map) {
-		NodeResult result = workspace.findAndUpdate(inner, map) ;
-		session.setLastResult(result) ;
-		return result != NodeResult.NULL;
+		NodeResult result = updateLastResult(workspace.findAndUpdate(inner, map)) ;
+		return result.getRowCount() > 0;
 	}
 
 	public PropertyQuery getQuery(){
@@ -217,15 +230,27 @@ public class SessionQuery {
 	}
 
 	public NodeResult update(Map<String, ?> modValues){
-		NodeResult nodeResult = workspace.update(inner, modValues);
-		session.setLastResult(nodeResult) ;
-		return nodeResult ;
+		return updateLastResult(workspace.set(inner, modValues));
 	}
 	
-	public Node findOneAtRepository(String groupid, Object uid) {
+	private NodeResult updateLastResult(NodeResult result) {
+		session.setLastResult(result) ;
+		return result;
+	}
+
+	public NodeResult increase(String propId){
+		return increase(propId, 1);
+	}
+	
+	public NodeResult increase(String propId, int incvalue){
+		return updateLastResult(workspace.inc(inner, StringUtil.lowerCase(propId), incvalue));
+	}
+	
+	
+	public Node findOneInDB(String groupid, Object uid) {
 		
 		for(String wname : session.getRepositorys().getWorkspaceNames()){
-			Node node = session.getRepositorys().getWorkspace(wname).findOne(AradonQuery.newByGroupId(groupid, uid).getQuery());
+			Node node = session.getRepositorys().getWorkspace(wname).findOne(AradonQuery.newByGroupId(groupid, uid).getQuery(), Columns.ALL);
 			if (node != null) return node ;
 		}
 		return null;
@@ -233,11 +258,6 @@ public class SessionQuery {
 
 	public InListQueryNode inlist(String field) {
 		return InListQueryNode.create(field, session, this.inner) ;
-	}
-
-	public SessionQuery where(String where ){
-		inner.where(where);
-		return this;
 	}
 
 

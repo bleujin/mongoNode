@@ -17,9 +17,9 @@ public class Session {
 	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
 
 	private Map<String, Node> modified = MapUtil.newMap();
-	private NodeResult lastResult = null;
 	private final RootNode root;
-
+	private Map<String, Object> attributes = MapUtil.newCaseInsensitiveMap() ;
+	
 	private Session(Repository repository, String wname) {
 		this.repository = repository;
 		this.workspace = repository.getWorkspace(wname);
@@ -66,15 +66,15 @@ public class Session {
 		
 		Node[] targets = modified.values().toArray(new Node[0]);
 		for (Node node : targets) {
-			node.updateLastModified();
-			this.lastResult = repository.getWorkspace(node.getWorkspaceName()).save(node);
+			NodeResult nodeResult = repository.getWorkspace(node.getWorkspaceName()).save(node);
+			setAttribute(NodeResult.class.getCanonicalName(), nodeResult) ;
 		}
 		this.clear();
 		return index;
 	}
 	
 	public NodeResult getLastResultInfo(){
-		return lastResult ;
+		return getAttribute(NodeResult.class.getCanonicalName(), NodeResult.class) ;
 	}
 
 	void notify(Node target, NodeEvent event) {
@@ -103,7 +103,7 @@ public class Session {
 
 	List<Node> findAllWorkspace(AradonQuery query) {
 		if (query.getUId() != null){
-			Node node = createQuery().findOneAtRepository(query.getGroupId(), query.getUId()) ;
+			Node node = createQuery().findOneInDB(query.getGroupId(), query.getUId()) ;
 			return (node == null) ? ListUtil.EMPTY : ListUtil.create(node) ;
 		} else {
 			List<Node> result = ListUtil.newList() ;
@@ -160,12 +160,6 @@ public class Session {
 		return root;
 	}
 
-
-
-	private boolean toReturn(NodeResult result) {
-		lastResult = result;
-		return result.getRowCount() > -1;
-	}
 	
 	public List<Node> group(PropertyQuery keys, PropertyQuery conds, PropertyQuery initial, String reduce) {
 		return workspace.group(keys, conds, initial, reduce);
@@ -183,10 +177,6 @@ public class Session {
 	public Node addReference(Node src, String relType, Node target) {
 		return getReferenceManager().addReference(src, relType, target);
 	}
-	
-	void setLastResult(NodeResult result) {
-		this.lastResult = result ;
-	}
 
 
 	public SessionQuery createQuery() {
@@ -196,5 +186,20 @@ public class Session {
 	Repository getRepositorys() {
 		return repository;
 	}
+
+	void setAttribute(String key, Object value) {
+		attributes.put(key, value) ;
+	}
+	
+	public <T> T getAttribute(String key, Class<T> T) {
+		Object value = attributes.get(key) ;
+		if (T.isInstance(value)) return (T)value ;
+		return null;
+	}
+
+	void setLastResult(NodeResult result) {
+		setAttribute(NodeResult.class.getCanonicalName(), result) ;
+	}
+
 
 }

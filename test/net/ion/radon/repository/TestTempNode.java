@@ -10,8 +10,6 @@ import net.sf.json.JSONObject;
 
 public class TestTempNode extends TestBaseRepository{
 
-
-	
 	public void testOtherSelect() throws Exception {
 		Node bleujin = session.newNode("bleujin") ;
 		bleujin.put("id", "bleujin") ;
@@ -26,27 +24,8 @@ public class TestTempNode extends TestBaseRepository{
 		session.commit() ;
 		session.createQuery().find().debugPrint(PageBean.ALL) ;
 	}
-	
-	
-	
-	public void testLastModified() throws Exception {
-		assertEquals(0, session.getRoot().getLastModified()) ;
 
-		Node bleujin = session.newNode("bleujin") ;
-		long created = bleujin.getLastModified() ;
-		
-		session.commit() ;
-		Thread.sleep(1000) ;
-		
-		bleujin.put("new", "value") ;
-		session.commit();
-		long modified = bleujin.getLastModified() ;
-		
-		
-		assertEquals(true, modified > 900 + created) ;
-	}
-	
-	
+
 	public void testChild() throws Exception {
 		Node dept = session.newNode("dept") ;
 		dept.createChild("dev").put("key", "val") ;

@@ -17,7 +17,7 @@ import net.ion.radon.repository.TestBaseRepository;
 
 import org.apache.commons.lang.ArrayUtils;
 
-public class TestColumn extends TestBaseRepository{
+public class TestFunction extends TestBaseRepository{
 	
 	public void testColumnParse() throws Exception {
 		assertEquals("c", Column.parse("nvl(a, b) c").getLabel()) ;
