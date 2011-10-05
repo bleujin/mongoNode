@@ -2,19 +2,19 @@ package net.ion.radon.repository.innode;
 
 import java.util.List;
 
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
-import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
 
 public class TestInListMDL extends  TestBaseInListQuery{
 	
-
 	public void testAppend() throws Exception {
 		createNode();
 		Node found = session.createQuery().findOne() ;
+		assertEquals(5, found.inlist("people").createQuery().find().size()) ;
 		
-		List<InNode> subList = found.inner("people").createQuery().find(PageBean.create(2, 1)) ;
+		List<InNode> subList = found.inlist("people").createQuery().lte("index", 1).find() ;
 		
 		assertEquals(0, subList.get(0).get("index")) ;
 		assertEquals(1, subList.get(1).get("index")) ;
@@ -25,13 +25,15 @@ public class TestInListMDL extends  TestBaseInListQuery{
 		
 		createNode();
 		Node found = session.createQuery().findOne() ;
-		found.inner("people").createQuery().eq("index", 1).remove() ;
+		int result = found.inlist("people").createQuery().eq("index", 1).remove() ;
+		assertEquals(1, result) ;
 		
-		assertNull(found.inner("people").createQuery().eq("index", 1).findOne()) ;
+		assertNull(found.inlist("people").createQuery().eq("index", 1).findOne()) ; // not saved
+		assertNotNull(session.createQuery().findOne().inlist("people").createQuery().eq("index", 1).findOne()) ; 
 		session.commit() ;
 		
 		Node newFound = session.createQuery().findOne() ;
-		assertNull(newFound.inner("people").createQuery().eq("index", 1).findOne()) ;
+		assertNull(newFound.inlist("people").createQuery().eq("index", 1).findOne()) ;
 	}
 	
 
@@ -39,30 +41,16 @@ public class TestInListMDL extends  TestBaseInListQuery{
 		
 		createNode();
 		Node found = session.createQuery().findOne() ;
-		found.inner("people").createQuery().gte("index", 3).remove() ;
+		found.inlist("people").createQuery().gte("index", 3).remove() ;
 		
-		assertEquals(3, found.inner("people").createQuery().find().size()) ;
+		assertEquals(3, found.inlist("people").createQuery().find().size()) ;
 		session.commit() ;
 		
 		Node newFound = session.createQuery().findOne() ;
-		assertEquals(3, newFound.inner("people").createQuery().find().size()) ;
+		assertEquals(3, newFound.inlist("people").createQuery().find().size()) ;
 	}
 	
 
-	public void testUpdate() throws Exception {
-		
-		createNode();
-		Node found = session.createQuery().findOne() ;
-		found.inner("people").createQuery().gte("index", 3).put("coffie", "top").put("index", 4).update() ;
-		
-		assertEquals(2, found.inner("people").createQuery().exist("coffie").find().size()) ;
-		session.commit() ;
-		
-		Node newFound = session.createQuery().findOne() ;
-		assertEquals(2, newFound.inner("people").createQuery().exist("coffie").find().size()) ;
-		assertEquals(2, newFound.inner("people").createQuery().eq("index", 4).find().size()) ;
-	}
-	
 	public void testInListNodeUpdate() throws Exception {
 		createNode();
 		Node found = session.createQuery().findOne() ;
@@ -75,21 +63,79 @@ public class TestInListMDL extends  TestBaseInListQuery{
 		assertEquals(2, newFound.inlist("people").createQuery().exist("coffie").find().size()) ;
 		assertEquals(2, newFound.inlist("people").createQuery().eq("index", 4).find().size()) ;
 	}
+	
+	
+
+	public void testInListNodeUpdate2() throws Exception {
+		Node bleujin = session.newNode().put("name", "bleujin") ;
+		bleujin.inlist("greeting").push(MapUtil.chainMap().put("eng", "hello")) ;
+		bleujin.inlist("greeting").push(MapUtil.chainMap().put("kor", "hi")) ;
+		session.commit() ;
+		
+		Node found = session.createQuery().findOne() ;
+		found.inlist("greeting").createQuery().eq("eng", "hello").update(MapUtil.chainMap().put("eng", "하이").put("index", 4)) ;
+		session.commit() ;
+		
+		Node newFound = session.createQuery().findOne() ;
+		
+		Debug.line(newFound) ;
+		
+		assertEquals(1, newFound.inlist("greeting").createQuery().exist("index").find().size()) ;
+		assertEquals(1, newFound.inlist("greeting").createQuery().eq("eng", "하이").find().size()) ;
+	}
+	
+	
+	
+	
+	
 
 	public void testPush() throws Exception {
 		session.newNode() ;
 		session.commit() ;
 		
-		Node newNode = session.createQuery().findOne() ;
-		newNode.inlist("message").push(MapUtil.<String, Object>chainMap().put("greeting", "red").toMap());
-		session.commit() ;
-
-		newNode.inlist("message").push(MapUtil.<String, Object>chainMap().put("greeting", "red").toMap());
-		session.commit() ;
+		session.createQuery().inlist("message").push(MapUtil.chainMap().put("greeting", "red"));
+		session.createQuery().inlist("message").push(MapUtil.chainMap().put("greeting", "red"));
 
 		assertEquals(2, session.createQuery().findOne().inlist("message").createQuery().find().size()) ;
 	}
+
+	public void xtestUpdate() throws Exception {
+		Node bleujin = session.newNode().put("name", "bleujin") ;
+		bleujin.inlist("greeting").push(MapUtil.chainMap().put("eng", "hello")) ;
+		bleujin.inlist("greeting").push(MapUtil.chainMap().put("kor", "hi")) ;
+
+		Node hero = session.newNode().put("name", "hero") ;
+		hero.inlist("greeting").push(MapUtil.<String, Object>chainMap().put("eng", "hello").toMap()) ;
+		hero.inlist("greeting").push(MapUtil.<String, Object>chainMap().put("kor", "hi").toMap()) ;
+
+		session.commit() ;
+
+	}
 	
 
-
+	public void testPushOnNewState() throws Exception {
+		Node node = session.newNode().put("greeting", "hi") ;
+		node.inlist("hobby").push(MapUtil.chainMap().put("name", "pramodel")) ;
+		node.inlist("hobby").push(MapUtil.chainMap().put("name", "baseball")) ;
+		
+		session.commit() ;
+		
+		
+		Node found = session.createQuery().findOne();
+		try {
+			found.inlist("hobby").push(MapUtil.chainMap().put("name", "movie")) ;
+			fail() ;
+		} catch(IllegalStateException expect) {
+		} catch(Exception ex){
+			fail() ;
+		}
+		
+		
+		
+		
+	}
+	
+	
+	
+	
 }

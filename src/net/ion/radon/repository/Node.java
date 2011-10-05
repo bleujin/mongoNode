@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.db.procedure.IStringObject;
+import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.myapi.ICursor;
@@ -70,12 +72,14 @@ public interface Node extends IPropertyFamily, INode {
 
 	public InListNode inlist(String name);
 
-	public boolean isSaved();
-	
+	public boolean isNew() ;
+
+
 }
 
 class RootNode implements Node {
 
+	private static final long serialVersionUID = -5004749388021801200L;
 	private Session session ;
 	RootNode(Session session){
 		this.session = session ;
@@ -94,7 +98,7 @@ class RootNode implements Node {
 	}
 
 	public AradonId getAradonId() {
-		return null;
+		return AradonId.EMPTY;
 	}
 
 	public ICursor getChild() {
@@ -123,8 +127,7 @@ class RootNode implements Node {
 	}
 
 	public IPropertyFamily getQuery() {
-		// TODO Auto-generated method stub
-		return null;
+		return NodeObject.BLANK_INNODE;
 	}
 
 	public ReferenceTaragetCursor getReferencedNodes(String aradonGroup) {
@@ -155,7 +158,7 @@ class RootNode implements Node {
 	}
 
 	public List<Node> removeChild(String nameOrId) {
-		return null ;
+		return ListUtil.EMPTY ;
 	}
 
 	public List<Node> removeDescendant() {
@@ -176,7 +179,7 @@ class RootNode implements Node {
 	}
 
 	public DBObject getDBObject() {
-		return null;
+		return NodeObject.BLANK_INNODE.getDBObject();
 	}
 
 	public Map<String, ? extends Object> toMap() {
@@ -251,7 +254,12 @@ class RootNode implements Node {
 		; // no action
 	}
 
-	public boolean isSaved() {
-		return true;
+	public boolean isNew() {
+		return false;
 	}
+
+	public Node put(String key, IStringObject val) {
+		throw new IllegalArgumentException("root node is read only") ;
+	}
+
 }

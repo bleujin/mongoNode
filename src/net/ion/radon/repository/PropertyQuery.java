@@ -168,6 +168,10 @@ public class PropertyQuery implements IPropertyFamily{
 		return this;
 	}
 
+	public PropertyQuery eleMatch(String key, PropertyQuery eleQuery) {
+		nobject.put(key, new BasicDBObject("$elemMatch", eleQuery.getDBObject())) ;
+		return this ;
+	}
 
 
 	public PropertyQuery isExist(String key) {
@@ -184,6 +188,7 @@ public class PropertyQuery implements IPropertyFamily{
 		nobject.put("$where", where) ;
 		return this ;
 	}
+
 
 
 

@@ -1,9 +1,9 @@
 package net.ion.radon.repository;
 
-import net.ion.radon.repository.function.TestFunction;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.ion.radon.repository.function.TestFunction;
 
 public class TestAllNode extends TestCase{
 
@@ -15,8 +15,10 @@ public class TestAllNode extends TestCase{
 		suite.addTestSuite(TestRootNode.class);
 		suite.addTestSuite(TestFind.class);
 		suite.addTestSuite(TestColumns.class);
+		suite.addTestSuite(TestAdvanceColumns.class) ;
 		
-		
+		suite.addTestSuite(TestAppend.class) ;
+		suite.addTestSuite(TestParticialNode.class) ;
 		
 		suite.addTestSuite(TestNodeCursor.class) ;
 		suite.addTestSuite(TestAdvanceNode.class) ;

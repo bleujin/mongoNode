@@ -21,17 +21,23 @@ public class SessionQuery {
 	private Session session ;
 	private Workspace workspace;
 	
-	private PropertyQuery inner = PropertyQuery.create();
+	private PropertyQuery inner ;
 	private PropertyFamily sort = PropertyFamily.create() ;
 
-	private SessionQuery(Session session){
+	private SessionQuery(Session session, PropertyQuery inner){
 		this.session = session ;
 		this.workspace = session.getCurrentWorkspace();
+		this.inner = inner ;
 	}
 	
 	public static SessionQuery create(Session session) {
-		return new SessionQuery(session);
+		return new SessionQuery(session, PropertyQuery.create());
 	}
+	
+	static SessionQuery create(Session session, PropertyQuery definedQuery) {
+		return new SessionQuery(session, definedQuery); 
+	}
+
 	
 	public Node findByAradonId(String groupId, Object uid){
 		inner.put(AradonQuery.newByGroupId(groupId, uid)) ;
@@ -145,6 +151,12 @@ public class SessionQuery {
 		return this ;
 	}
 
+	public SessionQuery eleMatch(String key, PropertyQuery eleQuery) {
+		inner.eleMatch(key, eleQuery) ;
+		return this ;
+	}
+
+	
 	public SessionQuery isExist(String key) {
 		inner.isExist(key);
 		return this ;
@@ -259,6 +271,8 @@ public class SessionQuery {
 	public InListQueryNode inlist(String field) {
 		return InListQueryNode.create(field, session, this.inner) ;
 	}
+
+
 
 
 }

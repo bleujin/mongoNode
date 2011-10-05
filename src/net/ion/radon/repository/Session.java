@@ -183,6 +183,10 @@ public class Session {
 		return SessionQuery.create(this);
 	}
 
+	SessionQuery createQuery(PropertyQuery definedQuery) {
+		return SessionQuery.create(this, definedQuery);
+	}
+
 	Repository getRepositorys() {
 		return repository;
 	}

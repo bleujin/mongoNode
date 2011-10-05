@@ -7,22 +7,18 @@ import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeResult;
 import net.ion.radon.repository.PropertyQuery;
 
-public class TestInListNodeQuery extends TestBaseInListQuery{
+public class TestInListQueryNodeMDL extends TestBaseInListQuery{
 
-	public void testPushInNode() throws Exception {
-		Node node = session.newNode() ;
-		node.put("name", "bleujin") ;
+	public void testPushDefault() throws Exception {
+		session.newNode().put("name", "bleujin") ;
 		session.commit() ;
 		
-		node.inlist("people").push(MapUtil.create("color", "red")) ;
-		node.inlist("people").push(MapUtil.create("color", "bleu")) ;
+		session.createQuery().eq("name", "bleujin").inlist("people").push(MapUtil.create("color", "red")) ;
+		session.createQuery().eq("name", "bleujin").inlist("people").push(MapUtil.create("color", "bleu")) ;
 
-		assertEquals(0, session.createQuery().findOne().inlist("people").createQuery().find().size()) ;
-		session.commit() ;
 		assertEquals(2, session.createQuery().findOne().inlist("people").createQuery().find().size()) ;
 	}
-	
-	
+
 	public void testPull() throws Exception {
 		createNodes() ;
 		assertEquals(2, session.createQuery().lte("oindex", 1).inlist("people").pull(PropertyQuery.create().eq("index", 0)).getRowCount());
@@ -56,43 +52,22 @@ public class TestInListNodeQuery extends TestBaseInListQuery{
 		Debug.debug(1, session.createQuery().eq("name", "hero").findOne().inlist("greeting").createQuery().findOne().get("eng")) ;
 	}
 	
-	
-	public void testCaseInSensitive() throws Exception {
-		session.newNode().put("name", "bleujin") ;
-		session.newNode().put("name", "hero");
-		session.commit() ;
-		
-		session.createQuery().inlist("Greeting").push(MapUtil.create("ENG", "hello")) ;
 
-		assertEquals(1, session.createQuery().eq("name", "bleujin").findOne().inlist("greeting").createQuery().find().size()) ;
-		assertEquals(1, session.createQuery().eq("name", "bleujin").findOne().inlist("Greeting").createQuery().find().size()) ;
-		Debug.debug(session.createQuery().eq("name", "bleujin").findOne().inlist("Greeting").createQuery().findOne()) ;
-		assertEquals("hello", session.createQuery().eq("name", "bleujin").findOne().inlist("Greeting").createQuery().findOne().getString("Eng")) ;
-	}
-	
-	
-	public void testDepth() throws Exception {
-		session.newNode().put("name", "bleujin") ;
-		session.commit() ;
-		session.createQuery().inlist("person").push(makeSampleJSON()) ;
-		
-		session.createQuery().find().debugPrint(PageBean.ALL) ;
-		Node node = session.createQuery().findOne() ;
-		assertEquals("bleujin", node.inlist("person").createQuery().findOne().get("name")) ;
-		assertEquals("seoul", node.inlist("person").createQuery().findOne().get("address.city")) ;
-		
-	}
-	
 	public void testInListUpdate() throws Exception {
-		session.newNode().put("name", "bleujin") ;
-		session.commit() ;
-		NodeResult result = session.createQuery().eq("name", "bleujin").update(MapUtil.chainMap().put("working", true)) ;
+		Node node = session.newNode().put("name", "bleujin") ;
+		node.inlist("hobby").push(MapUtil.chainMap().put("name", "promodel")) ;
+		node.inlist("hobby").push(MapUtil.chainMap().put("name", "navy")) ;
 		
-		Debug.line(result, result.getRowCount(), result.getErrorMessage()) ;
+		session.commit() ;
+		
+		NodeResult result = session.createQuery().eq("name", "bleujin").inlist("hobby").update(PropertyQuery.create("name", "navy"), MapUtil.chainMap().put("name", "navy promodel").put("type", "navy")) ;
+		assertEquals(1, result.getRowCount()) ;
+		assertEquals(2, session.createQuery().findOne().inlist("hobby").createQuery().find().size()) ;
 		
 		session.createQuery().find().debugPrint(PageBean.ALL) ;
-		
 	}
+
+	
 	
 	
 	

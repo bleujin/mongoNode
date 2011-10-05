@@ -424,8 +424,12 @@ public class NodeImpl implements Node {
 		return InListNodeImpl.load(name, getSession(), getSession().createQuery().id(getIdentifier()), this);
 	}
 	
-	public boolean isSaved(){
-		return !session.getModified().contains(this) ;
+	public boolean isModified(){
+		return session.getModified().contains(this) ;
+	}
+
+	public boolean isNew() {
+		return getLastModified() == 0L;
 	}
 }
 

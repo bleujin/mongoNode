@@ -15,6 +15,7 @@ public class TestAllRepository extends TestCase{
 		suite.addTest(TestAllWorkspace.suite()) ;
 
 		suite.addTest(TestAllRelation.suite()) ;
+		suite.addTest(TestAllInList.suite()) ;
 		suite.addTest(TestAllAdvance.suite()) ;
 		
 		// suite.addTest(TestMapReduce.suite());
