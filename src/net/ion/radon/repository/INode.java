@@ -3,6 +3,8 @@ package net.ion.radon.repository;
 import java.io.Serializable;
 import java.util.Map;
 
+import net.ion.framework.util.ChainMap;
+
 import com.mongodb.DBObject;
 
 public interface INode {
@@ -27,7 +29,7 @@ public interface INode {
 	
 	public void putAll(Map<String, ? extends Object> props) ;
 
-	public void putAll(IPropertyFamily createByMap);
+	public void putAll(ChainMap<String, ? extends Object> createByMap);
 	
 	public Map<String, ? extends Object> toMap() ;
 	
@@ -35,10 +37,10 @@ public interface INode {
 
 	public String getString(String key);
 
-	public Node getParent();
-
 	public boolean hasProperty(String key);
 
 	public boolean isMatchEncrypted(String key, String value);
+
+	public void notify(NodeEvent nevent);
 	
 }

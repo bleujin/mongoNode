@@ -5,11 +5,14 @@ import static net.ion.radon.repository.NodeConstants.PATH;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.ics.ActionQuery;
+import net.ion.radon.repository.mr.ReduceFormat;
 import net.ion.radon.repository.myapi.AradonQuery;
 
 import org.bson.types.ObjectId;
@@ -118,7 +121,12 @@ public class SessionQuery {
 		return this;
 	}
 	public SessionQuery and(IPropertyFamily... conds) {
-		inner.and(conds) ;
+		for (IPropertyFamily cond : conds) {
+			for (Entry<String, ? extends Object> c : cond.toMap().entrySet()) {
+				inner.put(c.getKey(), c.getValue()) ;
+			}
+		}
+//		inner.and(conds) ;
 		return this ;
 	}
 
@@ -199,11 +207,6 @@ public class SessionQuery {
 		return inner.toString();
 	}
 	
-	public Object group(String... keys) {
-		inner.group(keys);
-		return this;
-	}
-
 	public SessionQuery startPathInclude(String path) {
 		this.or(PropertyQuery.create().put(NodeConstants.PATH, path), PropertyQuery.create().gt(NodeConstants.PATH, path + "/")) ;
 		return this ;
@@ -218,16 +221,24 @@ public class SessionQuery {
 		inner.put(ID, new ObjectId(oid)) ;
 		return this ;
 	}
+	
+	public SessionQuery aquery(String str) {
+		ActionQuery.create(str).merge(inner) ;
+		return this ;
+	}
+
 
 	public int count() {
 		return find().count();
 	}
 
+	// map에 없는 key의 property들은 지워짐
 	public boolean overwriteOne(Map<String, ?> map) {
 		NodeResult result = updateLastResult(workspace.findAndOverwrite(inner, map));
 		return result != NodeResult.NULL;
 	}
 	
+	// map에 있는 값들만 set, map에 없는 key의 property들은 남아 있음. 
 	public boolean updateOne(Map<String, ?> map) {
 		NodeResult result = updateLastResult(workspace.findAndUpdate(inner, map)) ;
 		return result.getRowCount() > 0;
@@ -269,8 +280,30 @@ public class SessionQuery {
 	}
 
 	public InListQueryNode inlist(String field) {
-		return InListQueryNode.create(field, session, this.inner) ;
+		return InListQueryNode.create(field, session, this) ;
 	}
+	
+	public NodeCursor format(ReduceFormat format) {
+		return ProxyCursor.format(session, inner, format, workspace) ;
+	}
+	
+	public NodeCursor mapreduce(String mapFunction, String reduceFunction, String finalFunction) {
+		return ProxyCursor.create(session, inner, mapFunction, reduceFunction, finalFunction, workspace);
+	}
+
+	public Object apply(String mapFunction, String reduceFunction, String finalFunction, CommandOption options, ApplyHander handler) {
+		return workspace.applyMapReduce(mapFunction, reduceFunction, finalFunction, options, inner, handler);
+	}
+	
+
+	
+	public NodeCursor group(IPropertyFamily keys, IPropertyFamily initial, String reduce) {
+		return ProxyCursor.group(session, inner, keys, initial, reduce, workspace) ;
+	}
+
+
+
+
 
 
 

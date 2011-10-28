@@ -24,7 +24,8 @@ public class TestGetPath extends TestBaseRepository{
 
 	private Session createSampleNode() {
 		Node root = session.newNode("root").put("name", "root").put("depth", 1) ;
-		Node bleujin = root.createChild("bleujin").put("name", "bleujin").put("address", "seoul").inner("loc").put("x", 1).put("y", 1).getParent() ;
+		Node bleujin = root.createChild("bleujin") ;
+		bleujin.put("name", "bleujin").put("address", "seoul").inner("loc").put("x", 1).put("y", 1) ;
 		
 		for (int i = 0; i < 10 ; i++) {
 			bleujin.inlist("comments").push(MapUtil.<String, Object>chainMap().put("greeting", "hello").put("index", i)) ;

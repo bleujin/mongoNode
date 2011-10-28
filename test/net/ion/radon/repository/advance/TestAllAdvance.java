@@ -3,9 +3,11 @@ package net.ion.radon.repository.advance;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.ion.radon.repository.TestNodeListCursor;
 import net.ion.radon.repository.TestNodeRows;
 import net.ion.radon.repository.TestNodeSerialize;
 import net.ion.radon.repository.TestSequence;
+import net.ion.radon.repository.orm.TestORM;
 
 public class TestAllAdvance extends TestCase {
 
@@ -18,7 +20,10 @@ public class TestAllAdvance extends TestCase {
 		suite.addTestSuite(TestNodeRows.class);
 		suite.addTestSuite(TestNodeSerialize.class);
 		
-		// suite.addTestSuite(TestORM.class) ;
+		
+		suite.addTestSuite(TestNodeListCursor.class) ;
+		
+		suite.addTestSuite(TestORM.class) ;
 		
 		return suite ;
 	}

@@ -3,10 +3,13 @@ package net.ion.radon.repository;
 
 import static net.ion.radon.repository.NodeConstants.ARADON_GROUP;
 import static net.ion.radon.repository.NodeConstants.ARADON_UID;
+import static net.ion.radon.repository.NodeConstants.ARADON_GHASH;
 import static net.ion.radon.repository.NodeConstants.ID;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
+import net.ion.framework.util.HashFunction;
 import net.ion.radon.repository.myapi.AradonQuery;
 
 import org.bson.types.ObjectId;
@@ -17,6 +20,7 @@ import com.mongodb.DBObject;
 
 public class PropertyQuery implements IPropertyFamily{
 	
+	private static final long serialVersionUID = -4825662715495266491L;
 	private NodeObject nobject ;
 	public final static PropertyQuery EMPTY = new PropertyQuery(NodeObject.create()) ;
 	
@@ -36,6 +40,7 @@ public class PropertyQuery implements IPropertyFamily{
 		PropertyQuery query = PropertyQuery.create();
 		query.put(ARADON_GROUP, groupId);
 		query.put(ARADON_UID, uId);
+		query.put(ARADON_GHASH, HashFunction.hashGeneral(groupId));
 
 		return query;
 	}
@@ -66,6 +71,7 @@ public class PropertyQuery implements IPropertyFamily{
 	}
 	
 	public PropertyQuery put(String key, Object val) {
+		
 		nobject.put(key, val) ;
 		return this ;
 	}
@@ -77,15 +83,9 @@ public class PropertyQuery implements IPropertyFamily{
 	public int size() {
 		return nobject.size() ;
 	}
-	public Map<String, Object> toMap() {
+	public Map<String, ? extends Object> toMap() {
 		return nobject.toMap();
 	}
-	
-	public void group(String... keys) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	
 	public String toString(){
 		return nobject.toString() ;
@@ -93,8 +93,12 @@ public class PropertyQuery implements IPropertyFamily{
 
 	public PropertyQuery and(IPropertyFamily... conds) {
 		BasicDBList list = makeListCondition(conds);
-		nobject.put("$and", list) ;
-		
+		for (IPropertyFamily cond : conds) {
+			for (Entry<String, ? extends Object> c : cond.toMap().entrySet()) {
+				nobject.put(c.getKey(), c.getValue()) ;
+			}
+		}		
+//		nobject.put("$and", list) ;
 		return this ;
 	}
 
@@ -187,6 +191,11 @@ public class PropertyQuery implements IPropertyFamily{
 	public PropertyQuery where(String where) {
 		nobject.put("$where", where) ;
 		return this ;
+	}
+
+	public PropertyQuery not(PropertyQuery query) {
+		nobject.put("$not", query.getDBObject()) ;
+		return this;
 	}
 
 

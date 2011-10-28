@@ -2,7 +2,6 @@ package net.ion.radon.repository.vfs ;
 
 import java.io.Serializable;
 
-import net.ion.radon.repository.Node;
 import net.ion.radon.repository.Session;
 import net.sf.json.JSONObject;
 
@@ -62,7 +61,7 @@ class NodeFileData implements Serializable {
 	void save(Session session) throws FileSystemException {
 
 		JSONObject jsonObject = NodeFileUtil.toJSONObject(getBuffer());
-		Node node = session.mergePath(name.getNodePath(), jsonObject) ;
+		session.createQuery().findByPath(name.getNodePath()).putAll(jsonObject) ;  
 		session.commit();
 		this.buffer = new byte[0] ;
 	}

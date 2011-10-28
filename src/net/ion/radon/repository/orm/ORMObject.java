@@ -1,9 +1,10 @@
 package net.ion.radon.repository.orm;
 
-import net.ion.framework.util.ObjectUtil;
+import java.io.Serializable;
+
 import net.ion.radon.repository.NodeObject;
 
-public interface ORMObject {
+public interface ORMObject extends Serializable{
 
 	public void put(String key, Object value) ;
 	public NodeObject getNodeObject() ;

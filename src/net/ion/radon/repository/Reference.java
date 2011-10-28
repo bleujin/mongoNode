@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBRef;
 
 public class Reference {

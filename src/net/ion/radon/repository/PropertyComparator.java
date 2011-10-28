@@ -2,33 +2,47 @@ package net.ion.radon.repository;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.ion.framework.util.ListUtil;
 
-public class PropertyComparator<T extends Node> implements Comparator<T>{
+public class PropertyComparator<T extends INode> implements Comparator<T>{
 
 	private List<OrderColumn> orders = ListUtil.newList() ;  
 	
-	private PropertyComparator(String propId, int order) {
-		orders.add(new OrderColumn(propId, order)) ;
+	private PropertyComparator() {
 	}
 
+	public static <T extends INode> PropertyComparator<T> create(PropertyFamily pf){
+		PropertyComparator<T> pc =  new PropertyComparator<T>() ;
+		Integer one = new Integer(1) ;
+		for (Entry<String, ? extends Object> entry : pf.toMap().entrySet()) {
+			append(pc, entry.getKey(), one.equals(entry.getValue())) ;
+		}  
+		return pc ;
+	}
+	
+	private static <T extends INode> PropertyComparator<T> append(PropertyComparator<T> pc, String propId, boolean asc){
+		return (asc == true) ? pc.ascending(propId) : pc.descending(propId) ;
+	}
+	
 	public PropertyComparator<T> ascending(String propId){
 		orders.add(new OrderColumn(propId, 1)) ;
 		return this;
 	}
+	
 	public PropertyComparator<T> descending(String propId){
 		orders.add(new OrderColumn(propId, -1)) ;
 		return this;
 	}
 
 	
-	public static PropertyComparator<? super Node> newAscending(String propId) {
-		return new PropertyComparator<Node>(propId, 1);
+	public static PropertyComparator<? super INode> newAscending(String propId) {
+		return new PropertyComparator<INode>().ascending(propId);
 	}
 	
-	public static PropertyComparator<? super Node> newDescending(String propId) {
-		return new PropertyComparator<Node>(propId, -1);
+	public static PropertyComparator<? super INode> newDescending(String propId) {
+		return new PropertyComparator<INode>().descending(propId);
 	}
 
 	public int compare(T n1, T n2) {

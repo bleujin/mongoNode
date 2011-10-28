@@ -14,7 +14,7 @@ public class TestNodeType extends TestBaseRepository{
 
 	
 	public void testRestrict() throws Exception {
-		Node node = session.newNode().put("first", "first").put("second", "second").inner("location").put("x", 1).put("y", 2).getParent() ;
+		session.newNode().put("first", "first").put("second", "second").inner("location").put("x", 1).put("y", 2);
 		session.commit() ;
 		
 		NodeCursor nc = session.createQuery().find() ;

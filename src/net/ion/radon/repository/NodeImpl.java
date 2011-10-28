@@ -19,21 +19,25 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.db.procedure.IStringObject;
+import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.HashFunction;
 import net.ion.framework.util.NumberUtil;
 import net.ion.framework.util.StringUtil;
+import net.ion.radon.repository.innode.InListNodeImpl;
+import net.ion.radon.repository.innode.NormalInNode;
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.util.CipherUtil;
+import net.ion.radon.repository.util.MyNumberUtil;
 
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 public class NodeImpl implements Node {
@@ -46,7 +50,7 @@ public class NodeImpl implements Node {
 	private NodeImpl(Session session, String workspaceName, NodeObject no, String parentPath, String name) {
 		this.session = session ;
 		this.workspaceName = workspaceName;
-		this.setNodeMetaInfo(no);
+		this.setNodeMetaInfo(no, parentPath, name);
 	}
 
 	static NodeImpl create(String workspaceName, NodeObject no, String parentPath, String name) {
@@ -57,11 +61,8 @@ public class NodeImpl implements Node {
 			throw new IllegalArgumentException(name + " must be smallAlphaNumUnderBarComma");
 
 		final NodeImpl result = new NodeImpl(currentSession, workspaceName, no, parentPath, name);
-
-		result.nobject.put(PATH, makePath(parentPath, name));
-		result.nobject.put(NAME, name);
+		result.setName(parentPath, name) ;
 		result.setAradonId("__empty", result.getIdentifier()) ;
-
 		result.notify(NodeEvent.CREATE);
 		return result;
 	}
@@ -98,7 +99,8 @@ public class NodeImpl implements Node {
 		return true;
 	}
 
-	private void notify(NodeEvent event) {
+	public void notify(NodeEvent event) {
+		if (workspaceName == null || StringUtil.isBlank(workspaceName)) return ;
 		getSession().notify(this, event);
 	}
 
@@ -113,34 +115,15 @@ public class NodeImpl implements Node {
 
 	// @TODO if prop has '.' 
 	public Serializable get(String propId) {
-		Object result = nobject.get(propId);
-		
-		if (result instanceof DBObject){
-			return InNodeImpl.create(NodeObject.load((DBObject)result), propId, this) ;	
-		}
-		return (Serializable) result;
+		return nobject.get(propId, this) ;
 	}
 
 	public Serializable get(String propId, int index) {
-		Object result = nobject.get(propId);
-		if (result instanceof List){
-			return (Serializable) ((List)result).get(index) ;
-		} else if (index == 0){
-			return (Serializable) result ;
-		} else {
-			throw new IllegalArgumentException("element is not array") ;
-		}
+		return nobject.get(propId, index, this);
 	}
 	
-	private Serializable getByType(String propId) {
-		ReferenceTaragetCursor cursor = getSession().createRefQuery().to(this, StringUtil.substringBefore(propId, ".")).find();
-		Node refNode = cursor.next();
-		return refNode.get(StringUtil.substringAfterLast(propId, "."));
-	}
-
 	public int getAsInt(String propId) {
-		final String str = StringUtil.toString(get(propId));
-		return NumberUtil.isNumber(str) ? Integer.parseInt(str) : 0;
+		return MyNumberUtil.getAsInt(get(propId)) ;
 	}
 
 	public DBObject getDBObject() {
@@ -162,8 +145,8 @@ public class NodeImpl implements Node {
 		}
 	}
 
-	public void putAll(IPropertyFamily props) {
-		putAll(props.getDBObject().toMap());
+	public void putAll(ChainMap<String, ? extends Object> props) {
+		putAll(props.toMap());
 	}
 
 	public synchronized Node put(String key, Object val) {
@@ -172,13 +155,13 @@ public class NodeImpl implements Node {
 
 	private synchronized Node putProperty(PropertyId propId, Object val) {
 		nobject.putProperty(propId, val);
-		getSession().notify(this, NodeEvent.UPDATE);
+		notify(NodeEvent.UPDATE);
 		return this;
 	}
 
 	public synchronized Node append(String key, Object val) {
 		nobject.appendProperty(PropertyId.create(key), val);
-		getSession().notify(this, NodeEvent.UPDATE);
+		notify(NodeEvent.UPDATE);
 		return this;
 	}
 
@@ -187,7 +170,7 @@ public class NodeImpl implements Node {
 		putProperty(PropertyId.reserved(NAME), name);
 	}
 
-	private void setNodeMetaInfo(NodeObject _dbo) {
+	private void setNodeMetaInfo(NodeObject _dbo, String parentPath, String name) {
 
 		this.nobject = _dbo;
 
@@ -202,7 +185,6 @@ public class NodeImpl implements Node {
 		if (_dbo.get(OWNER) == null) {
 			setOwner("_unknown");
 		}
-
 	}
 
 	private void setCreated(Calendar c) {
@@ -228,28 +210,16 @@ public class NodeImpl implements Node {
 		return this;
 	}
 
-	public Map<String, Serializable> toMap() {
-		return Collections.unmodifiableMap(nobject.toMap());
+	public Map toMap() {
+		return nobject.toMap(this) ;
 	}
 
 	public Map<String, ? extends Object> toPropertyMap() {
-		Map<String, Object> result = new HashMap<String, Object>();
-		for (Entry<String, Serializable> entry : toMap().entrySet()) {
-			if (NodeUtil.isReservedProperty(entry.getKey()))
-				continue;
-			result.put(entry.getKey(), entry.getValue());
-		}
-		return Collections.unmodifiableMap(result);
+		return nobject.toPropertyMap(this );
 	}
 
 	public Map<String, ? extends Object> toPropertyMap(NodeColumns cols) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		for (Entry<String, Serializable> entry : toMap().entrySet()) {
-			if (NodeUtil.isReservedProperty(entry.getKey()) && !cols.contains(entry.getKey()))
-				continue;
-			result.put(entry.getKey(), entry.getValue());
-		}
-		return Collections.unmodifiableMap(result);
+		return nobject.toPropertyMap(cols, this) ;
 	}
 
 	public String toString() {
@@ -262,18 +232,6 @@ public class NodeImpl implements Node {
 
 	public String getWorkspaceName() {
 		return workspaceName;
-	}
-
-	public IPropertyFamily getQuery() {
-		PropertyQuery query = PropertyQuery.create();
-		Set<String> keys = getDBObject().keySet();
-
-		for (String key : keys) {
-			if (NodeUtil.isReservedProperty(key))
-				continue;
-			query.put(key, getDBObject().get(key));
-		}
-		return query;
 	}
 
 	public Object getId() {
@@ -289,9 +247,7 @@ public class NodeImpl implements Node {
 	}
 
 	private boolean existAradonId(String groupid, Object uid) {
-		Node node = getSession().createQuery().aradonGroupId(groupid, uid).findOne();
-		//Node node = getSession().createQuery().findOneAtRepository(groupid, uid);
-		return node != null;
+		return getSession().createQuery().aradonGroupId(groupid, uid).findOne() != null;
 	}
 
 	private String[] makeGroups(String groupid) {
@@ -401,13 +357,8 @@ public class NodeImpl implements Node {
 		return nodes.size();
 	}
 
-	public InNode inner(String name) {
-		if (hasProperty(name) && get(name) instanceof InNode) {
-			return (InNode) get(name);
-		}
-		NodeObject inner = NodeObject.create() ;
-		put(name, inner) ;
-		return InNodeImpl.create(inner, name, this);
+	public NormalInNode inner(String name) {
+		return (NormalInNode)nobject.inner(name, this) ;
 	}
 	
 	public boolean setReference(String refType, AradonQuery preQuery, AradonQuery newQuery) {
@@ -421,8 +372,15 @@ public class NodeImpl implements Node {
 	}
 
 	public InListNode inlist(String name) {
-		return InListNodeImpl.load(name, getSession(), getSession().createQuery().id(getIdentifier()), this);
+		Object result = nobject.get(name);
+		return inlist(name, result);
 	}
+
+	private InListNode inlist(String name, Object result) {
+		return InListNodeImpl.load((BasicDBList)result, name, this);
+	}
+	
+	
 	
 	public boolean isModified(){
 		return session.getModified().contains(this) ;
@@ -433,13 +391,3 @@ public class NodeImpl implements Node {
 	}
 }
 
-class MyBasicDBList extends BasicDBList implements Comparable {
-
-	public int compareTo(Object obj) {
-		if (!(obj instanceof MyBasicDBList))
-			return 0;
-		MyBasicDBList that = (MyBasicDBList) obj;
-		return ((Comparable) this.get(this.size() - 1)).compareTo((Comparable) that.get(that.size() - 1));
-	}
-
-}

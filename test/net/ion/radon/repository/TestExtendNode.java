@@ -9,8 +9,8 @@ import net.ion.radon.core.PageBean;
 public class TestExtendNode extends TestBaseRepository{
 
 	public void xsetUp() throws Exception {
-		session.newNode().put("name", "bleujin").inner("address").put("city", "seoul").put("street", 32).getParent().put("age", 20) ;
-		session.newNode().put("name", "hero").inner("address").put("city", "seoul").put("street", 32).getParent().put("age", 15) ;
+		session.newNode().put("name", "bleujin").put("age", 20).inner("address").put("city", "seoul").put("street", 32) ;
+		session.newNode().put("name", "hero").put("age", 15).inner("address").put("city", "seoul").put("street", 32) ;
 		session.commit() ;
 		
 		session.createQuery().eq("address.city", "seoul").ascending("age", "name").find().debugPrint(PageBean.ALL) ;

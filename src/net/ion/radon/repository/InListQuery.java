@@ -1,5 +1,6 @@
 package net.ion.radon.repository;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import net.ion.radon.repository.innode.GreaterFilter;
 import net.ion.radon.repository.innode.GreaterThanFilter;
 import net.ion.radon.repository.innode.InFilter;
 import net.ion.radon.repository.innode.InNodeFilter;
+import net.ion.radon.repository.innode.InNodeImpl;
 import net.ion.radon.repository.innode.LessFilter;
 import net.ion.radon.repository.innode.LessThanFilter;
 import net.ion.radon.repository.innode.NodeSort;
@@ -28,16 +30,17 @@ import org.bson.types.BasicBSONList;
 
 import com.mongodb.DBObject;
 
-public class InListQuery {
+public class InListQuery implements Serializable{
 
+	private static final long serialVersionUID = -9117395018107563109L;
 	private final NodeObject nobject;
 	private final String pname ;
-	private final Node parent ;
+	private final INode parent ;
 
 	private List<InNodeFilter> filters = ListUtil.newList() ;
 	private List<NodeSort> sorts = ListUtil.newList() ;
 
-	private InListQuery(NodeObject nobject, String pname, Node parent) {
+	private InListQuery(NodeObject nobject, String pname, INode parent) {
 		this.nobject = nobject ;
 		this.pname = pname ;
 		this.parent = parent ;
@@ -93,7 +96,7 @@ public class InListQuery {
 	}
 
 	
-	static InListQuery create(NodeObject nobject, String pname, Node parent) {
+	public static InListQuery create(NodeObject nobject, String pname, INode parent) {
 		return new InListQuery(nobject, pname, parent);
 	}
 
@@ -131,7 +134,7 @@ public class InListQuery {
 			boolean result = list.remove(inode.getDBObject()) ;
 			if (result) count++ ;
 		}
-		parent.getSession().notify(parent, NodeEvent.UPDATE);
+		parent.notify(NodeEvent.UPDATE);
 		return count ;
 	}
 
@@ -148,7 +151,7 @@ public class InListQuery {
 		}
 		
 //		parent.getSession().createQuery().id(parent.getIdentifier()).inlist(this.pname).push(modValues) ;
-		parent.getSession().notify(parent, NodeEvent.UPDATE);
+		parent.notify(NodeEvent.UPDATE);
 		return founds.size() ;
 	}
 
@@ -159,17 +162,20 @@ public class InListQuery {
 		
 		for (DBObject dbo : ((BasicBSONList)nobject.getDBObject()).toArray(new DBObject[0])) {
 			NodeObject no = NodeObject.load(dbo) ;
-			boolean isSatisfy = true ;
-			for(InNodeFilter filter : filters){
-				if (! filter.isTrue(no)) {
-					isSatisfy = false ;
-					break ;
-				} 
-			}
-			if (isSatisfy) result.add(InNodeImpl.create(no, pname, parent)) ;
+			if (isTrue(filters, no)) result.add(InNodeImpl.create(dbo, pname, parent)) ;
 		}
 		
 		return sort(result, page) ;
+	}
+	
+	
+	private boolean isTrue(List<InNodeFilter> filters, NodeObject no){
+		for(InNodeFilter filter : filters){
+			if (! filter.isTrue(no)) {
+				return false ;
+			} 
+		}
+		return true ;
 	}
 	
 

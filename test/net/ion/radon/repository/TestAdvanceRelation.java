@@ -12,7 +12,6 @@ import net.ion.radon.repository.myapi.ICursor;
 
 public class TestAdvanceRelation extends TestBaseRepository {
 	
-	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();

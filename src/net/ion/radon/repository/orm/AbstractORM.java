@@ -2,10 +2,11 @@ package net.ion.radon.repository.orm;
 
 import net.ion.framework.util.ObjectUtil;
 import net.ion.radon.repository.Node;
-import net.ion.radon.repository.NodeImpl;
 import net.ion.radon.repository.NodeObject;
 
 public abstract class AbstractORM implements ORMObject {
+
+	private static final long serialVersionUID = 6966530917552174294L;
 	private NodeObject no = NodeObject.create() ;
 	
 	public void put(String key, Object value){

@@ -14,14 +14,16 @@ public class TestInnerNode extends TestBaseRepository {
 		
 		session.commit() ;
 		
-		InNode inner = node.inner("name").put("firstName", "bleu").put("secondName", "jin") ;
+		node.inner("name").put("firstName", "bleu").put("secondName", "jin") ;
 		session.commit() ;
 		
-		Node found = session.createQuery().find().next() ;
 		
 		assertEquals("bleu", ((InNode)node.get("name")).get("firstname")) ;
-		
 		assertEquals("bleujin", ((InNode)node.get(NodeConstants.ARADON)).getString("uid") ) ;
+
+		Node found = session.createQuery().find().next() ;
+
+		assertEquals("bleu", found.get("name.firstname")) ;
 	}
 
 	public void testComplicateGet() throws Exception {

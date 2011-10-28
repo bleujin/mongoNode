@@ -1,5 +1,7 @@
 package net.ion.radon.repository;
 
+import com.mongodb.QueryBuilder;
+
 import net.ion.framework.util.DateUtil;
 import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
@@ -167,17 +169,58 @@ public class TestQueryOperator extends TestBaseRepository {
 	}
 	
 	
-	public void testWhere() throws Exception {
+	public void testAnd() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("age", 20).put("name", "bleujin") ;
+		session.commit() ;
+		
+		assertEquals(1, session.createQuery().eq("name", "bleujin").lte("age", 20).find().count()) ;
+		
+		SessionQuery squery = session.createQuery().and(PropertyQuery.create().eq("name", "bleujin"), PropertyQuery.create().eq("age", 20));
+		Debug.line(squery.getQuery().getDBObject()) ;
+		assertEquals(1, squery.find().count()) ;
+	}
+	
+	public void testCompositeAnd() throws Exception {
 		session.dropWorkspace() ;
 		session.newNode().put("age", 20) ;
+		
+		assertEquals(0, session.createQuery().and(PropertyQuery.create().lt("age", 20).gte("age", 10)).find().count()) ;
+		assertEquals(0, session.createQuery().and(PropertyQuery.create().lt("age", 20).lte("age", 20)).find().count()) ;
+		assertEquals(0, session.createQuery().and(PropertyQuery.create().lte("age", 20).lt("age", 20)).find().count()) ;
+		assertEquals(0, session.createQuery().and(PropertyQuery.create().lte("age", 20).lte("age", 10)).find().count()) ;
+		assertEquals(0, session.createQuery().and(PropertyQuery.create().lte("age", 10).lte("age", 10)).find().count()) ;
+//		assertEquals(1, session.createQuery().and(PropertyQuery.create().lte("age", 20).gte("age", 20)).find().count()) ;
+	}
+	
+	
+	
+	public void testWhere() throws Exception {
+		session.dropWorkspace() ;
+		session.newNode().put("age", 20).put("name", "bleujin") ;
 		session.commit() ;
 
-		assertEquals(0, session.createQuery().where("this.age < 20").find().count()) ;
-		assertEquals(0, session.createQuery().where("this.age < this.age").find().count()) ;
-		assertEquals(1, session.createQuery().where("this.age <= this.age").find().count()) ;
-		assertEquals(0, session.createQuery().where("this.age > this.age").find().count()) ;
-		assertEquals(1, session.createQuery().where("this.age >= this.age").find().count()) ;
+		assertEquals(0, session.createQuery().where("function(){ return this.age < 20 ;}").find().count()) ;
+		assertEquals(1, session.createQuery().where("function(){ return this.age <= 20;}").find().count()) ;
+		assertEquals(0, session.createQuery().where("function(){ return this.age < this.age;}").find().count()) ;
+		assertEquals(1, session.createQuery().where("function(){ return this.age <= this.age;}").find().count()) ;
+		assertEquals(0, session.createQuery().where("function(){ return this.age > this.age;}").find().count()) ;
+		assertEquals(1, session.createQuery().where("function(){ return this.age >= this.age;}").find().count()) ;
 
+		
+		assertEquals(1, session.createQuery().where("function(){ return this.name == 'bleujin';}").find().count()) ;
+		
+		assertEquals(1, session.createQuery().where("function(){ return this.name == 'bleujin';}").where("this.age <= 20").find().count()) ;
+		
+		
+		assertEquals(1, session.createQuery().and(PropertyQuery.create().eq("name", "bleujin"), PropertyQuery.create().lte("age", 20)).find().count()) ;
+		
+		
+		assertEquals(0, session.createQuery().and(PropertyQuery.create().where("function(){ return this.age > 20;}")).find().count()) ;
+		assertEquals(1, session.createQuery().and(PropertyQuery.create().where("function(){ return this.age <= 20;}")).find().count()) ;
+		assertEquals(0, session.createQuery().and(PropertyQuery.create().where("function(){ return this.name == 'hero' && this.age <= 20; }")).find().count()) ;
+
+		
 		assertEquals(0, session.createQuery().where("this.age != this.age").find().count()) ;
 	}
 	

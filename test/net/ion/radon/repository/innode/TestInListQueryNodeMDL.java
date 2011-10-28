@@ -55,8 +55,8 @@ public class TestInListQueryNodeMDL extends TestBaseInListQuery{
 
 	public void testInListUpdate() throws Exception {
 		Node node = session.newNode().put("name", "bleujin") ;
-		node.inlist("hobby").push(MapUtil.chainMap().put("name", "promodel")) ;
-		node.inlist("hobby").push(MapUtil.chainMap().put("name", "navy")) ;
+		node.inlist("hobby").push(MapUtil.<String, Object>chainMap().put("name", "promodel").toMap()) ;
+		node.inlist("hobby").push(MapUtil.<String, Object>chainMap().put("name", "navy").toMap()) ;
 		
 		session.commit() ;
 		

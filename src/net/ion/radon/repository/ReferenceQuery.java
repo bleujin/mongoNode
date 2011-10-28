@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import junit.framework.TestCase;
 import net.ion.framework.util.StringUtil;
 public class ReferenceQuery {
 

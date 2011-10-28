@@ -3,6 +3,8 @@ package net.ion.radon.repository;
 import java.util.Collections;
 import java.util.List;
 
+import net.ion.framework.util.Debug;
+import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.ICursor;
 
@@ -47,6 +49,21 @@ public class TestAdvanceNode extends TestBaseRepository{
 	}
 
 	
+	public void testInListCompare() throws Exception {
+		Node node = session.newNode().put("name", "bleujin") ;
+		node.inlist("comfr").push(MapUtil.chainMap().put("name", "novision").put("age", 20))
+			.push(MapUtil.chainMap().put("name", "iihi").put("age", 30)) 
+			.push(MapUtil.chainMap().put("name", "pm1200").put("age", 40));
+		
+		List<InNode> ilist = node.inlist("comfr").createQuery().find() ;
+		Collections.sort(ilist, PropertyComparator.newDescending("age")) ;
+		
+		
+		assertEquals("pm1200", ilist.get(0).getString("name")) ;
+		assertEquals("novision", ilist.get(2).getString("name")) ;
+	}
+	
+	
 	
 	
 	
@@ -68,9 +85,6 @@ public class TestAdvanceNode extends TestBaseRepository{
 		createQuery().eq("color", "red").increase("age", 2)  ;
 		assertEquals(4, createQuery().eq("color", "red").findOne().get("age")) ;
 	}
-	
-	
-	
 	
 	
 	

@@ -54,8 +54,6 @@ public final class People extends AbstractORM{
 		return (Integer)get("age") ;
 	}
 	
-
-	
 	
 	public boolean equals(Object that){
 		if (! (that instanceof People)){

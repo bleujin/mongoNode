@@ -9,9 +9,9 @@ public class TestRepositoryCentral extends TestCase{
 		
 		RepositoryCentral rc = new RepositoryCentral("61.250.201.78", 27017) ;
 		Session session = rc.testLogin("test") ;
+		session.dropWorkspace() ;
 		
 		assertEquals(0, session.createQuery().find().count()) ;
-		
 		
 		RepositoryCentral another = RepositoryCentral.create("61.250.201.78", 27017) ;
 		

@@ -13,7 +13,7 @@ public class TestAllQuery extends TestCase{
 		result.addTestSuite(TestQueryMDL.class) ;
 		result.addTestSuite(TestAdvanceQuery.class) ;
 
-
+		
 		return result;
 	}
 

@@ -22,8 +22,6 @@ public interface ICursor {
 
 	public ICursor limit(int n) ;
 
-	public int size() ;
-
 	public List<Map<String, ? extends Object>> toMapList(PageBean page) ;	
 
 	public List<Map<String, ? extends Object>> toPropertiesList(PageBean page) ;	

@@ -1,4 +1,4 @@
-package net.ion.radon.repository;
+package net.ion.radon.repository.innode;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -7,35 +7,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bson.types.BasicBSONList;
-
 import net.ion.framework.db.RepositoryException;
-import net.ion.framework.util.ListUtil;
+import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.NumberUtil;
 import net.ion.framework.util.StringUtil;
-import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.INode;
+import net.ion.radon.repository.InListQuery;
+import net.ion.radon.repository.InNode;
+import net.ion.radon.repository.Node;
+import net.ion.radon.repository.NodeColumns;
+import net.ion.radon.repository.NodeEvent;
+import net.ion.radon.repository.NodeObject;
 import net.ion.radon.repository.util.CipherUtil;
-import net.ion.radon.repository.util.JSONUtil;
-import net.sf.json.JSONObject;
+import net.ion.radon.repository.util.MyNumberUtil;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 
-public class InNodeImpl implements InNode {
+public abstract class InNodeImpl implements InNode {
 
 	private static final long serialVersionUID = 7569283280889592633L;
 	private NodeObject nobject;
 	private String pname;
-	private Node parent;
+	private INode parent;
 
-	private InNodeImpl(NodeObject nobject, String pname, Node parent) {
-		this.nobject = nobject;
+	protected InNodeImpl(DBObject dbo, String pname, INode parent) {
+		this.nobject = (dbo == null) ? NodeObject.create() : NodeObject.load(dbo);
 		this.pname = pname;
 		this.parent = parent;
 	}
 
-	static InNode create(NodeObject inner, String pname, Node parent) {
-		return new InNodeImpl(inner, pname, parent);
+	public static InNode create(DBObject inner, String pname, INode parent) {
+		return (parent instanceof Node) ? new NormalInNodeImpl(inner, pname, parent) : new TempInNodeImpl(inner, pname, parent);
 	}
 
 	public InNode inner(String name) {
@@ -44,12 +46,12 @@ public class InNodeImpl implements InNode {
 		}
 		NodeObject inner = NodeObject.create();
 		put(name, inner);
-		return InNodeImpl.create(inner, name, parent);
+		return InNodeImpl.create(inner.getDBObject(), name, parent);
 	}
 
 	public InNode append(String key, Object val) {
-		nobject.appendProperty(PropertyId.create(key), val);
-		parent.getSession().notify(parent, NodeEvent.UPDATE);
+		nobject.appendProperty(NodeObject.createPropId(key), val);
+		parent.notify(NodeEvent.UPDATE);
 		return this;
 	}
 
@@ -58,13 +60,13 @@ public class InNodeImpl implements InNode {
 	}
 
 	public InNode put(String key, Object val) {
-		nobject.putProperty(PropertyId.create(key), val);
+		nobject.putProperty(NodeObject.createPropId(key), val);
 		notify(NodeEvent.UPDATE);
 		return this;
 	}
 
-	private void notify(NodeEvent event) {
-		parent.getSession().notify(parent, event);
+	public void notify(NodeEvent event) {
+		parent.notify(event);
 	}
 
 	public void putAll(Map<String, ? extends Object> props) {
@@ -73,8 +75,8 @@ public class InNodeImpl implements InNode {
 		}
 	}
 
-	public void putAll(IPropertyFamily props) {
-		putAll(props.getDBObject().toMap());
+	public void putAll(ChainMap<String, ? extends Object> chainMap) {
+		putAll(chainMap.toMap());
 	}
 
 	public void clearProp() {
@@ -87,7 +89,7 @@ public class InNodeImpl implements InNode {
 	}
 
 	public Serializable get(String propId) {
-		return (Serializable) nobject.get(propId);
+		return (Serializable) nobject.get(propId.toLowerCase());
 	}
 
 	public Serializable get(String propId, int index) {
@@ -102,16 +104,11 @@ public class InNodeImpl implements InNode {
 	}
 
 	public int getAsInt(String propId) {
-		final String str = getString(propId);
-		return NumberUtil.isNumber(str) ? Integer.parseInt(str) : 0;
+		return MyNumberUtil.getAsInt(get(propId)) ;
 	}
 
 	public DBObject getDBObject() {
 		return nobject.getDBObject();
-	}
-
-	public Node getParent() {
-		return parent;
 	}
 
 	public String getString(String key) {
@@ -137,8 +134,8 @@ public class InNodeImpl implements InNode {
 
 	public Map<String, ? extends Object> toPropertyMap(NodeColumns cols) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		for (Entry<String, ? extends Object> entry : toMap().entrySet()) {
-			result.put(entry.getKey(), entry.getValue());
+		for (String key : nobject.toMap().keySet()) {
+			result.put(key, get(key));
 		}
 		return Collections.unmodifiableMap(result);
 	}
@@ -147,27 +144,31 @@ public class InNodeImpl implements InNode {
 		return toMap().toString();
 	}
 
-	// public String getPath() {
-	// throw new UnsupportedOperationException() ;
-	// }
-
-	public InNode append(JSONObject json) {
-		DBObject dbo = nobject.getDBObject();
-		if (dbo instanceof BasicBSONList) {
-			((BasicBSONList) dbo).add(NodeObject.load(JSONUtil.toDBObject(json)).getDBObject()) ;
-		} else if (dbo.keySet().size() == 0) {
-			BasicDBList list = new BasicDBList() ;
-			list.add(NodeObject.load(JSONUtil.toDBObject(json)).getDBObject());
-			this.nobject = NodeObject.load(list) ;
-			parent.put(this.pname, this.nobject);
-		} else {
-			throw new IllegalStateException("mismathc type : must be array type");
-		}
-		notify(NodeEvent.UPDATE);
-		return this;
+	public InListQuery inListQuery() {
+		return InListQuery.create(nobject, pname, parent);
 	}
 	
-	public InQuery createQuery() {
-		return InQuery.create(nobject, pname, parent);
+	public INode getParent(){
+		return parent ;
+	}
+	
+	public int hashCode(){
+		return nobject.getDBObject().hashCode() ;
+	}
+	
+	public boolean equals(Object _that){
+		if (_that instanceof InNodeImpl){
+			InNodeImpl that = (InNodeImpl)_that ;
+			return nobject.getDBObject().equals(that.getDBObject()) ;
+		} else return false ;
 	}
 }
+
+
+
+
+
+
+
+
+

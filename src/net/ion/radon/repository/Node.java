@@ -7,8 +7,10 @@ import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.db.procedure.IStringObject;
+import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.innode.NormalInNode;
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.myapi.ICursor;
 
@@ -30,8 +32,6 @@ public interface Node extends IPropertyFamily, INode {
 
 	// public NodeResult save() ;
 	// public Node merge(IPropertyFamily query) ;
-
-	public IPropertyFamily getQuery() ;
 
 	public Object getId() ;
 
@@ -58,6 +58,8 @@ public interface Node extends IPropertyFamily, INode {
 
 	public Session getSession();
 
+	public Node getParent();
+
 	public AradonId getAradonId();
 
 	public boolean addReference(String refType, AradonQuery query);
@@ -70,10 +72,13 @@ public interface Node extends IPropertyFamily, INode {
 
 	public long getLastModified();
 
+	public NormalInNode inner(String name) ;
+	
 	public InListNode inlist(String name);
 
 	public boolean isNew() ;
 
+	public void notify(NodeEvent nevent);
 
 }
 
@@ -213,7 +218,7 @@ class RootNode implements Node {
 		return false;
 	}
 
-	public InNode inner(String name) {
+	public NormalInNode inner(String name) {
 		throw new IllegalArgumentException("root node is read only") ;
 	}
 
@@ -229,7 +234,7 @@ class RootNode implements Node {
 		throw new IllegalArgumentException("root node is read only") ;
 	}
 
-	public void putAll(IPropertyFamily createByMap) {
+	public void putAll(ChainMap<String, ? extends Object> chainMap) {
 		throw new IllegalArgumentException("root node is read only") ;
 	}
 
@@ -260,6 +265,9 @@ class RootNode implements Node {
 
 	public Node put(String key, IStringObject val) {
 		throw new IllegalArgumentException("root node is read only") ;
+	}
+
+	public void notify(NodeEvent nevent) {
 	}
 
 }

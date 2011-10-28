@@ -55,7 +55,6 @@ public class TestUpdate extends TestBaseRepository{
 		assertTrue(found.getString("greeting") == null) ;
 	}
 	
-	
 	public void testNotExistUpdate() throws Exception {
 		createTestNode() ;
 		

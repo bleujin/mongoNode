@@ -1,11 +1,8 @@
 package net.ion.radon.repository.innode;
 
-import java.util.Arrays;
+import net.ion.radon.repository.NodeObject;
 
 import org.apache.commons.lang.ArrayUtils;
-
-import net.ion.radon.repository.InNode;
-import net.ion.radon.repository.NodeObject;
 
 public class InFilter implements InNodeFilter{
 

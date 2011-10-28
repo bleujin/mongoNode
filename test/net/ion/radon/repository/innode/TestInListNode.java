@@ -1,6 +1,9 @@
 package net.ion.radon.repository.innode;
 
+import net.ion.framework.util.Debug;
 import net.ion.radon.repository.Node;
+import net.ion.radon.repository.TestBaseRepository;
+import net.sf.json.JSONObject;
 
 public class TestInListNode extends  TestBaseInListQuery{
 
@@ -63,6 +66,14 @@ public class TestInListNode extends  TestBaseInListQuery{
 		assertEquals(5, found.inlist("people").createQuery().exist("index").find().size()) ;
 	}
 	
+	
+	public void testGet() throws Exception {
+		createNode() ;
+		Node found = session.createQuery().findOne() ;
+
+		Object pvalue = found.inlist("people").get(0);
+		Debug.line(pvalue.getClass(), pvalue) ;
+	}
 
 	
 }

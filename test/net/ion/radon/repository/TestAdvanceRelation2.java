@@ -1,12 +1,6 @@
 package net.ion.radon.repository;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import net.ion.framework.db.Rows;
-import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.myapi.AradonQuery;
 
 public class TestAdvanceRelation2 extends TestBaseRepository{
 

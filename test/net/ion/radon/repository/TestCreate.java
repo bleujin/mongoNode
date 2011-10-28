@@ -17,10 +17,14 @@ public class TestCreate extends TestCase{
 	}
 	
 	public void testNewNode() throws Exception {
-		session.newNode().put("name", "bleujin").put("age", 20) ;
+		Node newNode = session.newNode().put("name", "bleujin").put("age", 20) ;
+		assertEquals(0, newNode.getLastModified()) ; 
+		
 		
 		session.commit() ;
 		assertEquals(1, session.createQuery().eq("name", "bleujin").lte("age", 20).find().count()) ;
+		
+		assertEquals(true, newNode.getLastModified() > 0) ;
 	}
 
 	public void testOtherType() throws Exception {

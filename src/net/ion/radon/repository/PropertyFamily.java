@@ -11,6 +11,7 @@ import com.mongodb.DBObject;
 
 public class PropertyFamily implements IPropertyFamily{
 	
+	private static final long serialVersionUID = 5606467563983898492L;
 	private NodeObject nobject ;
 	private PropertyFamily(){
 		nobject = NodeObject.create() ;
@@ -64,8 +65,13 @@ public class PropertyFamily implements IPropertyFamily{
 		return nobject.getDBObject();
 	}
 
-	public Map<String, Object> toMap() {
+	public Map<String, ? extends Object> toMap() {
 		return nobject.toMap();
 	}
+	
+	public String toJSONString(){
+		return nobject.getDBObject().toString() ;
+	}
+
 
 }

@@ -1,6 +1,5 @@
 package net.ion.radon.repository.innode;
 
-import net.ion.radon.repository.InQuery;
 import net.ion.radon.repository.NodeObject;
 
 public class AndFilter implements InNodeFilter{

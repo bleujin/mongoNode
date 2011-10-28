@@ -16,7 +16,8 @@ public class TestSample extends TestBaseRepository{
 		hero.put("name", "hero").put("birth", new Date()) ;
 		
 		Node n = session.newNode() ;
-		n.inner("address").put("city", "seoul").put("street", 20).getParent().inner("name").put("firstname", "bleu").put("lastname", "jin") ;
+		n.inner("address").put("city", "seoul").put("street", 20) ;
+		n.inner("name").put("firstname", "bleu").put("lastname", "jin") ;
 		
 		session.commit() ;
 

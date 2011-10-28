@@ -59,7 +59,7 @@ public class ReferenceTaragetCursor implements ICursor{
 	}
 
 	public int size() {
-		return cursor.size();
+		return cursor.count();
 	}
 
 	public List<Node> toList(PageBean page) {

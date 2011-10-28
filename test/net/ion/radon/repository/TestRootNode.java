@@ -5,6 +5,7 @@ import net.ion.radon.repository.myapi.ICursor;
 public class TestRootNode extends TestBaseRepository{
 
 	public void testGet() throws Exception {
+		
 		Node root = session.getRoot() ;
 		
 		assertEquals("", root.getIdentifier()) ;
@@ -27,6 +28,12 @@ public class TestRootNode extends TestBaseRepository{
 		assertEquals(bigboy.getIdentifier(), cursor.next().getIdentifier()) ;
 	}
 
+	
+	public void testPath() throws Exception {
+		Node node = session.newNode("bleujin") ;
+		assertEquals("/bleujin", node.getPath()) ;
+	}
+	
 	
 	public void testFindByPath() throws Exception {
 		Node node = session.createQuery().findByPath("/") ;

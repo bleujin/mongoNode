@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.sql.RowSetMetaData;
 
-import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.IColumn;
 import net.ion.radon.repository.Node;
 

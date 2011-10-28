@@ -4,21 +4,20 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.ion.radon.repository.advance.TestAllAdvance;
+import net.ion.radon.repository.mr.TestAllMapReduce;
 
 public class TestAllRepository extends TestCase{
 
 	public static Test suite() throws Exception{
-		TestSuite suite = new TestSuite("RepositoryAll");
+		TestSuite suite = new TestSuite("Test RepositoryAll");
 		
-		suite.addTest(TestAllNode.suite()) ;
-		suite.addTest(TestAllQuery.suite()) ;
-		suite.addTest(TestAllWorkspace.suite()) ;
-
-		suite.addTest(TestAllRelation.suite()) ;
-		suite.addTest(TestAllInList.suite()) ;
-		suite.addTest(TestAllAdvance.suite()) ;
+		suite.addTest(TestAllSimpleRepository.suite()) ;
+		suite.addTest(TestAllAdvanceRepository.suite()) ;
 		
-		// suite.addTest(TestMapReduce.suite());
+		
+		// working
+		// suite.addTestSuite(TestNodeCreateSpeed.class) ;
+		
 		return suite;
 	}
 }

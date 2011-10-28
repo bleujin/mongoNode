@@ -14,8 +14,8 @@ public class TestInListQuerySort extends  TestBaseInListQuery {
 	public void testPath() throws Exception {
 		Node node = createNode();
 		
-		Debug.debug(node.inner("people").createQuery().findOne()) ;
-		node.inner("people").createQuery().descending("index").findOne() ;
+		Debug.debug(node.inlist("people")) ;
+		node.inlist("people").createQuery().descending("index").findOne() ;
 	}
 	
 
@@ -24,8 +24,8 @@ public class TestInListQuerySort extends  TestBaseInListQuery {
 		createNode();
 		Node found = session.createQuery().findOne() ;
 		
-		assertEquals(0, found.inner("people").createQuery().ascending("address.city").ascending("index").findOne().get("index")) ;
-		assertEquals(0, found.inner("people").createQuery().ascending("not.key").findOne().get("index")) ;
+		assertEquals(0, found.inlist("people").createQuery().ascending("address.city").ascending("index").findOne().get("index")) ;
+		assertEquals(0, found.inlist("people").createQuery().ascending("not.key").findOne().get("index")) ;
 	}
 
 	
@@ -33,7 +33,7 @@ public class TestInListQuerySort extends  TestBaseInListQuery {
 		createNode();
 		Node found = session.createQuery().findOne() ;
 		
-		List<InNode> founds = found.inner("people").createQuery().ascending("address.city").ascending("index").find(PageBean.create(2,2));
+		List<InNode> founds = found.inlist("people").createQuery().ascending("address.city").ascending("index").find(PageBean.create(2,2));
 		assertEquals(2, founds.size()) ;
 		assertEquals(2, founds.get(0).getAsInt("index")) ;
 		assertEquals(3, founds.get(1).getAsInt("index")) ;

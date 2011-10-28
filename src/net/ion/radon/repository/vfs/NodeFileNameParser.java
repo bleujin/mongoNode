@@ -1,12 +1,8 @@
 package net.ion.radon.repository.vfs;
 
-import net.ion.framework.util.StringUtil;
-
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.provider.UriParser;
-import org.apache.commons.vfs.provider.VfsComponentContext;
 import org.apache.commons.vfs.provider.local.LocalFileNameParser;
 
 public class NodeFileNameParser extends LocalFileNameParser {

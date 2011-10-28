@@ -9,6 +9,7 @@ import net.ion.framework.util.MapUtil;
 import net.ion.radon.repository.myapi.ICredential;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -16,6 +17,8 @@ public class RepositoryCentral {
 
 	private Mongo mongo;
 	private String currentDBName = "test";
+	private String user;
+	private String pwd;
 
 	public RepositoryCentral(String host, int port) throws UnknownHostException, MongoException{
 		this(host, port, "test") ;
@@ -25,6 +28,13 @@ public class RepositoryCentral {
 		this.mongo = loadMongo(host, port) ;
 		this.currentDBName = defaultDBName ;
 	}
+	
+	public RepositoryCentral(String host, int port, String defaultDBName, String user, String pwd) throws UnknownHostException, MongoException{
+		this.mongo = loadMongo(host, port) ;
+		this.currentDBName = defaultDBName ;
+		this.user = user;
+		this.pwd = pwd;
+	}	
 
 	private static Map<String, Mongo> STORE = MapUtil.newMap();
 	private synchronized static Mongo loadMongo(String host, int port) throws UnknownHostException, MongoException {
@@ -74,7 +84,25 @@ public class RepositoryCentral {
 
 	public Session login(String dbName, String defaultWorkspace, ICredential credential) {
 		final Repository repository = Repository.create(mongo.getDB(dbName));
-		return Session.create(repository, defaultWorkspace);
+		return LocalSession.create(repository, defaultWorkspace);
+	}
+	
+	public Session login(String dbName, String defaultWorkspace) {
+		if(this.user == null) new Exception("User is null");
+		if(this.pwd == null) new Exception("Password is null");
+
+		DB db = mongo.getDB(dbName);
+		if(!db.isAuthenticated()){
+			boolean isLogin = db.authenticate(user, pwd.toCharArray());
+			if(!isLogin) new Exception("Authenticate is false");	
+		}
+
+		final Repository repository = Repository.create(db);
+		return LocalSession.create(repository, defaultWorkspace);
+	}
+	
+	public Session login(String defaultWorkspace) {
+		return login(currentDBName, defaultWorkspace);
 	}
 
 	public void unload(){
