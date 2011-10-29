@@ -1,11 +1,11 @@
 package net.ion.radon.repository.advance;
 
-import static net.ion.radon.repository.NodeConstants.PATH;
-import net.ion.framework.util.Debug;
-import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Explain;
 import net.ion.radon.repository.Node;
+import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.TestBaseRepository;
+
+import com.mongodb.BasicDBObject;
 
 public class TestIndex extends TestBaseRepository{
 
@@ -21,5 +21,15 @@ public class TestIndex extends TestBaseRepository{
 	public void testConfirmIndex() throws Exception {
 		session.newNode("bleujin").put("nmae", "bleujin") ;
 		session.commit() ;
+	}
+	
+	public void testCreateCompoundIndex() throws Exception {
+		session.newNode().inner("name").put("firstname", "bleu").put("lastname", "jin").getParent().put("age", 20) ;
+		session.commit() ;
+
+		session.getCurrentWorkspace().getCollection().ensureIndex(new BasicDBObject("name.firstname", -1)) ;
+		
+		NodeCursor nc = session.createQuery().eq("name.firstname", "bleu").find() ;
+		assertEquals(true, nc.explain().useIndex()) ;
 	}
 }

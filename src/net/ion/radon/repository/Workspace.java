@@ -68,7 +68,7 @@ public class Workspace {
 		if (collection.getName().startsWith("system.")) return result ;
 		
 		collection.ensureIndex(ARADON_INDEX.getDBObject());
-		// collection.ensureIndex(new BasicDBObject("__aradon.group", 1)) ;
+		// collection.ensureIndex(new BasicDBObject("__aradon", 1)) ;
 		collection.ensureIndex(PATH_INDEX.getDBObject(), PropertyFamily.create().put("name", "_path_id").put("unique", Boolean.FALSE).getDBObject());
 		
 		return result;

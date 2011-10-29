@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="mycom" name="net.ion.radon.repository.TestAllRepository" tests="164" time="3.625" timestamp="2011-10-04T12:41:34">
+<testsuite errors="0" failures="0" hostname="mycom" name="net.ion.radon.repository.TestAllRepository" tests="213" time="8.39" timestamp="2011-10-29T04:53:55">
   <properties>
     <property name="java.vendor" value="Sun Microsystems Inc." />
     <property name="sun.java.launcher" value="SUN_STANDARD" />
@@ -7,7 +7,7 @@
     <property name="sun.management.compiler" value="HotSpot Client Compiler" />
     <property name="os.name" value="Windows XP" />
     <property name="sun.boot.class.path" value="D:\java\jdk5_22\jre\lib\rt.jar;D:\java\jdk5_22\jre\lib\i18n.jar;D:\java\jdk5_22\jre\lib\sunrsasign.jar;D:\java\jdk5_22\jre\lib\jsse.jar;D:\java\jdk5_22\jre\lib\jce.jar;D:\java\jdk5_22\jre\lib\charsets.jar;D:\java\jdk5_22\jre\classes" />
-    <property name="TODAY" value="October 4 2011" />
+    <property name="TODAY" value="October 29 2011" />
     <property name="build.number" value="2" />
     <property name="sun.desktop" value="windows" />
     <property name="java.vm.specification.vendor" value="Sun Microsystems Inc." />
@@ -21,7 +21,7 @@
     <property name="sun.boot.library.path" value="D:\java\jdk5_22\jre\bin" />
     <property name="manifest.main.class" value="" />
     <property name="ant.project.name" value="Jar Publish" />
-    <property name="DSTAMP" value="20111004" />
+    <property name="DSTAMP" value="20111029" />
     <property name="java.version" value="1.5.0_22" />
     <property name="user.timezone" value="" />
     <property name="sun.arch.data.model" value="32" />
@@ -54,9 +54,9 @@
     <property name="java.vendor.url" value="http://java.sun.com/" />
     <property name="java.vm.vendor" value="Sun Microsystems Inc." />
     <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition" />
-    <property name="java.class.path" value="D:\eclipse\workspace\MongoNode\bin;D:\eclipse\workspace\MongoNode\lib\aradon_0.5.jar;D:\eclipse\workspace\MongoNode\lib\commons-beanutils-1.8.0.jar;D:\eclipse\workspace\MongoNode\lib\commons-codec-1.3.jar;D:\eclipse\workspace\MongoNode\lib\commons-collections-3.2.jar;D:\eclipse\workspace\MongoNode\lib\commons-io-1.4.jar;D:\eclipse\workspace\MongoNode\lib\commons-lang-2.4.jar;D:\eclipse\workspace\MongoNode\lib\commons-logging-1.1.jar;D:\eclipse\workspace\MongoNode\lib\commons-vfs-20070730.jar;D:\eclipse\workspace\MongoNode\lib\ezmorph-1.0.5.jar;D:\eclipse\workspace\MongoNode\lib\iframework_2.2.jar;D:\eclipse\workspace\MongoNode\lib\json-lib-2.2.2-jdk15.jar;D:\eclipse\workspace\MongoNode\lib\jsqlparser.jar;D:\eclipse\workspace\MongoNode\lib\junit.jar;D:\eclipse\workspace\MongoNode\lib\mongo-2.6.3.jar;D:\eclipse341\plugins\org.apache.ant_1.7.0.v200803061910\lib\ant-launcher.jar;D:\eclipse341\plugins\org.apache.ant_1.7.0.v200803061910\lib\ant.jar;D:\eclipse341\plugins\org.apache.ant_1.7.0.v200803061910\lib\ant-junit.jar" />
+    <property name="java.class.path" value="D:\eclipse\workspace\MongoNode\bin;D:\eclipse\workspace\MongoNode\lib\aradon_0.5.jar;D:\eclipse\workspace\MongoNode\lib\commons-beanutils-1.8.0.jar;D:\eclipse\workspace\MongoNode\lib\commons-codec-1.3.jar;D:\eclipse\workspace\MongoNode\lib\commons-collections-3.2.jar;D:\eclipse\workspace\MongoNode\lib\commons-io-1.4.jar;D:\eclipse\workspace\MongoNode\lib\commons-lang-2.4.jar;D:\eclipse\workspace\MongoNode\lib\commons-logging-1.1.jar;D:\eclipse\workspace\MongoNode\lib\commons-vfs-20070730.jar;D:\eclipse\workspace\MongoNode\lib\ezmorph-1.0.5.jar;D:\eclipse\workspace\MongoNode\lib\iframework_2.2.jar;D:\eclipse\workspace\MongoNode\lib\json-lib-2.2.2-jdk15.jar;D:\eclipse\workspace\MongoNode\lib\jsqlparser.jar;D:\eclipse\workspace\MongoNode\lib\junit.jar;D:\eclipse\workspace\MongoNode\lib\mongo-2.6.5.jar;D:\eclipse\workspace\MongoNode\lib\mongo-2.7.0-rc1.jar;D:\eclipse341\plugins\org.apache.ant_1.7.0.v200803061910\lib\ant-launcher.jar;D:\eclipse341\plugins\org.apache.ant_1.7.0.v200803061910\lib\ant.jar;D:\eclipse341\plugins\org.apache.ant_1.7.0.v200803061910\lib\ant-junit.jar" />
     <property name="ant.version" value="Apache Ant version 1.7.0 compiled on December 13 2006" />
-    <property name="TSTAMP" value="1241" />
+    <property name="TSTAMP" value="0453" />
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
     <property name="java.vm.specification.version" value="1.0" />
     <property name="sun.cpu.endian" value="little" />
@@ -74,226 +74,299 @@
     <property name="basedir" value="D:\eclipse\workspace\MongoNode" />
     <property name="baseDir" value="." />
     <property name="ant.java.version" value="1.5" />
-    <property name="TODAY_MY" value="10/04/2011 12:41" />
+    <property name="TODAY_MY" value="10/29/2011 04:53" />
     <property name="ant.core.lib" value="D:\eclipse341\plugins\org.apache.ant_1.7.0.v200803061910\lib\ant.jar" />
     <property name="file.encoding" value="MS949" />
     <property name="java.specification.version" value="1.5" />
   </properties>
-  <testcase classname="net.ion.radon.repository.TestCreate" name="testNewNode" time="0.188" />
+  <testcase classname="net.ion.radon.repository.TestCreate" name="testNewNode" time="0.172" />
   <testcase classname="net.ion.radon.repository.TestCreate" name="testOtherType" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestCreate" name="testCaseSentive" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestCreate" name="testCaseSentive" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestCreate" name="testCaseInSentiveQuery" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestCreate" name="testCreateWithPath" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestCreate" name="testChildNode" time="0.031" />
   <testcase classname="net.ion.radon.repository.TestCreate" name="testDupName" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestCreate" name="testPath" time="0.015" />
   <testcase classname="net.ion.radon.repository.TestCreate" name="testReserved" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestUpdate" name="testUpdate" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestUpdate" name="testFindUpdate" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestUpdate" name="testFindOverwrite" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestUpdate" name="testUpdate" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestUpdate" name="testFindUpdate" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestUpdate" name="testFindOverwrite" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestUpdate" name="testNotExistUpdate" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestUpdate" name="testMultiUpdate" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestUpdate" name="testResult" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestUpdate" name="testLastResult" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestRemove" name="testNodeRemove" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestRemove" name="testQueryRemove" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestRootNode" name="testGet" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestUpdate" name="testMultiUpdate" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestUpdate" name="testResult" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestUpdate" name="testLastResult" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestRemove" name="testNodeRemove" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestRemove" name="testQueryRemove" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestRootNode" name="testPath" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestRootNode" name="testGet" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestRootNode" name="testChild" time="0.015" />
   <testcase classname="net.ion.radon.repository.TestRootNode" name="testFindByPath" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestFind" name="testFindByPath" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestFind" name="testFindById" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestFind" name="testFindByProperty" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestFind" name="testByAradonId" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestFind" name="testCacheLoad" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestColumns" name="testSelect" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestFind" name="testFindByPath" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestFind" name="testFindById" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestFind" name="testFindByProperty" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestFind" name="testByAradonId" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestFind" name="testCacheLoad" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestColumns" name="testSelect" time="0.015" />
   <testcase classname="net.ion.radon.repository.TestColumns" name="testBlankColumn" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestColumns" name="testSelectDup" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestColumns" name="testCompositeSelect" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestColumns" name="testCompositeSelect2" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestColumns" name="testSlice" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestColumns" name="testExcludeSlice" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testSelectAll" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testPaging" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testSort" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testEach" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testDebugPrint" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testScreen" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testCompare" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testTwoCompare" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testListCompare" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testEncrypt" time="0.266" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testIncrease" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testNewNode" time="0.062" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testFind" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testPredefinedIndexCount" time="0.046" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testAradonId" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testGroupPath" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testGroupAndId" time="0.032" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testAradonIdSort" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestAradonId" name="testfindGroupUid" time="0.016" />
-  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testColumnParse" time="0.015" />
-  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testSecurity" time="0.016" />
-  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testToCharFromDate" time="0.0" />
-  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testToChar" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestColumns" name="testSelectDup" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestColumns" name="testCompositeSelect" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestColumns" name="testCompositeSelect2" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestColumns" name="testSlice" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestColumns" name="testExcludeSlice" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceColumns" name="testSlice" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testCreateTempNode" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testSetGet" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testAppend" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testMerge" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testGetParent" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testMergeId" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testMergeAradonId" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testMergePath" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testMergtPath2" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestTemporaryNode" name="testInListOverwrite" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestMergeNode" name="testMergeNode" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestMergeNode" name="testMetaGet" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestMergeNode" name="testMergeOnExist" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestMergeNode" name="testNotExist" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestMergeNode" name="testLastModified" time="0.109" />
+  <testcase classname="net.ion.radon.repository.TestToMap" name="testGet" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestToMap" name="testInnerClass" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestToMap" name="testTempInner" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestToMap" name="testInList" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAppend" name="testAppend" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestParticialNode" name="testWithColumns" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestParticialNode" name="testPush" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testSelectAll" time="0.032" />
+  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testPaging" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testSort" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testEach" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testDebugPrint" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestNodeCursor" name="testScreen" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testCompare" time="0.032" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testTwoCompare" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testListCompare" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testInListCompare" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testEncrypt" time="0.25" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceNode" name="testIncrease" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testNewNode" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testFind" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testPredefinedIndexCount" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testAradonId" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testGroupPath" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testGroupAndId" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testAradonIdSort" time="0.063" />
+  <testcase classname="net.ion.radon.repository.TestAradonId" name="testfindGroupUid" time="0.015" />
+  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testColumnParse" time="0.016" />
+  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testSecurity" time="0.0" />
+  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testToCharFromDate" time="0.015" />
+  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testToChar" time="0.0" />
   <testcase classname="net.ion.radon.repository.function.TestFunction" name="testDateColumn" time="0.047" />
-  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testDateOrder" time="0.015" />
+  <testcase classname="net.ion.radon.repository.function.TestFunction" name="testDateOrder" time="0.016" />
   <testcase classname="net.ion.radon.repository.function.TestFunction" name="testPrefix" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestInnerNode" name="testInterrface" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestInnerNode" name="testComplicateGet" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestTempNode" name="testChild" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestTempNode" name="testOtherSelect" time="0.094" />
-  <testcase classname="net.ion.radon.repository.TestLastModified" name="testWhenNew" time="0.11" />
-  <testcase classname="net.ion.radon.repository.TestLastModified" name="testQueryUpdate" time="0.218" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testAllFind" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testEqual" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testGreaterThan" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testGraterThanEqual" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testLessThan" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testLessThanEqual" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testInExpression" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testExist" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestInnerNode" name="testInterrface" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestInnerNode" name="testComplicateGet" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestLastModified" name="testWhenNew" time="0.109" />
+  <testcase classname="net.ion.radon.repository.TestLastModified" name="testQueryUpdate" time="0.203" />
   <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testNotExist" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testAllFind" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testEqual" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testGreaterThan" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testGraterThanEqual" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testLessThan" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testLessThanEqual" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testInExpression" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testExist" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testBetween" time="0.047" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testBetween2" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testOrExpression" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testOr2" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testBetween2" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testOrExpression" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testOr2" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testOrAradonGroup" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testRegExpression" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testWhere" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testDate" time="0.032" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testRegExpression" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testAnd" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testCompositeAnd" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testWhere" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testDate" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testDateLessThen" time="0.015" />
   <testcase classname="net.ion.radon.repository.TestQueryOperator" name="testDateGreaterThen" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestQueryMDL" name="testQueryRemove" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestQueryMDL" name="testQueryUpdate" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceQuery" name="testAnd" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceQuery" name="testNotify" time="0.0" />
-  <testcase classname="net.ion.radon.repository.innode.TestInPut" name="testCase" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInPut" name="testPath" time="0.0" />
-  <testcase classname="net.ion.radon.repository.innode.TestInPut" name="testQuery" time="0.015" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuery" name="testExist" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuery" name="testEqualFilter" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuery" name="testNotEqualFilter" time="0.015" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuery" name="testGreater" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuery" name="testLess" time="0.015" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuery" name="testIn" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuerySort" name="testPath" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuerySort" name="testSort" time="0.015" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListQuerySort" name="testSortPage" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testUpdate" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testAppend" time="0.015" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testRemove" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testRemove2" time="0.0" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testInListNodeUpdate" time="0.015" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testPush" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListNodeQuery" name="testPush" time="0.0" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListNodeQuery" name="testPushInNode" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListNodeQuery" name="testPull" time="0.031" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListNodeQuery" name="testMultiPush" time="0.0" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListNodeQuery" name="testCaseInSensitive" time="0.062" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListNodeQuery" name="testDepth" time="0.016" />
-  <testcase classname="net.ion.radon.repository.innode.TestInListNodeQuery" name="testInListUpdate" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestQueryMDL" name="testQueryUpdate" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceQuery" name="testAnd" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceQuery" name="testNotify" time="0.015" />
   <testcase classname="net.ion.radon.repository.TestRepositoryCentral" name="testCreate" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestRepositoryCentral" name="testSameMongo" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestSession" name="testParentChild2" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestSession" name="testSameSessionInSameThread" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestSession" name="testSessionLogout" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testWorkspace2" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testReference" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testSessionSave" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testConplict" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testWorkspace" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestParentChild" name="testParentChild" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestParentChild" name="testReferenceDepth" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testRelation" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testReference2" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testOtherRelation" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testAddReference" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testRemoveReference" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testUpdateReference" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestFindRelation" name="testReference" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestFindRelation" name="testSimpleReference" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testReference" time="0.063" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testSetReference" time="0.031" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testAradonDuplicate" time="0.047" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testFindByGroup" time="0.062" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testDifferentWorksapce" time="0.047" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testCaseInsentiveReference" time="0.047" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testReference" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testHasProperty" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testReferenceGroup" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testViewRef" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestSequence" name="testCreate" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestSequence" name="testInit" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testWorkspace2" time="0.078" />
+  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testReference" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testSessionSave" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testConplict" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestWorkspace" name="testWorkspace" time="0.031" />
+  <testcase classname="net.ion.radon.repository.innode.TestInPut" name="testCase" time="0.094" />
+  <testcase classname="net.ion.radon.repository.innode.TestInPut" name="testPath" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInPut" name="testQuery" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListNode" name="testGet" time="0.015" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListNode" name="testExist" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListNode" name="testEqualFilter" time="0.015" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListNode" name="testNotEqualFilter" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListNode" name="testGreater" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListNode" name="testLess" time="0.015" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListNode" name="testIn" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQuerySort" name="testPath" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQuerySort" name="testSort" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQuerySort" name="testSortPage" time="0.015" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testAppend" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testPush" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testRemove" time="0.015" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testRemove2" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testInListNodeUpdate" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testInListNodeUpdate2" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListMDL" name="testPushOnNewState" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNode" name="testDepth" time="0.015" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNode" name="testCaseInSensitive" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNode" name="testEleMatch" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNodeMDL" name="testPush" time="0.016" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNodeMDL" name="testPushDefault" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNodeMDL" name="testPull" time="0.015" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNodeMDL" name="testMultiPush" time="0.0" />
+  <testcase classname="net.ion.radon.repository.innode.TestInListQueryNodeMDL" name="testInListUpdate" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestBasicInner" name="testUse" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestSequence" name="testCreate" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestSequence" name="testUse" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestSequence" name="testInit" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestSequence" name="testNext" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestSequence" name="testCache" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestSequence" name="testUse" time="0.015" />
-  <testcase classname="net.ion.radon.repository.advance.TestExplain" name="testViewExplain" time="0.016" />
-  <testcase classname="net.ion.radon.repository.advance.TestExplain" name="testViewLastExplain" time="0.0" />
-  <testcase classname="net.ion.radon.repository.advance.TestIndex" name="testLazyConfirmPath" time="0.016" />
-  <testcase classname="net.ion.radon.repository.advance.TestIndex" name="testConfirmIndex" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestSequence" name="testCache" time="0.015" />
+  <testcase classname="net.ion.radon.repository.advance.TestExplain" name="testViewExplain" time="0.0" />
+  <testcase classname="net.ion.radon.repository.advance.TestExplain" name="testViewLastExplain" time="0.016" />
+  <testcase classname="net.ion.radon.repository.advance.TestIndex" name="testLazyConfirmPath" time="0.0" />
+  <testcase classname="net.ion.radon.repository.advance.TestIndex" name="testConfirmIndex" time="0.016" />
+  <testcase classname="net.ion.radon.repository.advance.TestIndex" name="testCreateCompoundIndex" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestNodeRows" name="testCreate" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testSort" time="0.0" />
-  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testReference" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testSort" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testReference" time="0.015" />
   <testcase classname="net.ion.radon.repository.TestNodeRows" name="testFavoriate" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestNodeRows" name="testMeta" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestNodeRows" name="testValue" time="0.0" />
   <testcase classname="net.ion.radon.repository.TestNodeRows" name="testCursor" time="0.016" />
   <testcase classname="net.ion.radon.repository.TestNodeRows" name="testCursor2" time="0.015" />
   <testcase classname="net.ion.radon.repository.TestNodeRows" name="testDecode" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testColumn" time="0.016" />
-  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testUnionAll" time="0.015" />
-  <testcase classname="net.ion.radon.repository.TestNodeSerialize" name="testSerialize" time="0.016" />
-  <system-out><![CDATA[[[[{age=2, color=red}, {age=1, color=red}]]] by net.ion.radon.repository.TestAradonId:testFind[20111004-124135]
-[[[{ "name" : "_id_" , "ns" : "test.abcd" , "key" : { "_id" : 1}}, { "name" : "_aradon_id" , "ns" : "test.abcd" , "unique" : true , "key" : { "__aradon.group" : 1 , "__aradon.uid" : -1}}, { "name" : "_path_id" , "ns" : "test.abcd" , "unique" : true , "key" : { "__path" : 1}}]]] by net.ion.radon.repository.TestAradonId:testPredefinedIndexCount[20111004-124135]
-[2011-10-04 12:41:35] by net.ion.radon.repository.function.TestFunction:testToChar[20111004-124135]
-[20111004-124135] by net.ion.radon.repository.function.TestFunction:testToChar[20111004-124135]
-[20111004-124135] by net.ion.radon.repository.function.TestFunction:testDateColumn[20111004-124135]
+  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testColumn" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestNodeRows" name="testUnionAll" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestNodeSerialize" name="testSerialize" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestNodeListCursor" name="testSort" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestNodeListCursor" name="testSkip" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestNodeListCursor" name="testPage" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestNodeListCursor" name="testIterator" time="0.0" />
+  <testcase classname="net.ion.radon.repository.orm.TestORM" name="testUse" time="0.125" />
+  <testcase classname="net.ion.radon.repository.TestPropertyFamily" name="testJSONString" time="0.0" />
+  <testcase classname="net.ion.radon.repository.util.TestJSONMessage" name="testLoad" time="0.0" />
+  <testcase classname="net.ion.radon.repository.util.TestJSONMessage" name="testToJSON" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestParentChild" name="testParentChild" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestParentChild" name="testReferenceDepth" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testRelation" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testReference2" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testOtherRelation" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testAddReference" time="0.031" />
+  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testRemoveReference" time="0.0" />
+  <testcase classname="net.ion.radon.repository.TestGeneralRelation" name="testUpdateReference" time="0.047" />
+  <testcase classname="net.ion.radon.repository.TestFindRelation" name="testReference" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestFindRelation" name="testSimpleReference" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testReference" time="0.046" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testSetReference" time="0.047" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testAradonDuplicate" time="0.032" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testFindByGroup" time="0.046" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testDifferentWorksapce" time="0.047" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation" name="testCaseInsentiveReference" time="0.032" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testReference" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testHasProperty" time="0.016" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testReferenceGroup" time="0.015" />
+  <testcase classname="net.ion.radon.repository.TestAdvanceRelation2" name="testViewRef" time="0.0" />
+  <testcase classname="net.ion.radon.repository.mr.TestGroup" name="testInListSort" time="0.047" />
+  <testcase classname="net.ion.radon.repository.mr.TestMapReduce" name="testDefault" time="0.016" />
+  <testcase classname="net.ion.radon.repository.mr.TestMapReduce" name="testLimit" time="0.0" />
+  <testcase classname="net.ion.radon.repository.mr.TestMapReduce" name="testOnlyMapFunction" time="0.016" />
+  <testcase classname="net.ion.radon.repository.mr.TestNodeFormat" name="testNode" time="0.0" />
+  <testcase classname="net.ion.radon.repository.mr.TestMRSpeed" name="testMapSortOptimize" time="0.203" />
+  <testcase classname="net.ion.radon.repository.mr.TestMRSpeed" name="testFilter" time="1.078" />
+  <testcase classname="net.ion.radon.repository.mr.TestMRSpeed" name="testMap" time="0.109" />
+  <testcase classname="net.ion.radon.repository.mr.TestMRSpeed" name="testRecentSlice" time="0.625" />
+  <testcase classname="net.ion.radon.repository.mr.TestMRSpeed" name="testReduce" time="2.281" />
+  <testcase classname="net.ion.radon.repository.mr.TestMRSpeed" name="testCollectionSort" time="0.219" />
+  <system-out><![CDATA[[====================, [{index=1, name=hero}, class net.ion.radon.repository.innode.TempInNodeImpl]] by net.ion.radon.repository.TestToMap:testInList[20111029-045356]
+[[[ "bleujin" , "hero" , "jin"], class net.ion.radon.repository.innode.InListNodeImpl]] by net.ion.radon.repository.TestAppend:testAppend[20111029-045356]
+[[[{age=1, color=red}, {age=2, color=red}]]] by net.ion.radon.repository.TestAradonId:testFind[20111029-045357]
+[[[{ "v" : 1 , "key" : { "_id" : 1} , "ns" : "test.abcd" , "name" : "_id_"}, { "v" : 1 , "key" : { "__aradon.group" : 1 , "__aradon.uid" : -1} , "ns" : "test.abcd" , "name" : "__aradon.group_1___aradon.uid_-1"}, { "v" : 1 , "key" : { "__path" : 1} , "ns" : "test.abcd" , "name" : "_path_id"}]]] by net.ion.radon.repository.TestAradonId:testPredefinedIndexCount[20111029-045357]
+[2011-10-29 04:53:57] by net.ion.radon.repository.function.TestFunction:testToChar[20111029-045357]
+[20111029-045357] by net.ion.radon.repository.function.TestFunction:testToChar[20111029-045357]
+[20111029-045357] by net.ion.radon.repository.function.TestFunction:testDateColumn[20111029-045357]
 [[<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE RowSet PUBLIC '-//Sun Microsystems, Inc.//DTD RowSet//EN' 'http://java.sun.com/j2ee/dtds/RowSet.dtd'>
 
 <RowSet>
   <data>
     <ins>
-      <date>Tue Oct 04 12:41:35 GMT 2011</date>
+      <date>Sat Oct 29 04:53:57 GMT 2011</date>
       <name><![CDATA[d2&#x5d;&#x5d;&gt;</name>
     </ins>
     <ins>
-      <date>Tue Oct 04 12:24:55 GMT 2011</date>
+      <date>Sat Oct 29 04:37:17 GMT 2011</date>
       <name><![CDATA[d1&#x5d;&#x5d;&gt;</name>
     </ins>
   </data>
 </RowSet>
-]] by net.ion.radon.repository.function.TestFunction:testDateOrder[20111004-124135]
-[[{key=val}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.ReferenceTaragetCursor:each[20111004-124135]
-[[{key=val}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.ReferenceTaragetCursor:each[20111004-124135]
-[[{age=20, greeting=hi!, name=hello}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124136]
-[[1317732096140, 1317732096343]] by net.ion.radon.repository.TestLastModified:testQueryUpdate[20111004-124136]
-[[{color=black, name=my1}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124136]
-[[{color=red, name=my4}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124136]
-[[{ "path" : { "$regex" : "^\\/\\w*$"}}]] by net.ion.radon.repository.TestQueryOperator:testRegExpression[20111004-124136]
-[[{age=40, address=null, path=/hero, name=hero}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124136]
-[====================, []] by net.ion.radon.repository.TestQueryOperator:testDate[20111004-124136]
-[[{birthdate=Fri Jan 01 00:00:00 GMT 2010}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124136]
-[[{name=bleujin, 1=2, address={ "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}}, color=["red","blue","white"], index=0}]] by net.ion.radon.repository.innode.TestInListQuerySort:testPath[20111004-124136]
-[[1, hello]] by net.ion.radon.repository.innode.TestInListNodeQuery:testMultiPush[20111004-124136]
-[[{eng=hello}]] by net.ion.radon.repository.innode.TestInListNodeQuery:testCaseInSensitive[20111004-124137]
-[[{person=[ { "name" : "bleujin" , "1" : 2 , "address" : { "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}} , "color" : [ "red" , "blue" , "white"]}], name=bleujin}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124137]
-[====================, [{ "err" :  null  , "updatedExisting" : true , "n" : 1 , "ok" : 1.0}, 1, null]] by net.ion.radon.repository.innode.TestInListNodeQuery:testInListUpdate[20111004-124137]
-[[{name=bleujin, working=true}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124137]
-[====================, [Mongo: 61.250.201.78:27017, Mongo: 61.250.201.78:27017]] by net.ion.radon.repository.TestRepositoryCentral:testCreate[20111004-124137]
-[[1]] by net.ion.radon.repository.TestWorkspace:testReference[20111004-124137]
-[[[]]] by net.ion.radon.repository.TestWorkspace:testWorkspace[20111004-124137]
-[[{greeting=44564, name=jin}]] by net.ion.radon.repository.TestGeneralRelation:testRelation[20111004-124137]
-[[{greeting=Tue Oct 04 12:41:37 GMT 2011, name=heeya}]] by net.ion.radon.repository.TestGeneralRelation:testRelation[20111004-124137]
-[[N/A]] by net.ion.radon.repository.TestGeneralRelation:testRemoveReference[20111004-124137]
-[[{target_aradon={ "group" : "dept" , "uid" : "dev" , "ghash" : 7576180}, type=dept, target={ "workspace" : "abcd" , "id" : { "$oid" : "4e8aff01441107e0e6f36ce2"} , "orderNo" :  null }, src_aradon={ "group" : "employee" , "uid" : "bleujin" , "ghash" : 12316472402134}, src={ "workspace" : "abcd" , "id" : { "$oid" : "4e8aff01441107e0e6f36ce3"} , "orderNo" :  null }}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursor:each[20111004-124137]
-[[{age=20, name=bleu, id=bleujin}]] by net.ion.radon.repository.TestAdvanceRelation:testFindByGroup[20111004-124137]
-[====================, [{dno=20, deptno=20, name=bleu, id=bleujin}]] by net.ion.radon.repository.TestAdvanceRelation:testCaseInsentiveReference[20111004-124137]
-[[my, [{seq=1, name=bleujin}]]] by net.ion.radon.repository.TestSequence:testUse[20111004-124137]
-[[                , CURRENT, 0]] by net.ion.radon.repository.StopWatch:current[20111004-124137]
-[[                , make nodeRows, 0]] by net.ion.radon.repository.StopWatch:end[20111004-124137]
-[[[bleujin, hero], seoul, 10]] by net.ion.radon.repository.TestNodeSerialize:testSerialize[20111004-124137]
-[[[bleujin, hero], other]] by net.ion.radon.repository.TestNodeSerialize:testSerialize[20111004-124137]
+]] by net.ion.radon.repository.function.TestFunction:testDateOrder[20111029-045357]
+[[1319864037734, 1319864037937]] by net.ion.radon.repository.TestLastModified:testQueryUpdate[20111029-045357]
+[[{color=black, name=my1}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045358]
+[[{color=red, name=my4}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045358]
+[[{ "path" : { "$regex" : "^\\/\\w*$"}}]] by net.ion.radon.repository.TestQueryOperator:testRegExpression[20111029-045358]
+[[{age=40, address=null, path=/hero, name=hero}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045358]
+[====================, [{ "name" : "bleujin" , "age" : 20}]] by net.ion.radon.repository.TestQueryOperator:testAnd[20111029-045358]
+[====================, []] by net.ion.radon.repository.TestQueryOperator:testDate[20111029-045358]
+[[{birthdate=Fri Jan 01 00:00:00 GMT 2010}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045358]
+[====================, [Mongo: 61.250.201.78:27017, Mongo: 61.250.201.78:27017]] by net.ion.radon.repository.TestRepositoryCentral:testCreate[20111029-045358]
+[[1]] by net.ion.radon.repository.TestWorkspace:testReference[20111029-045358]
+[[[]]] by net.ion.radon.repository.TestWorkspace:testWorkspace[20111029-045358]
+[====================, [class net.ion.radon.repository.innode.NormalInNodeImpl, {name=bleujin, 1=2, address={ "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}}, color=[ "red" , "blue" , "white"], index=0}]] by net.ion.radon.repository.innode.TestInListNode:testGet[20111029-045358]
+[[[ { "name" : "bleujin" , "1" : 2 , "address" : { "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}} , "color" : [ "red" , "blue" , "white"] , "index" : 0} , { "name" : "bleujin" , "1" : 2 , "address" : { "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}} , "color" : [ "red" , "blue" , "white"] , "index" : 1} , { "name" : "bleujin" , "1" : 2 , "address" : { "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}} , "color" : [ "red" , "blue" , "white"] , "index" : 2} , { "name" : "bleujin" , "1" : 2 , "address" : { "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}} , "color" : [ "red" , "blue" , "white"] , "index" : 3} , { "name" : "bleujin" , "1" : 2 , "address" : { "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}} , "color" : [ "red" , "blue" , "white"] , "index" : 4}]]] by net.ion.radon.repository.innode.TestInListQuerySort:testPath[20111029-045358]
+[====================, [{greeting=[ { "eng" : "하이" , "index" : 4} , { "kor" : "hi"}], name=bleujin}]] by net.ion.radon.repository.innode.TestInListMDL:testInListNodeUpdate2[20111029-045358]
+[[{person=[ { "name" : "bleujin" , "1" : 2 , "address" : { "city" : "seoul" , "street" : [ 1 , 2 , 3] , "col" : { "val" : "A"}} , "color" : [ "red" , "blue" , "white"]}], name=bleujin}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045358]
+[[{eng=hello}]] by net.ion.radon.repository.innode.TestInListQueryNode:testCaseInSensitive[20111029-045358]
+[[1, hello]] by net.ion.radon.repository.innode.TestInListQueryNodeMDL:testMultiPush[20111029-045358]
+[[{name=bleujin, hobby=[ { "name" : "promodel"} , { "type" : "navy" , "name" : "navy promodel"}]}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045358]
+[[my, [{seq=1, name=bleujin}]]] by net.ion.radon.repository.TestSequence:testUse[20111029-045358]
+[[                , CURRENT, 0]] by net.ion.radon.repository.StopWatch:current[20111029-045358]
+[[                , make nodeRows, 0]] by net.ion.radon.repository.StopWatch:end[20111029-045358]
+[[[ "bleujin" , "hero"], seoul, 10]] by net.ion.radon.repository.TestNodeSerialize:testSerialize[20111029-045359]
+[[[ "bleujin" , "hero"], other]] by net.ion.radon.repository.TestNodeSerialize:testSerialize[20111029-045359]
+[====================, [{name=hero}]] by net.ion.radon.repository.TestNodeListCursor:testIterator[20111029-045359]
+[====================, [{name=bleujin}]] by net.ion.radon.repository.TestNodeListCursor:testIterator[20111029-045359]
+[[id:bee, age:29]] by net.ion.radon.repository.orm.TestORM:testUse[20111029-045359]
+[[id:hero, age:30]] by net.ion.radon.repository.orm.TestORM:testUse[20111029-045359]
+[[{address.city=seoul, phone.first=1234, name=bleujin, phone.sec=0}, {"address":{"city":"seoul"},"phone":{"first":1234,"sec":"0"},"name":"bleujin"}]] by net.ion.radon.repository.util.TestJSONMessage:testLoad[20111029-045359]
+[====================, [address, {"city":"seoul"}]] by net.ion.radon.repository.util.TestJSONMessage:testToJSON[20111029-045359]
+[====================, [phone, {"first":1234,"sec":"0"}]] by net.ion.radon.repository.util.TestJSONMessage:testToJSON[20111029-045359]
+[====================, [name, bleujin]] by net.ion.radon.repository.util.TestJSONMessage:testToJSON[20111029-045359]
+[[{greeting=Sat Oct 29 04:53:59 GMT 2011, name=heeya}]] by net.ion.radon.repository.TestGeneralRelation:testRelation[20111029-045359]
+[[{greeting=44564, name=jin}]] by net.ion.radon.repository.TestGeneralRelation:testRelation[20111029-045359]
+[[N/A]] by net.ion.radon.repository.TestGeneralRelation:testRemoveReference[20111029-045359]
+[[{target_aradon={group=dept, uid=dev, ghash=7576180}, type=dept, target={workspace=abcd, id=4eab86e74411645e6888fb3b, orderNo=null}, src_aradon={group=employee, uid=bleujin, ghash=12316472402134}, src={workspace=abcd, id=4eab86e74411645e6888fb3c, orderNo=null}}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045359]
+[[{age=20, name=bleu, id=bleujin}]] by net.ion.radon.repository.TestAdvanceRelation:testFindByGroup[20111029-045359]
+[====================, [{dno=20, deptno=20, name=bleu, id=bleujin}]] by net.ion.radon.repository.TestAdvanceRelation:testCaseInsentiveReference[20111029-045359]
+[[{limit=2.0, skip=0.0, sortkey=name, friends=[ { "age" : 25 , "name" : "iihi"} , { "age" : 20 , "name" : "novision"}]}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeListCursor:each[20111029-045359]
+[[{limit=2.0, skip=0.0, sortkey=name, friends=[ { "age" : 30 , "name" : "air"} , { "age" : 20 , "name" : "baegi"}]}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeListCursor:each[20111029-045359]
+[====================, [3.0, 3, class java.lang.Double]] by net.ion.radon.repository.mr.TestMapReduce:testOnlyMapFunction[20111029-045359]
+[====================, [3.0, 3, class java.lang.Double]] by net.ion.radon.repository.mr.TestMapReduce:testOnlyMapFunction[20111029-045359]
+[[{plist=[ { "sort2" : 1 , "parentid" : 0 , "sort1" : 60750285718392 , "content" : "347kd01W3c04rDbee0cpy75yriv4601l04gEYivZ3fI" , "postid" : "4eab86e73dea11442bbfa7a8"} , { "sort2" : 2 , "parentid" : 0 , "sort1" : 60750295400220 , "content" : "528WcMzcd105YF4ke264hy3U33oE9qJ4TBezvy2X5Hw" , "postid" : "4eab86e73dea1144e0bfa7a8"}], pcount=1000, post=http://localhost/post}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.ApplyCursor:each[20111029-045359]
+[====================, [54]] by net.ion.radon.repository.mr.TestMRSpeed:testMapSortOptimize[20111029-045359]
+[[{post_list=[ { "sort2" : 3 , "parentid" : 0 , "sort1" : 60750905306122 , "content" : "7447x6bri10agbZ63dCUsCc21eC849omHP6959hl5r51" , "postid" : "4eab86e83dea1144cfdea7a8"} , { "sort2" : 3 , "parentid" : 0 , "sort1" : 60750908190454 , "content" : "7505K05X626d1xXy83twqg291i0zr63A1Fe7cY4i48F6" , "postid" : "4eab86e83dea114409dfa7a8"}]}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.ApplyCursor:each[20111029-045401]
+[====================, [291]] by net.ion.radon.repository.mr.TestMRSpeed:testFilter[20111029-045401]
+[[{post_list=[ { "sort2" : 0 , "parentid" : 0 , "sort1" : 60751560718804 , "content" : "798XhVhw68qY375178h6g4a1I5cb98kk33sp4atY667" , "postid" : "4eab86e93dea1144e6eba7a8"} , { "sort2" : 1 , "parentid" : 0 , "sort1" : 60751556751793 , "content" : "7115izPCvDZCCk0wiFhHkYqY88mos1g9Zje1r8q6rZw" , "postid" : "4eab86e93dea11448feba7a8"}]}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.ApplyCursor:each[20111029-045401]
+[====================, [40]] by net.ion.radon.repository.mr.TestMRSpeed:testMap[20111029-045401]
+[[{post_list=[ { "sort2" : 8617 , "parentid" : 0 , "sort1" : 60752113000964 , "content" : "9991Pcn86Qp3u6kapT1yhxL1A1lE0RzUkvq4uv30k2gu" , "postid" : "4eab86e93dea1144b713a8a8"} , { "sort2" : 6164 , "parentid" : 0 , "sort1" : 60752113036375 , "content" : "9992G1Nh1Jdh86UhfR52779v5yci87SV6rXDSu6liA43" , "postid" : "4eab86e93dea1144b813a8a8"} , { "sort2" : 6581 , "parentid" : 0 , "sort1" : 60752113072795 , "content" : "9993C6a0I6Kdzds61xd20t8WOt22zkZnpn3nCQ822A5g" , "postid" : "4eab86e93dea1144b913a8a8"} , { "sort2" : 8333 , "parentid" : 0 , "sort1" : 60752113112913 , "content" : "99941h948d5Ax9746l514meyk8781hAcwMC2Zj9YKw0r" , "postid" : "4eab86e93dea1144ba13a8a8"} , { "sort2" : 3534 , "parentid" : 0 , "sort1" : 60752113709807 , "content" : "9995hQ37BmU3px1AFrWKp4h7sI8y2Ge460Gbo56d588c" , "postid" : "4eab86e93dea1144bb13a8a8"} , { "sort2" : 2400 , "parentid" : 0 , "sort1" : 60752113742477 , "content" : "999602zR9by81YiS542A5kjwsbz46hxE2g89851jq4kf" , "postid" : "4eab86e93dea1144bc13a8a8"} , { "sort2" : 3283 , "parentid" : 0 , "sort1" : 60752113782212 , "content" : "99973ii92IOrx0nr92043cxiU9F5tQ7co95Y0c2H1a7g" , "postid" : "4eab86e93dea1144bd13a8a8"} , { "sort2" : 6945 , "parentid" : 0 , "sort1" : 60752113821790 , "content" : "99981bm1zT6J76UjOkOjNX917so4HLcA5wMd0117quip" , "postid" : "4eab86e93dea1144be13a8a8"} , { "sort2" : 6697 , "parentid" : 0 , "sort1" : 60752113854055 , "content" : "9999u6bxte64j0Ks42Vus3o0l08t6oJOo05f4E1717n5" , "postid" : "4eab86e93dea1144bf13a8a8"} , { "sort2" : 8745 , "parentid" : 0 , "sort1" : 60752113886271 , "content" : "10000Vz5abR521Ds305Q25E9Q3vncC321eU76scdT2mS5" , "postid" : "4eab86e93dea1144c013a8a8"}], post=http://localhost/post}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.NodeCursorImpl:each[20111029-045401]
+[????????????????????, [9]] by net.ion.radon.repository.mr.TestMRSpeed:testRecentSlice[20111029-045401]
+[====================, [19992]] by net.ion.radon.repository.mr.TestMRSpeed:testReduce[20111029-045402]
+[[{post_list=[ { "sort2" : 3918 , "parentid" : 0 , "sort1" : 60752729948311 , "content" : "10000E9M2rSMi1epjT4I7t14j2X8908kprf5g98de3b30" , "postid" : "4eab86ea3dea1144d03aa8a8"} , { "sort2" : 7393 , "parentid" : 0 , "sort1" : 60752729916402 , "content" : "9999nW1Vux10AV6beNjD6t71C2efR6HTAnz36M882VY8" , "postid" : "4eab86ea3dea1144cf3aa8a8"} , { "sort2" : 3687 , "parentid" : 0 , "sort1" : 60752729884425 , "content" : "9998nf19rtkVqaV6ggGh0EM4V636Nqu1dz4j1rY9E640" , "postid" : "4eab86ea3dea1144ce3aa8a8"} , { "sort2" : 2998 , "parentid" : 0 , "sort1" : 60752729852393 , "content" : "9997aMz7f85tg2G4kaUbkbiL94jm90lq9u8Y5134bwP3" , "postid" : "4eab86ea3dea1144cd3aa8a8"} , { "sort2" : 3985 , "parentid" : 0 , "sort1" : 60752729820611 , "content" : "9996w7t4y1OcSNH3eH9r31R88fohtk67ebFnH92E6P8S" , "postid" : "4eab86ea3dea1144cc3aa8a8"} , { "sort2" : 2690 , "parentid" : 0 , "sort1" : 60752729788631 , "content" : "99953xTJ8a3uy9Lf7G766015pmA26t95XOt7F0Hk5gd6" , "postid" : "4eab86ea3dea1144cb3aa8a8"} , { "sort2" : 5903 , "parentid" : 0 , "sort1" : 60752729756565 , "content" : "9994n1g35aktc6iiDcugumXi58Y98g72S4ru088n00sF" , "postid" : "4eab86ea3dea1144ca3aa8a8"} , { "sort2" : 3963 , "parentid" : 0 , "sort1" : 60752729724645 , "content" : "9993loT5zwMQ39085wEbw5Aje56tuH79894Qy3q54zN2" , "postid" : "4eab86ea3dea1144c93aa8a8"} , { "sort2" : 882 , "parentid" : 0 , "sort1" : 60752729692822 , "content" : "9992vOQ9vSd7ln39I79p3p4pQe6mY09e1i0aa682As6k" , "postid" : "4eab86ea3dea1144c83aa8a8"} , { "sort2" : 5294 , "parentid" : 0 , "sort1" : 60752729660898 , "content" : "9991vl4w850Cl969ykN3769EaIT6tfd0mln7apvDbrYU" , "postid" : "4eab86ea3dea1144c73aa8a8"}], post=http://localhost/post, postid=null}, class net.ion.radon.repository.NodeImpl]] by net.ion.radon.repository.ApplyCursor:each[20111029-045404]
+[====================, [10758026]] by net.ion.radon.repository.mr.TestMRSpeed:testCollectionSort[20111029-045404]
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
