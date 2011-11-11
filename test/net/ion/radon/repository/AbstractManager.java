@@ -62,7 +62,9 @@ public abstract class AbstractManager<T extends AbstractORM> {
 	}
 
 	public Node toNode(T p) {
-		return NodeImpl.load(wsname, p.getNodeObject());
+		IDRow<T> idRow = getIDRow(p);
+		PropertyQuery query = session.createQuery().aradonGroupId(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId()).getQuery() ;
+		return NodeImpl.load(query, wsname, p.getNodeObject());
 	}
 
 	protected Session getSession() {

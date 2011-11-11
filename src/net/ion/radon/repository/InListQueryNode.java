@@ -8,8 +8,6 @@ import net.ion.radon.repository.innode.InListFilterQuery;
 import com.mongodb.BasicDBObject;
 
 public class InListQueryNode {
-
-	// private NodeObject listquery = NodeObject.create() ;
 	
 	private String field ;
 	private Session session ;
@@ -31,10 +29,10 @@ public class InListQueryNode {
 	}
 
 	public NodeResult pull() {
-		return pull(PropertyQuery.EMPTY) ;
+		return session.getCurrentWorkspace().unset(squery.getQuery(), new BasicDBObject(field, 1)) ;
 	}
 
-	public NodeResult pull(IPropertyFamily query) {
+	public NodeResult pull(PropertyQuery query) {
 		BasicDBObject dbo = new BasicDBObject() ;
 		dbo.put(field, query.getDBObject()) ;
 		
@@ -52,10 +50,10 @@ public class InListQueryNode {
 		return session.getCurrentWorkspace().push(squery.getQuery(), dbo) ;
 	}
 
-	public NodeResult update(IPropertyFamily query, ChainMap cmap) {
+	public NodeResult update(PropertyQuery query, ChainMap cmap) {
 		return update(query, cmap.toMap()) ;
 	}
-	public NodeResult update(IPropertyFamily query, Map<String, Object> map) {
+	public NodeResult update(PropertyQuery query, Map<String, Object> map) {
 		NodeResult result = this.pull(query);
 		if (result.getRowCount() == 0) {
 			return NodeResult.NULL;

@@ -15,7 +15,7 @@ import net.ion.radon.repository.PropertyQuery;
 public class AradonQuery implements IPropertyFamily{
 
 	private static final long serialVersionUID = -2160983060926085268L;
-	private IPropertyFamily props ;
+	private PropertyQuery props ;
 	private AradonQuery(PropertyQuery props) {
 		this.props = props ;
 	}
@@ -27,7 +27,7 @@ public class AradonQuery implements IPropertyFamily{
 		return new AradonQuery(PropertyQuery.create(ARADON_GROUP, groupId).put(ARADON_UID, uid).put(ARADON_GHASH, HashFunction.hashGeneral(groupId)) );
 	}
 
-	public IPropertyFamily getQuery() {
+	public PropertyQuery getQuery() {
 		return props;
 	}
 

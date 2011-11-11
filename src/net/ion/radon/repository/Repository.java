@@ -50,7 +50,7 @@ public class Repository {
 	Node findNodeById(String oid) {
 		Set<String> cols = getWorkspaceNames() ;
 		for (String colName : cols) {
-			Node obj = getWorkspace(colName).findOne(PropertyFamily.create(ID, new ObjectId(oid))) ;
+			Node obj = getWorkspace(colName).findOne(PropertyQuery.createById(oid), Columns.ALL) ;
 			if (obj != null) return obj ;
 		}
 		throw new IllegalArgumentException("id:" + oid + " not found");

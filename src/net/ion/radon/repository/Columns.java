@@ -15,7 +15,7 @@ public class Columns implements Serializable{
 	
 	public final static Columns ALL = new Columns(true) ;
 	
-	public static final String[] MetaColumns = ListUtil.toList(NodeConstants.ID, NodeConstants.OWNER, NodeConstants.LASTMODIFIED, NodeConstants.CREATED, NodeConstants.TIMEZONE, NodeConstants.NAME, NodeConstants.PATH, NodeConstants.ARADON).toArray(new String[0]);
+	public static final String[] MetaColumns = ListUtil.toList(NodeConstants.ID, NodeConstants.OWNER, NodeConstants.LASTMODIFIED, NodeConstants.CREATED, NodeConstants.TIMEZONE, NodeConstants.NAME, NodeConstants.PATH, NodeConstants.ARADON, NodeConstants.RELATION).toArray(new String[0]);
 	public static final Columns Meta = Columns.append().add(MetaColumns);
 	
 	private Columns(boolean include){

@@ -7,9 +7,9 @@ public class CommandOption {
 	public final static CommandOption BLANK = new CommandOption() ;
 	
 	private int limit = 0 ;
+	private int skip = 0 ;
 	private NodeObject sort = NodeObject.create() ;
 	private boolean verbose = true ;
-	private int skip = 0 ;
 	
 	private CommandOption(){
 		

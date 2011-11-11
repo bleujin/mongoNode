@@ -13,6 +13,7 @@ public class PropertyFamily implements IPropertyFamily{
 	
 	private static final long serialVersionUID = 5606467563983898492L;
 	private NodeObject nobject ;
+	public final static PropertyFamily BLANK = new PropertyFamily() ;
 	private PropertyFamily(){
 		nobject = NodeObject.create() ;
 	}

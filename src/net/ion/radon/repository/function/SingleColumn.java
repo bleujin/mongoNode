@@ -16,8 +16,7 @@ public abstract class SingleColumn implements IColumn {
 		meta.setColumnName(index, getLabel());
 		meta.setColumnLabel(index, getLabel());
 		Object value = getValue(node);
-		meta.setColumnType(index, value == null ? Types.OTHER : mapping
-				.get(value.getClass()));
+		meta.setColumnType(index, value == null ? Types.OTHER : mapping.get(value.getClass()));
 
 		return 0;
 	}
@@ -25,6 +24,5 @@ public abstract class SingleColumn implements IColumn {
 	public int getColumnCount(Node node) {
 		return 1;
 	}
-	
 
 }

@@ -3,6 +3,8 @@ package net.ion.radon.repository;
 import java.util.Collection;
 import java.util.List;
 
+import com.mongodb.DB;
+
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.sf.json.JSONObject;
 
@@ -11,8 +13,6 @@ public abstract class Session {
 	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
 
 	public abstract Session changeWorkspace(String wname);
-
-	public abstract ReferenceManager getReferenceManager();
 
 	public abstract ISequence getSequence(String prefix, String id);
 
@@ -60,11 +60,13 @@ public abstract class Session {
 
 	public abstract Node getRoot();
 
-	public abstract ReferenceQuery createRefQuery();
+//	public abstract ReferenceManager getReferenceManager();
 
-	public Node addReference(Node src, String relType, Node target) {
-		return getReferenceManager().addReference(src, relType, target);
-	}
+//	public abstract ReferenceQuery createRefQuery();
+
+//	public Node addReference(Node src, String relType, Node target) {
+//		return getReferenceManager().addReference(src, relType, target);
+//	}
 
 	public SessionQuery createQuery() {
 		return SessionQuery.create(this);
@@ -97,6 +99,8 @@ public abstract class Session {
 		return getCurrentWorkspace().merge(query, tnode);
 	}
 
-	public abstract Node mergeNode(MergeQuery mergeQuery) ;
+	public abstract Node mergeNode(MergeQuery mergeQuery, String... props) ;
+
+	public abstract Workspace getWorkspace(String wname) ;
 
 }

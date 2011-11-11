@@ -84,5 +84,9 @@ public class InListNodeImpl implements InListNode{
 	public DBObject getDBObject() {
 		return list;
 	}
+	
+	public int size(){
+		return list.size() ;
+	}
 
 }

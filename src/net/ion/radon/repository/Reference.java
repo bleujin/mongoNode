@@ -22,7 +22,7 @@ public class Reference {
 	public Node getTargetNode(){
 		ReferenceObject refObject = getTarget() ;
 		DBRef target = new DBRef(repository.getDB(), refObject.getWorkspaceName(), refObject.getId());
-		return NodeImpl.load(repository.getWorkspace(target.getRef()).getName(), NodeObject.load(target.fetch())) ;
+		return NodeImpl.load(PropertyQuery.createById(refObject.getId().toString()), repository.getWorkspace(target.getRef()).getName(), NodeObject.load(target.fetch())) ;
 	}
 	
 	private ReferenceObject getSource() {
@@ -36,7 +36,7 @@ public class Reference {
 	public Node getSourceNode(){
 		ReferenceObject refObject = getSource() ;
 		DBRef source = new DBRef(repository.getDB(), refObject.getWorkspaceName(), refObject.getId());
-		return NodeImpl.load(repository.getWorkspace(source.getRef()).getName(), NodeObject.load(source.fetch())) ;
+		return NodeImpl.load(PropertyQuery.createById(refObject.getId().toString()), repository.getWorkspace(source.getRef()).getName(), NodeObject.load(source.fetch())) ;
 	}
 
 	public ReferenceNode getReferenceNode(){

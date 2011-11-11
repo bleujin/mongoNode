@@ -3,7 +3,6 @@ package net.ion.radon.repository;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,7 +12,6 @@ import net.ion.radon.repository.innode.InNodeImpl;
 import net.ion.radon.repository.util.JSONUtil;
 import net.sf.json.JSONObject;
 
-import org.apache.commons.lang.CharUtils;
 import org.bson.types.BasicBSONList;
 
 import com.mongodb.BasicDBList;
@@ -60,7 +58,7 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		return inner.toString();
 	}
 
-	public void put(String key, Object value) {
+	public NodeObject put(String key, Object value) {
 
 		if (value instanceof IPropertyFamily) {
 			inner.put(key.toLowerCase(), ((IPropertyFamily) value).getDBObject());
@@ -69,6 +67,7 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		} else {
 			inner.put(key.toLowerCase(), value);
 		}
+		return this ;
 	}
 
 	public void put(String key, String[] values) {
@@ -101,7 +100,6 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		}
 		 return result;
 	}
-	
 
 	Serializable get(String propId, INode parent){
 		Object result = get(propId);
@@ -130,6 +128,7 @@ public class NodeObject implements Serializable, IPropertyFamily {
 	}
 	
 	private InNode inner(String name, Object result, INode parent){
+		
 		if (! (result instanceof DBObject)) {
 			DBObject value = new BasicDBObject() ;
 			put(name, value) ;
@@ -138,10 +137,12 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		return InNodeImpl.create((DBObject)result, name, parent) ;
 	}
 	
-	InListNode inlist(String name, INode parent) {
+	public InListNode inlist(String name, INode parent) {
 		Object result = get(name) ;
 		return inlist(name, result, parent) ;
 	}
+	
+	
 	private InListNode inlist(String name, Object result, INode parent) {
 		if (! (result instanceof BasicDBList)) {
 			BasicDBList value = new BasicDBList() ;
@@ -163,12 +164,14 @@ public class NodeObject implements Serializable, IPropertyFamily {
 			if (beforeVal instanceof BasicBSONList) {
 				((BasicBSONList) beforeVal).add(val);
 			} else {
-				BasicDBList vals = new BasicDBList();
-				vals.add(beforeVal);
-				vals.add(val);
-				putProperty(pid, vals);
+				BasicDBList list = new BasicDBList();
+				list.add(beforeVal);
+				list.add(val);
+				putProperty(pid, list);
 			}
 		} else {
+//			BasicDBList list = new BasicDBList();
+//			list.add(val);
 			putProperty(pid, val);
 		}
 
@@ -222,39 +225,15 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		return PropertyId.create(key) ;
 	}
 	
+	public int hashCode(){
+		return inner.hashCode() ;
+	}
+	
+	public boolean equals(Object obj){
+		if (! (obj instanceof NodeObject)) return false ;
+		NodeObject that = (NodeObject) obj ;
+		return inner.equals(that.inner) ;
+	}
 	
 }
 
-class PropertyId {
-
-	private String innerKey;
-
-	private PropertyId(String key) {
-		this.innerKey = key.toLowerCase();
-	}
-
-	public static PropertyId create(String key) {
-		checkAllowedPropertyName(key);
-		return new PropertyId(key);
-	}
-
-	private static void checkAllowedPropertyName(String pkey) {
-		if (StringUtil.isBlank(pkey) || NodeUtil.isReservedProperty(pkey)) {
-			// if (StringUtil.isBlank(pkey)) {
-			throw new IllegalArgumentException("illegal property id :" + pkey);
-		}
-		if (CharUtils.isAsciiNumeric(pkey.charAt(0)))
-			throw new IllegalArgumentException("illegal property id :" + pkey);
-	}
-
-	public String getKeyString() {
-		return innerKey;
-	}
-
-	public static PropertyId reserved(String key) {
-		if (!key.startsWith("_"))
-			throw new IllegalArgumentException("illegal reserved property id :" + key);
-
-		return new PropertyId(key);
-	}
-}

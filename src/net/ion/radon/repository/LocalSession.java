@@ -47,10 +47,6 @@ public class LocalSession extends Session {
 		return this ;
 	}
 
-
-	public ReferenceManager getReferenceManager() {
-		return repository.getReferenceManager();
-	}
 	
 	public ISequence getSequence(String prefix, String id) {
 		return ISequence.createOrLoad(repository.getWorkspace("_sequence"), prefix, id) ;
@@ -115,9 +111,9 @@ public class LocalSession extends Session {
 		return TempNodeImpl.create(NodeObject.create()) ;
 	}
 	
-	public Node mergeNode(MergeQuery mergeQuery) {
+	public Node mergeNode(MergeQuery mergeQuery, String... props) {
 		
-		Node found = SessionQuery.create(this, PropertyQuery.load(NodeObject.load(mergeQuery.getDBObject()))).findOne(Columns.Meta) ;
+		Node found = SessionQuery.create(this, PropertyQuery.load(NodeObject.load(mergeQuery.getDBObject()))).findOne(Columns.append().add(Columns.MetaColumns).add(props)) ;
 		if (found == null){
 			Node newNode = newNode() ;
 			Map<String, ? extends Object> queryMap = mergeQuery.data();
@@ -131,7 +127,10 @@ public class LocalSession extends Session {
 			for (String metakey : Columns.MetaColumns) {
 				metaInfo.putProperty( PropertyId.reserved(metakey), (Object)found.get(metakey)) ;
 			} 
-			return NodeImpl.load(getCurrentWorkspaceName(), metaInfo) ;
+			for (String pkey : props) { // set
+				metaInfo.putProperty( PropertyId.create(pkey), (Object)found.get(pkey)) ;
+			}
+			return NodeImpl.load(PropertyQuery.load(mergeQuery), getCurrentWorkspaceName(), metaInfo) ;
 		}
 	}
 
@@ -158,13 +157,13 @@ public class LocalSession extends Session {
 	}
 
 	public NodeResult remove(Node node) {
-		if (node == getRoot()) return NodeResult.create(null) ;
+		if (node == getRoot()) return NodeResult.NULL ;
 		return repository.getWorkspace(node.getWorkspaceName()).remove(node);
 	}
 
 	Node createChild(Node parent, String name) {
 		final NodeImpl newNode = NodeImpl.create(workspace.getName(), NodeObject.create(), parent.getPath(), name);
-		getReferenceManager().addChildReference(parent, name, newNode);
+		newNode.toRelation(NodeConstants.PARENT, parent.selfRef()) ;
 
 		return newNode;
 	}
@@ -198,15 +197,6 @@ public class LocalSession extends Session {
 		return root;
 	}
 
-	public ReferenceQuery createRefQuery(){
-		return ReferenceQuery.create(repository.getReferenceManager());
-	}
-	     
-	public Node addReference(Node src, String relType, Node target) {
-		return getReferenceManager().addReference(src, relType, target);
-	}
-
-
 	public SessionQuery createQuery() {
 		return SessionQuery.create(this);
 	}
@@ -231,6 +221,11 @@ public class LocalSession extends Session {
 
 	void setLastResult(NodeResult result) {
 		setAttribute(NodeResult.class.getCanonicalName(), result) ;
+	}
+
+	@Override
+	public Workspace getWorkspace(String wname) {
+		return repository.getWorkspace(wname) ;
 	}
 	
 }

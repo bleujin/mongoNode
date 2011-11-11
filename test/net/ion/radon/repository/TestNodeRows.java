@@ -21,13 +21,7 @@ public class TestNodeRows extends TestBaseRepository {
 	}
 
 	private Rows makeRow() throws SQLException {
-		Node node = session.newNode("hello");
-		node.put("string", "hello");
-		node.put("boolean", true);
-		node.put("int", new Integer(10));
-		node.put("long", new Long(20));
-		node.put("double", new Double(30));
-		node.put("date", new Date(System.currentTimeMillis()));
+		Node node = session.newNode("hello").put("string", "hello").put("boolean", true).put("int", new Integer(10)).put("long", new Long(20)).put("double", new Double(30)).put("date", new Date(System.currentTimeMillis()));
 		
 		Rows rows = NodeRows.createByNode(Queryable.Fake, node, NodeColumns.create("string", "boolean", "int", "long", "double", "date"));
 		return rows;
@@ -108,31 +102,12 @@ public class TestNodeRows extends TestBaseRepository {
 	}
 	
 	public void testReference() throws Exception {
-		
-		session.dropWorkspace() ;
-		
-		
-		Node dev = session.newNode() ;
-		dev.setAradonId("dept", "dev") ;
-		dev.put("deptno", 20) ;
-		dev.put("dname", "dev") ;
+		Node dev = session.newNode().setAradonId("dept", "dev").put("deptno", 20).put("dname", "dev") ;
+		Node bleujin = session.newNode().setAradonId("employee", "bleujin").put("id", "bleujin").put("name", "bleu").put("age", 20) ;
+		bleujin.toRelation("dept", dev.selfRef()) ;
 		session.commit() ;
 		
-		Node bleujin = session.newNode() ;
-		bleujin.setAradonId("employee", "bleujin") ;
-		bleujin.put("id", "bleujin") ;
-		bleujin.put("name", "bleu") ;
-		bleujin.put("age", 20) ;
-
-		// set reference
-		bleujin.addReference("rdept", AradonQuery.newByGroupId("dept", "dev")) ;
-		session.commit() ;
-		
-		ReferenceTaragetCursor emps = dev.getReferencedNodes("employee");
-		assertEquals(1, emps.size()) ;
-		assertEquals("bleujin", emps.next().getString("id")) ;
-
-		NodeColumns columns = NodeColumns.create("id", "name", "dept.deptno", "age", "dept.deptno dno");
+		NodeColumns columns = NodeColumns.create("id", "name", "#dept.deptno", "age", "#dept.deptno dno");
 		Rows rows = NodeRows.createByNode(Queryable.Fake, bleujin, columns) ;
 		assertEquals(5, rows.getMetaData().getColumnCount());
 		assertEquals("deptno",rows.getMetaData().getColumnName(3));

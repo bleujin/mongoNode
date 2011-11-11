@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import static net.ion.radon.repository.NodeConstants.ARADON;
 import static net.ion.radon.repository.NodeConstants.GHASH;
 import static net.ion.radon.repository.NodeConstants.GROUP;
 import static net.ion.radon.repository.NodeConstants.PATH;
@@ -10,7 +9,6 @@ import java.util.Map;
 
 import net.ion.framework.util.HashFunction;
 import net.ion.framework.util.StringUtil;
-import net.ion.radon.repository.myapi.AradonQuery;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -19,7 +17,7 @@ public class MergeQuery implements IPropertyFamily{
 
 	private final DBObject iquery ;
 	private DBObject blankData = new BasicDBObject() ;
-	private MergeQuery(IPropertyFamily query ) {
+	private MergeQuery(PropertyQuery query ) {
 		this.iquery = query.getDBObject() ;
 	}
 
@@ -36,7 +34,7 @@ public class MergeQuery implements IPropertyFamily{
 	}
 
 	public static MergeQuery createByAradon(String groupId, Object uid) {
-		MergeQuery result = new MergeQuery(AradonQuery.newByGroupId(groupId, uid));
+		MergeQuery result = new MergeQuery(PropertyQuery.createByAradon(groupId, uid));
 
 		result.putBlankData(makeAradonId(groupId, uid), "/" + groupId + uid, groupId + uid) ;
 		return result;
@@ -63,9 +61,6 @@ public class MergeQuery implements IPropertyFamily{
 		blankData.put(NodeConstants.PATH, path) ;
 		blankData.put(NodeConstants.NAME, name) ;
 	}
-	
-	
-	
 	
 	
 	private static NodeObject makeAradonId(String groupid, Object uid) {

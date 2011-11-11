@@ -1,44 +1,38 @@
 package net.ion.radon.repository;
 
+import net.ion.framework.util.Debug;
+
+
 public class TestFindRelation extends TestBaseRepository{
 
-	public void testReference() throws Exception {
-		Node node1 = createTestNode() ;
-		Node node2 = createTestNode() ;
+	public void testToRelation() throws Exception {
+		Node from = session.newNode().put("name", "bleujin").put("greeting", "hello") ;
+		Node to = session.newNode().put("name", "hero").put("greeting", "hi");
 
-		session.addReference(node1.createChild("child1"), "curson", node2.createChild("child2")) ;
+		from.toRelation("friend", to.selfRef()) ;
 		session.commit() ;
 		
-		Node find =  session.createRefQuery().from( session.createRefQuery().from(node1).findOne()).findOne() ;
-		assertEquals("child2", find.getName()) ;
-		session.remove(session.createRefQuery().from(node1).findOne()) ; // remove child1
-		assertEquals(1, session.createRefQuery().to(find).find().count()) ;
+		assertEquals(1, session.createQuery().to(to, "Friend").find().count()) ;
 	}
 	
+	public void testRelationValue() throws Exception {
+		Node to = session.newNode().setAradonId("emp", 7756).put("name", "hero").put("greeting", "hi");
+		Node from = session.newNode().put("name", "bleujin").put("greeting", "hello") ;
 
-	public void testSimpleReference() throws Exception {
-		Node parent = createTestNode() ;
-		Node child = parent.createChild("child1") ;
-		session.commit() ;
-
-//		ReferenceTaragetCursor rc =  session.createRefQuery().from(child).find() ;
-//		while(rc.hasNext()) {
-//			Debug.line(rc.next()) ;
-//		}
-
-		assertEquals("child1", session.createRefQuery().from(parent).findOne().getName()) ;
-		assertEquals("child1", session.createRefQuery().from(parent, "_child" ).findOne().getName()) ;
-		
-		assertEquals(parent.getIdentifier(), session.createRefQuery().to(child).findOne().getName()) ;
-		assertEquals(parent.getIdentifier(), session.createRefQuery().to(child, "_child" ).findOne().getName()) ;
+		from.toRelation("friend",  to.selfRef()) ;
+		Debug.line(from.toMap()) ;
 	}
 	
-
-	private Node createTestNode() {
-		Node node = session.newNode().put("name", "bleujin").put("greeting", "hello") ;
-		
+	public void testToAradonId() throws Exception {
+		Node to = session.newNode().setAradonId("emp", 7756).put("name", "hero").put("greeting", "hi");
+		Node from = session.newNode().put("name", "bleujin").put("greeting", "hello").toRelation("friend", to.selfRef()) ;
 		session.commit() ;
-		return node;
+		
+		assertEquals(1, session.createQuery().to(to, "Friend").find().count()) ;
 	}
+	
+	
+	
+	
 	
 }

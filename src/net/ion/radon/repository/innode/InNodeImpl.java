@@ -12,12 +12,14 @@ import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.NumberUtil;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.INode;
+import net.ion.radon.repository.InListNode;
 import net.ion.radon.repository.InListQuery;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeColumns;
 import net.ion.radon.repository.NodeEvent;
 import net.ion.radon.repository.NodeObject;
+import net.ion.radon.repository.PropertyId;
 import net.ion.radon.repository.util.CipherUtil;
 import net.ion.radon.repository.util.MyNumberUtil;
 
@@ -60,11 +62,16 @@ public abstract class InNodeImpl implements InNode {
 	}
 
 	public InNode put(String key, Object val) {
-		nobject.putProperty(NodeObject.createPropId(key), val);
+		return this.put(NodeObject.createPropId(key), val);
+	}
+
+	public InNode put(PropertyId key, Object val) {
+		nobject.putProperty(key, val);
 		notify(NodeEvent.UPDATE);
 		return this;
 	}
 
+	
 	public void notify(NodeEvent event) {
 		parent.notify(event);
 	}
@@ -147,6 +154,11 @@ public abstract class InNodeImpl implements InNode {
 	public InListQuery inListQuery() {
 		return InListQuery.create(nobject, pname, parent);
 	}
+	
+	public InListNode inlist(String key){
+		return nobject.inlist(key, this) ;
+	}
+
 	
 	public INode getParent(){
 		return parent ;

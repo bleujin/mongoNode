@@ -33,7 +33,7 @@ public class ReferenceManager {
 
 	
 	ReferenceTaragetCursor find(ReferenceQuery rquery) {
-		return ReferenceTaragetCursor.create(repository, getWorkspace().find(rquery.getQuery()), rquery.getForward());
+		return ReferenceTaragetCursor.create(repository, getWorkspace().find(rquery.getQuery(), Columns.ALL), rquery.getForward());
 	}
 	
 	NodeResult remove(ReferenceQuery rquery) {
@@ -54,9 +54,9 @@ public class ReferenceManager {
 
 	private Node createRefNode(Node src, String relType, Node target) {
 		Node newNode = getWorkspace().newNode() ;
-		newNode.put(SRC, src.toRef());
+		newNode.put(SRC, src.selfRef());
 		newNode.put(TYPE, relType.toLowerCase());
-		newNode.put(TARGET, target.toRef());
+		newNode.put(TARGET, target.selfRef());
 		
 		newNode.put(SRC_ARADON, src.getAradonId()) ;
 		newNode.put(TARGET_ARADON, target.getAradonId()) ;

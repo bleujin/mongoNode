@@ -1,5 +1,6 @@
 package net.ion.radon.repository.innode;
 
+import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.PropertyFamily;
@@ -10,21 +11,19 @@ public class InListFilterQuery {
 
 	private final String field;
 	private final SessionQuery squery;
-	private final Session session;
 	private final String filterFn;
 
 	
 	private StringBuilder withPropertyExp = new StringBuilder() ;
-	private PropertyFamily options = PropertyFamily.create().put("skip", 0).put("limit", 1000000) ;
-	private InListFilterQuery(String field, SessionQuery squery, Session session, String filterFn) {
+	private PropertyFamily options = PropertyFamily.create().put("fromindex", 0).put("toindex", 1000000) ;
+	private InListFilterQuery(String field, SessionQuery squery, String filterFn) {
 		this.field = field ;
 		this.squery = squery ;
-		this.session = session ;
 		this.filterFn = filterFn ;
 	}
 
 	public static InListFilterQuery create(String field, SessionQuery squery, Session session, String filterFn) {
-		return new InListFilterQuery(field, squery, session, filterFn);
+		return new InListFilterQuery(field, squery, filterFn);
 	}
 
 	public InListFilterQuery withProperty(String... cols) {
@@ -40,7 +39,7 @@ public class InListFilterQuery {
 	}
 
 	public InListFilterQuery inlistPage(PageBean page) {
-		options.put("skip", page.getStartLoc()).put("limit", page.getStartLoc() + page.getListNum()) ;
+		options.put("fromindex", page.getStartLoc()).put("toindex", page.getStartLoc() + page.getListNum()) ;
 		return this;
 	}
 
@@ -67,7 +66,7 @@ public class InListFilterQuery {
 				params + "\n" + 
 				" var myresult = Array.prototype.filter.call(this.%3$s, _params.filter, this.%3$s) ; \n" + 
 				(options.getDBObject().containsField("sortkey") ? " Array.prototype.sort.call(myresult, _params.comfn); \n"  :"")+
-				" myresult = Array.prototype.slice.call(myresult, _params.skip, _params.limit); \n" + 
+				" myresult = Array.prototype.slice.call(myresult, _params.fromindex, _params.toindex); \n" + 
 				" emit(this._id, {%3$s:myresult %4$s});}\n";
 		
 		String mapFunction = String.format(mapFn, args) ;

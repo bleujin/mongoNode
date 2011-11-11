@@ -6,14 +6,16 @@ public class NodeResult {
 
 	public static final NodeResult NULL = new EmptyResult();
 	
+	private PropertyQuery query ;
 	private WriteResult wr ;
 	
-	private NodeResult(WriteResult wr) {
+	private NodeResult(PropertyQuery query, WriteResult wr) {
+		this.query = query ;
 		this.wr = wr ; 
 	}
 
-	public static NodeResult create(WriteResult wr) {
-		return new NodeResult(wr);
+	public static NodeResult create(PropertyQuery query, WriteResult wr) {
+		return new NodeResult(query, wr);
 	}
 
 	public String getErrorMessage(){
@@ -32,10 +34,11 @@ public class NodeResult {
 		return wr.isLazy() ;
 	}
 	
+
 	private static class EmptyResult extends NodeResult {
 		
 		EmptyResult(){
-			super(null) ;
+			super(PropertyQuery.EMPTY, null) ;
 		}
 		public String getErrorMessage(){
 			return "";

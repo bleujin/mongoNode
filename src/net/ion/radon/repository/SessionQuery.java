@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.ChainMap;
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.ics.ActionQuery;
@@ -120,8 +121,8 @@ public class SessionQuery {
 		inner.nin(key, objects);
 		return this;
 	}
-	public SessionQuery and(IPropertyFamily... conds) {
-		for (IPropertyFamily cond : conds) {
+	public SessionQuery and(PropertyQuery... conds) {
+		for (PropertyQuery cond : conds) {
 			for (Entry<String, ? extends Object> c : cond.toMap().entrySet()) {
 				inner.put(c.getKey(), c.getValue()) ;
 			}
@@ -130,7 +131,7 @@ public class SessionQuery {
 		return this ;
 	}
 
-	public SessionQuery or(IPropertyFamily... conds) {
+	public SessionQuery or(PropertyQuery... conds) {
 		inner.or(conds) ;
 		return this ;
 	}
@@ -185,6 +186,16 @@ public class SessionQuery {
 		inner.lt(key, value) ;
 		return this;
 	}
+	
+
+	public SessionQuery to(Node target, String relType) {
+		PropertyQuery idquery = PropertyQuery.create(NodeConstants.RELATION + "." + relType, target.selfRef());
+		PropertyQuery aidquery = PropertyQuery.create(NodeConstants.RELATION + "." + relType, NodeObject.create().put("_ref", target.getWorkspaceName())) ;
+		Debug.line(idquery, aidquery) ;
+		this.or(idquery, aidquery) ;
+		return this;
+	}
+
 
 	public List<Node> find(PageBean page) throws RepositoryException {
 		return find().toList(page);

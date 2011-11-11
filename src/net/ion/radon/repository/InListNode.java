@@ -14,4 +14,5 @@ public interface InListNode extends IPropertyFamily, Serializable{
 	InListNode push(Map<String, ? extends Object> values);
 
 	public Object get(int index) ;
+	public int size() ;
 }

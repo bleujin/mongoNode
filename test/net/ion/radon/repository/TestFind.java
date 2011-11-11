@@ -36,7 +36,7 @@ public class TestFind extends TestBaseRepository{
 		Node newNode = session.newNode("name") ;
 		
 		Node child = newNode.createChild("child") ;
-		child.append("name", "bleujin") ;
+		child.put("name", "bleujin") ;
 		session.commit();
 
 		

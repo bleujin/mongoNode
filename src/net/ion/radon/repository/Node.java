@@ -13,6 +13,7 @@ import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.innode.NormalInNode;
 import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.myapi.ICursor;
+import net.ion.radon.repository.relation.IRelation;
 
 import com.mongodb.DBObject;
 
@@ -26,7 +27,7 @@ public interface Node extends IPropertyFamily, INode {
 
 
 	
-	public ReferenceObject toRef() ;
+//	public ReferenceObject toRef() ;
 		
 	public String getIdentifier() ;
 
@@ -48,13 +49,13 @@ public interface Node extends IPropertyFamily, INode {
 	
 	public ICursor getChild() ;
 
-	public ReferenceTaragetCursor getChild(String name);
+	public Node getChild(String name);
 	
-	public List<Node> removeChild() ;
-	
-	public List<Node> removeChild(String nameOrId) ;
+//	public List<Node> removeChild() ;
+//	
+//	public List<Node> removeChild(String nameOrId) ;
 
-	public List<Node> removeDescendant() ;
+//	public List<Node> removeDescendant() ;
 
 	public Session getSession();
 
@@ -62,13 +63,13 @@ public interface Node extends IPropertyFamily, INode {
 
 	public AradonId getAradonId();
 
-	public boolean addReference(String refType, AradonQuery query);
+//	public boolean addReference(String refType, AradonQuery query);
 
-	public ReferenceTaragetCursor getReferencedNodes(String aradonGroup);
+//	public ReferenceTaragetCursor getReferencedNodes(String aradonGroup);
 
-	public int removeReference(String refType, AradonQuery query);
+//	public int removeReference(String refType, AradonQuery query);
 
-	public boolean setReference(String refType, AradonQuery preQuery, AradonQuery newQuery);
+//	public boolean setReference(String refType, AradonQuery preQuery, AradonQuery newQuery);
 
 	public long getLastModified();
 
@@ -79,6 +80,14 @@ public interface Node extends IPropertyFamily, INode {
 	public boolean isNew() ;
 
 	public void notify(NodeEvent nevent);
+
+	public Node toRelation(String relType, NodeRef aref);
+
+	public IRelation relation(String relType);
+
+	public PropertyQuery getQuery();
+
+	public NodeRef selfRef();
 
 }
 
@@ -110,8 +119,8 @@ class RootNode implements Node {
 		return session.createQuery().regEx(NodeConstants.PATH, "^\\/\\w*$").find() ;
 	}
 
-	public ReferenceTaragetCursor getChild(String name) {
-		return session.createRefQuery().child(session.createQuery().findByPath("/" + name), name).find();
+	public Node getChild(String name) {
+		return session.createQuery().findByPath("/" + name);
 	}
 
 	public Object getId() {
@@ -131,8 +140,8 @@ class RootNode implements Node {
 		return "/";
 	}
 
-	public IPropertyFamily getQuery() {
-		return NodeObject.BLANK_INNODE;
+	public PropertyQuery getQuery() {
+		return PropertyQuery.EMPTY;
 	}
 
 	public ReferenceTaragetCursor getReferencedNodes(String aradonGroup) {
@@ -268,6 +277,18 @@ class RootNode implements Node {
 	}
 
 	public void notify(NodeEvent nevent) {
+	}
+
+	public Node toRelation(String relType, NodeRef aref) {
+		throw new IllegalArgumentException("root node is read only") ;
+	}
+
+	public IRelation relation(String relType) {
+		throw new IllegalArgumentException("root node is read only") ;
+	}
+
+	public NodeRef selfRef() {
+		return NodeRef.create(this);
 	}
 
 }

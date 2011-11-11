@@ -25,6 +25,7 @@ public class TestAllNode extends TestCase{
 		
 		suite.addTestSuite(TestNodeCursor.class) ;
 		suite.addTestSuite(TestAdvanceNode.class) ;
+		suite.addTestSuite(TestAdvanceNodeGet.class) ;
 		suite.addTestSuite(TestAradonId.class);
 		suite.addTestSuite(TestFunction.class);
 		suite.addTestSuite(TestInnerNode.class) ;

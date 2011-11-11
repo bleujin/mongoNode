@@ -51,7 +51,7 @@ public class ReferenceQuery {
 	}
 	
 	public ReferenceQuery from(Node src){
-		this.query = PropertyQuery.create(ReferenceManager.SRC, src.toRef());
+		this.query = PropertyQuery.create(ReferenceManager.SRC, src.selfRef());
 		this.forward = Forward.To;
 		return this;
 	}
@@ -63,12 +63,12 @@ public class ReferenceQuery {
 
 	public ReferenceQuery from(Node src, String refType, Node target){
 		from(src, refType);
-		addQuery(ReferenceManager.TARGET, target.toRef());
+		addQuery(ReferenceManager.TARGET, target.selfRef());
 		return this;
 	}
 
 	public ReferenceQuery to(Node target){
-		this.query = PropertyQuery.create(ReferenceManager.TARGET, target.toRef());
+		this.query = PropertyQuery.create(ReferenceManager.TARGET, target.selfRef());
 		this.forward = Forward.From;
 		return this;
 	}

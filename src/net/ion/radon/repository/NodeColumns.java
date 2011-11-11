@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.sql.RowSetMetaData;
 
 import net.ion.framework.db.rowset.RowSetMetaDataImpl;
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 
@@ -47,7 +48,8 @@ public class NodeColumns {
 		
 		NodeColumns result = new NodeColumns();
 		for (int i = 0; i < columns.length; i++) {
-			result.columnList.add(Column.parse(columns[i])) ;
+			IColumn col = Column.parse(columns[i]);
+			result.columnList.add(col) ;
 		}
 		return result ;
 	}

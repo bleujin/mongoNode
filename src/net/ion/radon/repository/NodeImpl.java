@@ -2,42 +2,40 @@ package net.ion.radon.repository;
 
 import static net.ion.radon.repository.NodeConstants.ARADON;
 import static net.ion.radon.repository.NodeConstants.CREATED;
-import static net.ion.radon.repository.NodeConstants.GHASH;
-import static net.ion.radon.repository.NodeConstants.GROUP;
 import static net.ion.radon.repository.NodeConstants.ID;
 import static net.ion.radon.repository.NodeConstants.LASTMODIFIED;
 import static net.ion.radon.repository.NodeConstants.NAME;
 import static net.ion.radon.repository.NodeConstants.OWNER;
 import static net.ion.radon.repository.NodeConstants.PATH;
 import static net.ion.radon.repository.NodeConstants.TIMEZONE;
-import static net.ion.radon.repository.NodeConstants.UID;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.db.procedure.IStringObject;
 import net.ion.framework.util.ChainMap;
-import net.ion.framework.util.HashFunction;
 import net.ion.framework.util.NumberUtil;
+import net.ion.framework.util.ObjectUtil;
 import net.ion.framework.util.StringUtil;
+import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.innode.InListNodeImpl;
 import net.ion.radon.repository.innode.NormalInNode;
 import net.ion.radon.repository.myapi.AradonQuery;
+import net.ion.radon.repository.relation.IRelation;
 import net.ion.radon.repository.util.CipherUtil;
 import net.ion.radon.repository.util.MyNumberUtil;
 
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 public class NodeImpl implements Node {
@@ -47,10 +45,13 @@ public class NodeImpl implements Node {
 	private NodeObject nobject;
 	private String workspaceName;
 
-	private NodeImpl(Session session, String workspaceName, NodeObject no, String parentPath, String name) {
+	private transient final PropertyQuery query ;
+	
+	private NodeImpl(Session session, PropertyQuery query, String workspaceName, NodeObject no, String parentPath, String name) {
 		this.session = session ;
 		this.workspaceName = workspaceName;
 		this.setNodeMetaInfo(no, parentPath, name);
+		this.query = query;
 	}
 
 	static NodeImpl create(String workspaceName, NodeObject no, String parentPath, String name) {
@@ -60,27 +61,27 @@ public class NodeImpl implements Node {
 		if (!isSmallAlphaNumUnderBarComma(name))
 			throw new IllegalArgumentException(name + " must be smallAlphaNumUnderBarComma");
 
-		final NodeImpl result = new NodeImpl(currentSession, workspaceName, no, parentPath, name);
+		final NodeImpl result = new NodeImpl(currentSession, PropertyQuery.EMPTY, workspaceName, no, parentPath, name);
 		result.setName(parentPath, name) ;
 		result.setAradonId("__empty", result.getIdentifier()) ;
 		result.notify(NodeEvent.CREATE);
 		return result;
 	}
 
-	static NodeImpl load(String workspaceName, NodeObject no) {
+	static NodeImpl load(PropertyQuery query, String workspaceName, NodeObject no) {
 		final String path = no.getString(PATH);
 		String parentPath = StringUtil.substringBeforeLast(path, "/");
 		if (StringUtil.isBlank(parentPath))
 			parentPath = "/";
 
-		NodeImpl loadedNode = new NodeImpl(Session.getCurrent(), workspaceName, no, parentPath, no.getString(NAME));
+		NodeImpl loadedNode = new NodeImpl(Session.getCurrent(), query, workspaceName, no, parentPath, no.getString(NAME));
 
 		return loadedNode;
 	}
 
-	static NodeImpl load(String workspaceName, DBObject dbo) {
+	static NodeImpl load(PropertyQuery query, String workspaceName, DBObject dbo) {
 		if (dbo == null) return null ;
-		return load(workspaceName, NodeObject.load(dbo));
+		return load(query, workspaceName, NodeObject.load(dbo));
 	}
 
 	private static boolean isSmallAlphaNumUnderBarComma(String str) {
@@ -113,11 +114,91 @@ public class NodeImpl implements Node {
 		}
 	}
 
-	// @TODO if prop has '.' 
+	// prop has '.' or '#' 
 	public Serializable get(String propId) {
-		return nobject.get(propId, this) ;
+		if (propId.startsWith("$")){ // aid
+			return getAradonIdExpression(propId) ;
+		}
+		
+		String propExpr = transRegular(propId) ;
+		if (propId.startsWith("#")){   // relation
+			return getRelationExpression(propExpr) ;
+		} else if (propId.startsWith("!")){ // path
+			return getPathExpression(propExpr);
+		} 		
+		return nobject.get(propExpr, this) ;
 	}
 
+	private Serializable getAradonIdExpression(String propExpr) {
+		String aidExpr = transNumRegular(StringUtil.substringBetween(propExpr, "$", ".")) ;
+		String remain = transRegular(StringUtil.substringAfter(propExpr, ".")) ;
+		
+		String wsName = getWorkspaceName() ;
+		if (StringUtil.countMatches(aidExpr, ":") == 2) {
+			wsName = StringUtil.substringBefore(aidExpr, ":") ;
+			aidExpr = StringUtil.substringAfter(aidExpr, ":") ;
+		}
+		String groupId = StringUtil.substringBefore(aidExpr, ":") ;
+		String uidExpr = StringUtil.substringAfter(aidExpr, ":") ;
+		Object uid = (uidExpr != null && uidExpr.startsWith("#")) ? Integer.parseInt(uidExpr.substring(1)) : uidExpr ;
+		
+		Node targetNode = getQuery().findOne(getSession(), wsName, getQuery(), PropertyQuery.createByAradon(groupId, uid)) ;
+		return targetNode == null ? null : targetNode.get(remain) ;
+	}
+
+	private Serializable getPathExpression(String propExpr) {
+
+		String path = StringUtil.substringBetween(propExpr, "!", ".") ;
+		String remain = StringUtil.substringAfter(propExpr, ".") ;
+		
+		String wsName = getWorkspaceName() ;
+		if (path.contains(":")) {
+			wsName = StringUtil.substringBefore(path, ":") ;
+			path = StringUtil.substringAfter(path, ":") ;
+		}
+		Node targetNode = getQuery().findOne(getSession(), wsName, getQuery(), PropertyQuery.createByPath(path)) ;
+		return targetNode == null ? null : targetNode.get(remain) ;
+	}
+	
+	private Serializable getRelationExpression(String propExpr){
+		
+		String relType = StringUtil.substringBetween(propExpr, "#", ".") ;
+		String remain = StringUtil.substringAfter(propExpr, ".") ;
+		
+		Node targetNode = relation(relType).fetch(0);
+		return targetNode == null ? null : targetNode.get(remain) ;
+	}
+
+	private static Pattern p = Pattern.compile("\\{[a-zA-Z][a-zA-Z0-9_.]*\\}");
+	private String transRegular(String key) {
+		if (! key.contains("{")) return key ;
+		
+		Matcher m = p.matcher(key);
+
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			Serializable value = get(StringUtil.substringBetween(m.group(), "{", "}"));
+			m.appendReplacement(sb, ObjectUtil.toString(value));
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+	
+	private String transNumRegular(String key) {
+		if (! key.contains("{")) return key ;
+		
+		Matcher m = p.matcher(key);
+
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			Serializable value = get(StringUtil.substringBetween(m.group(), "{", "}"));
+			m.appendReplacement(sb, ((value instanceof Integer) ? "#" : "") + ObjectUtil.toString(value));
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+	
+	
 	public Serializable get(String propId, int index) {
 		return nobject.get(propId, index, this);
 	}
@@ -200,13 +281,8 @@ public class NodeImpl implements Node {
 		if (existAradonId(groupid, uid))
 			throw RepositoryException.throwIt("duplicated groupId/uid : " + groupid + "/" + uid);
 
-		NodeObject inner = NodeObject.create();
 
-		inner.put(GROUP, makeGroups(groupid));
-		inner.put(GHASH, HashFunction.hashGeneral(groupid));
-		inner.put(UID, uid);
-
-		putProperty(PropertyId.reserved(ARADON), inner);
+		putProperty(PropertyId.reserved(ARADON), AradonId.create(groupid, uid).toNodeObject());
 		return this;
 	}
 
@@ -250,15 +326,6 @@ public class NodeImpl implements Node {
 		return getSession().createQuery().aradonGroupId(groupid, uid).findOne() != null;
 	}
 
-	private String[] makeGroups(String groupid) {
-		String[] groups = StringUtil.split(groupid, ".");
-
-		String[] result = new String[groups.length];
-		for (int i = 0; i < groups.length; i++) {
-			result[i] = StringUtil.join(groups, ".", 0, i + 1);
-		}
-		return result;
-	}
 
 	// child
 	public Node createChild(String name) {
@@ -273,24 +340,12 @@ public class NodeImpl implements Node {
 		return StringUtil.toString(get(key));
 	}
 
-	public ReferenceTaragetCursor getChild() {
-		return getSession().createRefQuery().child(this).find();
+	public NodeCursor getChild() {
+		return session.createQuery().eq(NodeConstants.RELATION + "." + NodeConstants.PARENT, this.selfRef()).find();
 	}
 
-	public ReferenceTaragetCursor getChild(String name) {
-		return getSession().createRefQuery().child(this, name).find();
-	}
-
-	public List<Node> removeChild(String nameOrId) {
-		return getSession().getReferenceManager().removeChildNode(this, nameOrId);
-	}
-	
-	public List<Node> removeChild() {
-		return getSession().getReferenceManager().removeChildNodes(this);
-	}
-
-	public List<Node> removeDescendant() {
-		return getSession().getReferenceManager().removeDescendant(this);
+	public Node getChild(String name) {
+		return getSession().createQuery().findByPath(getPath() + "/" + name);
 	}
 
 	void clearProp(boolean fire) {
@@ -309,18 +364,16 @@ public class NodeImpl implements Node {
 		clearProp(true);
 	}
 
-	public ReferenceObject toRef() {
-		ReferenceObject result = new ReferenceObject(workspaceName, getId());
-		result.put("orderNo", get("orderNo"));
-
-		return result;
-	}
-
 	public Node getParent() {
-		final ReferenceTaragetCursor rc = getSession().createRefQuery().parent(this).find();
-		if (rc.size() == 0)
-			return getSession().getRoot();
-		return rc.next();
+		Node parent = relation(NodeConstants.PARENT).fetch(0);
+		
+		
+		return (parent == null) ? getSession().getRoot() : parent ;
+		
+//		final ReferenceTaragetCursor rc = getSession().createRefQuery().parent(this).find();
+//		if (rc.size() == 0)
+//			return getSession().getRoot();
+//		return rc.next();
 	}
 
 	public AradonId getAradonId() {
@@ -331,39 +384,9 @@ public class NodeImpl implements Node {
 		return nobject.containsField(key);
 	}
 
-	public boolean addReference(String relType, AradonQuery query) {
-
-		if (getAradonId() == AradonId.EMPTY)
-			throw RepositoryException.throwIt("this operation not permitted. since this node has not aradon id : ");
-
-		List<Node> nodes = getSession().findAllWorkspace(query) ;
-		for (Node node : nodes) {
-			getSession().addReference(this, relType, node);
-		}
-		return nodes.size() > 0;
-	}
-
-	public ReferenceTaragetCursor getReferencedNodes(String aradonGroup) {
-		return getSession().createRefQuery().to(this, ":aradon:" + aradonGroup).find();
-	}
-
-	public int removeReference(String refType, AradonQuery query) {
-		List<Node> nodes = getSession().findAllWorkspace(query) ;
-		
-		for (Node node : nodes) {
-			getSession().createRefQuery().from(this, refType, node).remove() ;
-		}
-		
-		return nodes.size();
-	}
 
 	public NormalInNode inner(String name) {
 		return (NormalInNode)nobject.inner(name, this) ;
-	}
-	
-	public boolean setReference(String refType, AradonQuery preQuery, AradonQuery newQuery) {
-		removeReference(refType, preQuery);
-		return addReference(refType, newQuery);
 	}
 
 	public long getLastModified() {
@@ -388,6 +411,24 @@ public class NodeImpl implements Node {
 
 	public boolean isNew() {
 		return getLastModified() == 0L;
+	}
+
+	public Node toRelation(String relType, NodeRef aref) {
+		inner(NodeConstants.RELATION).inlist(relType).push(aref.toMap());
+		return this ;
+	}
+
+	public IRelation relation(String relType) {
+		InListNode refList = inner(NodeConstants.RELATION).inlist(relType);
+		return NodeRelation.load(this, refList, relType) ;
+	}
+
+	public PropertyQuery getQuery() {
+		return query;
+	}
+
+	public NodeRef selfRef() {
+		return NodeRef.create(this);
 	}
 }
 

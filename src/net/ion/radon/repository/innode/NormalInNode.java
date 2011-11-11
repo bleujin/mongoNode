@@ -2,6 +2,7 @@ package net.ion.radon.repository.innode;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.radon.repository.INode;
+import net.ion.radon.repository.InListNode;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
 
@@ -16,6 +17,7 @@ public interface NormalInNode extends InNode {
 	public NormalInNode append(String key, Object val) ;
 	
 	public NormalInNode putEncrypt(String key, String val)  throws RepositoryException;
+
 }
 
 

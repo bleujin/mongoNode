@@ -26,4 +26,8 @@ public interface NodeConstants {
 	final static String ARADON_UID = ARADON +  ".uid";
 	final static String ARADON_GHASH = ARADON +  ".ghash";
 
+	public static final String RELATION = RESERVED_PREFIX + "reference";
+
+	public static final String PARENT = RESERVED_PREFIX + "parent";
+
 }

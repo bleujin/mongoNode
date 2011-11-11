@@ -22,9 +22,7 @@ public class TestNodeColumns extends TestBaseRepository {
 		NodeColumns columns =  NodeColumns.create("id", "name", "group.key", "group.key another");
 		
 		assertEquals("id", columns.get(1).getLabel());
-		assertEquals(true, columns.get(3) instanceof ReferenceColumn);
 		assertEquals("key", columns.get(3).getLabel());
-		assertEquals(true, columns.get(4) instanceof ReferenceColumn);
 		assertEquals("another", columns.get(4).getLabel());
 	}
 	

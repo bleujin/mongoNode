@@ -2,7 +2,6 @@ package net.ion.radon.repository;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,11 +59,7 @@ public class Column {
 				
 				paramString = StringUtil.substringBeforeLast(paramString, ")");
 				String[] params = getParams(paramString);
-//				String[] params = StringUtil.substringBeforeLast(paramString, ")").split(",");
-//				for (int i = 0; i < params.length; i++) {
-//					params[i] = params[i].trim() ;
-//				}
-				
+
 				String alias = StringUtil.defaultIfEmpty(StringUtil.substringAfterLast(expression, ")").trim(), expression);
 				Class clz = Class.forName("net.ion.radon.repository.function." + StringUtil.capitalize(fnName) + "Function");
 	            Object[] passed = {params, alias};
@@ -77,15 +72,17 @@ public class Column {
 				
 				return new ConstantColumn(value, alias);
 			} else {
-				String[] exps = StringUtil.split(expression, ". ");
+				String[] exps = StringUtil.split(expression, " ");
 				if (exps.length == 1) {
-					return new NormalColumn(exps[0], exps[0]);
-				} else if (exps.length == 2 && expression.contains(".")) { // a.b
-					return new ReferenceColumn(expression, exps[1]);
-				} else if (exps.length == 2 && expression.contains(" ")) { // a b
+					return new NormalColumn(exps[0], StringUtil.coalesce(StringUtil.substringAfterLast(exps[0], "."), exps[0]));
+				} else if (exps.length == 2) {
 					return new NormalColumn(exps[0], exps[1]);
-				} else if (exps.length == 3 && expression.contains(".")) { // a.b c
-					return new ReferenceColumn(exps[0] + "." + exps[1], exps[2]);
+//				} else if (exps.length == 2 && expression.contains(".")) { // a.b
+//					return new ReferenceColumn(expression, exps[1]);
+//				} else if (exps.length == 2 && expression.contains(" ")) { // a b
+//					return new NormalColumn(exps[0], exps[1]);
+//				} else if (exps.length == 3 && expression.contains(".")) { // a.b c
+//					return new ReferenceColumn(exps[0] + "." + exps[1], exps[2]);
 				} else {
 					throw new IllegalArgumentException(expression + " is illegal expression");
 				}
@@ -118,47 +115,6 @@ public class Column {
 		String fnName = StringUtil.lowerCase(StringUtil.substringBefore(expression, "("));
 		return FunctionName.contains(fnName);
 	}
-}
-
-class ReferenceColumn extends SingleColumn {
-
-	private static HashMap<String, String> relTypeMap = new HashMap<String, String>();
-	static {
-		relTypeMap.put("r", ":reference:") ;
-		relTypeMap.put("w", ":workspace:") ;
-		relTypeMap.put("a", ":aradon:") ;
-	}
-	
-	private String relName;
-	private String colName;
-	private String label;
-	private String relType;
-
-	ReferenceColumn(String targetColumn, String label) {
-		//a.b
-		this.relType = (targetColumn.contains(":"))?  relTypeMap.get(StringUtil.substringBefore(targetColumn, ":")) : ":aradon:";
-		this.relName = (targetColumn.contains(":"))?  StringUtil.substringBetween(targetColumn, ":", ".") : StringUtil.substringBefore(targetColumn, ".");
-		this.colName = StringUtil.substringAfterLast(targetColumn, ".");
-		this.label = label;
-	}
-
-	public Object getValue(Node node) {
-		
-		ReferenceTaragetCursor rcursor = node.getSession().createRefQuery().from(node, relType + StringUtil.lowerCase(relName)).find();
-		if (rcursor.hasNext()) {
-			return rcursor.next().get(colName);
-		}
-		return null;
-	}
-
-	public String getTargetGroup() {
-		return relName;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
 }
 
 class NormalColumn extends SingleColumn {
