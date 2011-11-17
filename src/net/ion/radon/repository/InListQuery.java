@@ -160,9 +160,11 @@ public class InListQuery implements Serializable{
 	private List<InNode> myfind(PageBean page){
 		List<InNode> result = ListUtil.newList() ;
 		
+		int index = 0 ;
 		for (DBObject dbo : ((BasicBSONList)nobject.getDBObject()).toArray(new DBObject[0])) {
 			NodeObject no = NodeObject.load(dbo) ;
-			if (isTrue(filters, no)) result.add(InNodeImpl.create(dbo, pname, parent)) ;
+			if (isTrue(filters, no)) result.add(InNodeImpl.create(dbo, pname, parent, index)) ;
+			index++ ;
 		}
 		
 		return sort(result, page) ;

@@ -2,11 +2,13 @@ package net.ion.radon.repository;
 
 import java.net.UnknownHostException;
 
+import junit.framework.TestCase;
+
+import net.ion.framework.util.Debug;
+
 import org.bson.types.ObjectId;
 
 import com.mongodb.MongoException;
-
-import junit.framework.TestCase;
 
 public class TestSession extends TestCase{
 	
@@ -55,6 +57,29 @@ public class TestSession extends TestCase{
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			clients[i].join() ;
 		}
+	}
+	
+	
+	public void testThread() throws Exception {
+		RepositoryCentral rc = RepositoryCentral.testCreate() ;
+		final Session session =  rc.testLogin("abcd") ;
+		session.dropWorkspace() ;
+
+		final Node node = session.newNode().put("name", "bleujin") ;
+		
+		Thread t = new Thread(new Runnable(){
+			public void run() {
+				Session s = node.getSession() ;
+				s.commit() ;
+				assertEquals(true, session == s) ;
+				assertEquals(true, session.createQuery().count() == 1) ;
+			}
+		}) ;
+		t.start() ;
+		t.join() ;
+
+		Node found = session.createQuery().findOne() ;
+		assertEquals(true, found != null) ;
 	}
 }	
 

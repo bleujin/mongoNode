@@ -1,8 +1,6 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
-import net.ion.radon.core.PageBean;
 
 public class TestAdvanceColumns extends TestBaseRepository {
 

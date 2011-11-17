@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
@@ -31,25 +30,31 @@ public class ProxyCursor implements NodeCursor{
 	private final Workspace workspace;
 	private final CommandOption options ;
 	
-	private ProxyCursor(Session session, PropertyQuery inner, String mapFunction, String reduceFunction, String finalFunction, Workspace workspace){
+	private ProxyCursor(Session session, PropertyQuery inner, String mapFunction, String reduceFunction, String finalFunction, Workspace workspace, CommandOption options){
 		this.session = session ;
 		this.inner = inner ;
 		this.mapFunction = mapFunction ;
 		this.reduceFunction = reduceFunction ;
 		this.finalFunction = finalFunction ;
 		this.workspace = workspace ;
-		this.options = CommandOption.create() ;
+		this.options = options ;
 	} 
 	
 	
 	public static NodeCursor create(Session session, PropertyQuery inner, String mapFunction, String reduceFunction, String finalFunction, Workspace workspace) {
-		return new ProxyCursor(session, inner, mapFunction, reduceFunction, finalFunction, workspace);
+		return create(session, inner, mapFunction, reduceFunction, finalFunction, workspace, CommandOption.create());
 	}
+	
+	public static NodeCursor create(Session session, PropertyQuery inner, String mapFunction, String reduceFunction, String finalFunction, Workspace workspace, CommandOption options) {
+		return new ProxyCursor(session, inner, mapFunction, reduceFunction, finalFunction, workspace, options);
+	}
+	
 	public static NodeCursor format(Session session, PropertyQuery inner, ReduceFormat format, Workspace workspace) {
-		return create(session, inner, format.getMap(), format.getReduce(), format.getFinalize(), workspace);
+		return create(session, inner, format.getMap(), format.getReduce(), format.getFinalize(), workspace, CommandOption.create());
 	}
+	
 	public static NodeCursor group(Session session, PropertyQuery inner, IPropertyFamily keys, IPropertyFamily initial, String reduce, Workspace workspace) {
-		return NodeListCursor.create(session, inner, workspace.group(keys, inner, initial, reduce)) ;
+		return NodeListCursor.create(session, inner, workspace.group(session, keys, inner, initial, reduce)) ;
 	}
 	
 	public NodeCursor ascending(String... propIds) {
@@ -153,7 +158,7 @@ public class ProxyCursor implements NodeCursor{
 
 	private synchronized NodeCursor createReal(){
 		if (real == null){
-			real = workspace.mapreduce(mapFunction, reduceFunction, finalFunction, options, inner);
+			real = workspace.mapreduce(session, mapFunction, reduceFunction, finalFunction, options, inner);
 		} 
 		return real ;
 	}

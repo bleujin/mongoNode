@@ -24,13 +24,12 @@ public class NodeFileSystem extends AbstractFileSystem implements Serializable {
 
 	private static final long serialVersionUID = 3618976263774036655L;
 	private final RepositoryCentral rc;
-	private final String dbName;
 	private final String wname;
 
 	protected NodeFileSystem(RepositoryCentral rc, String dbName, String wname, FileName rootName, FileSystemOptions fileSystemOptions) {
 		super(rootName, null, fileSystemOptions);
 		this.rc = rc;
-		this.dbName = dbName;
+		rc.changeDB(dbName) ;
 		this.wname = wname;
 
 	}
@@ -51,7 +50,7 @@ public class NodeFileSystem extends AbstractFileSystem implements Serializable {
 
 	
 	Session getSession(){
-		return rc.testLogin(dbName, wname);
+		return rc.testLogin(wname);
 	}
 	
 	private void toNodeFileObject(FileObject fo, FileObject root) throws FileSystemException {

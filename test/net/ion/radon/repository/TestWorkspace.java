@@ -70,7 +70,7 @@ public class TestWorkspace extends TestBaseRepository{
 		assertEquals(0, session.getModified().size()) ;
 
 		session.changeWorkspace(WORKSPACE_NAME) ;
-		Node load = session.createQuery().findByPath("/name/child");
+		Node load = session.createQuery().path("/name/child").findOne();
 		assertEquals("bleujin", load.getString("name")) ;
 
 		
@@ -79,12 +79,30 @@ public class TestWorkspace extends TestBaseRepository{
 		// session.clear();
 		
 		session.changeWorkspace(WORKSPACE_NAME + "0") ;
-		Node load1 =  session.createQuery().findByPath("/name/child");
+		Node load1 =  session.createQuery().path("/name/child").findOne();
 		assertEquals("heeya", load1.getString("name")) ;
 		
 	}
+
+	public void testCache() throws Exception {
+		Workspace one = session.changeWorkspace("123").getCurrentWorkspace() ;
+		session.changeWorkspace("234") ;
+		Workspace two = session.changeWorkspace("123").getCurrentWorkspace() ;
+		
+		assertEquals(true, one == two) ;
+	}
 	
 
+	public void testWorkspaceCaseSensitiveName() throws Exception {
+		
+		session.changeWorkspace("MyTest") ;
+		session.dropWorkspace() ;
+		
+		session.newNode().put("name", "bleujin") ;
+		session.commit() ;
+		
+		assertEquals(1, session.getWorkspace("mytest").count()) ;
+	}
 	
 	
 	

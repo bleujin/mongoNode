@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 import net.ion.radon.repository.relation.IRelation;
 
 public class NodeRelation implements IRelation {
@@ -23,7 +22,7 @@ public class NodeRelation implements IRelation {
 		if (relList.size() <= index)
 			return null ;
 
-		return parent.getQuery().findOne(parent.getSession(), getWsName(index), getQuery(), getRefQuery(index));
+		return parent.getQuery().corelateNode(parent.getSession(), getWsName(index), getQuery(), getRefQuery(index));
 	}
 
 	private PropertyQuery getRefQuery(int index) {
@@ -52,6 +51,10 @@ public class NodeRelation implements IRelation {
 	public int remove() {
 		return parent.inner(NodeConstants.RELATION).inlist(relType).createQuery().remove() ;
 		// return parent.getSession().createQuery().id(parent.getIdentifier()).inlist(NodeConstants.RELATION + "." + relType).pull() ;
+	}
+
+	public NodeCursor froms() {
+		return parent.getSession().createQuery().eq(NodeConstants.RELATION + "." + relType, parent.selfRef()).find();
 	}
 
 

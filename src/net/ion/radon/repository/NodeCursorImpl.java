@@ -23,18 +23,20 @@ import com.mongodb.MapReduceOutput;
 
 public class NodeCursorImpl implements NodeCursor{
 
+	private Session session ;
 	private String workspaceName;
 	private DBCursor cursor;
 	private final PropertyQuery iquery ;
 
-	protected NodeCursorImpl(PropertyQuery iquery, String workspaceName, DBCursor cursor) {
+	protected NodeCursorImpl(Session session, PropertyQuery iquery, String workspaceName, DBCursor cursor) {
+		this.session = session ;
 		this.workspaceName = workspaceName;
 		this.cursor = cursor;
 		this.iquery = iquery ;
 	}
 
-	static NodeCursorImpl create(PropertyQuery iquery, String workspaceName, DBCursor cursor) {
-		return new NodeCursorImpl(iquery, workspaceName, cursor);
+	static NodeCursorImpl create(Session session, PropertyQuery iquery, String workspaceName, DBCursor cursor) {
+		return new NodeCursorImpl(session, iquery, workspaceName, cursor);
 	}
 
 	public boolean hasNext() {
@@ -42,7 +44,7 @@ public class NodeCursorImpl implements NodeCursor{
 	}
 
 	public Node next() {
-		return NodeImpl.load(iquery, workspaceName, cursor.next());
+		return NodeImpl.load(session, iquery, workspaceName, cursor.next());
 	}
 
 	public int count() {
@@ -186,24 +188,27 @@ public class NodeCursorImpl implements NodeCursor{
 
 class ApplyCursor implements NodeCursor {
 
+	private Session session ;
 	private String workspaceName ;
 	private Iterator<DBObject> iterator ;
 	private final PropertyQuery iquery;
 	
-	protected ApplyCursor(PropertyQuery iquery, String workspaceName, Iterator<DBObject> iterator) {
+	protected ApplyCursor(Session session , PropertyQuery iquery, String workspaceName, Iterator<DBObject> iterator) {
+		this.session = session ;
 		this.workspaceName = workspaceName  ;
 		this.iterator = iterator ;
 		this.iquery = iquery ; 
 	}
 	
-	static ApplyCursor create(PropertyQuery iquery, MapReduceOutput out) {
+	static ApplyCursor create(Session session, PropertyQuery iquery, MapReduceOutput out) {
 		String workspaceName = out.getOutputCollection() == null ? null : out.getOutputCollection().getName() ;
-		return new ApplyCursor(iquery, workspaceName, out.results().iterator());
+
+		return new ApplyCursor(session, iquery, workspaceName, out.results().iterator());
 	}
 
 	public Node next() {
 		DBObject dbo = iterator.next() ;
-		return NodeImpl.load(iquery, workspaceName, (DBObject)dbo.get("value") );
+		return NodeImpl.load(session, iquery, workspaceName, (DBObject)dbo.get("value") );
 	}
 
 	public int count() {

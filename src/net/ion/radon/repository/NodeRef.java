@@ -1,13 +1,12 @@
 package net.ion.radon.repository;
 
+import static net.ion.radon.repository.NodeConstants.ARADON;
+import static net.ion.radon.repository.NodeConstants.GROUP;
+import static net.ion.radon.repository.NodeConstants.UID;
+
 import java.util.Map;
 
-import net.ion.radon.repository.myapi.AradonQuery;
-
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
-import static net.ion.radon.repository.NodeConstants.* ;
 public class NodeRef implements IPropertyFamily {
 
 	private static final long serialVersionUID = 4422760795799886975L;

@@ -16,4 +16,6 @@ public interface InNode extends IPropertyFamily, INode  {
 	public InNode putEncrypt(String key, String val)  throws RepositoryException;
 
 	public InListNode inlist(String key);
+
+	public int getIndex();
 }

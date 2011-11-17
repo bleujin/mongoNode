@@ -1,6 +1,5 @@
 package net.ion.radon.repository.mr;
 
-import net.ion.radon.repository.CommandOption;
 import net.ion.radon.repository.IPropertyFamily;
 import net.ion.radon.repository.NodeConstants;
 import net.ion.radon.repository.PropertyFamily;

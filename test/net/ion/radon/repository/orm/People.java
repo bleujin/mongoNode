@@ -1,7 +1,5 @@
 package net.ion.radon.repository.orm;
 
-import net.ion.framework.util.NumberUtil;
-import net.ion.framework.util.ObjectUtil;
 
 public final class People extends AbstractORM{
 

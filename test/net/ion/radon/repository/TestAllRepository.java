@@ -3,8 +3,6 @@ package net.ion.radon.repository;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.ion.radon.repository.advance.TestAllAdvance;
-import net.ion.radon.repository.mr.TestAllMapReduce;
 
 public class TestAllRepository extends TestCase{
 

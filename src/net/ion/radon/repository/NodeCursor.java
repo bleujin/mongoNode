@@ -5,12 +5,11 @@ import java.util.Map;
 
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.ICursor;
-import net.ion.radon.repository.myapi.INodeCursor;
 import net.ion.radon.repository.orm.AbstractORM;
 
 import org.apache.commons.collections.Closure;
 
-public interface NodeCursor extends ICursor, INodeCursor {
+public interface NodeCursor extends ICursor {
 
 	public boolean hasNext()  ;
 

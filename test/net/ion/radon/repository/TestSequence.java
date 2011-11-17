@@ -6,7 +6,14 @@ import net.ion.radon.core.PageBean;
 
 public class TestSequence extends TestBaseRepository{
 
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		session.changeWorkspace("_sequence").dropWorkspace() ;
+	}
+	
 	public void testInit() throws Exception {
+		
 		ISequence seq = session.getSequence("test", "bleujin");
 		seq.reset() ;
 
@@ -17,26 +24,15 @@ public class TestSequence extends TestBaseRepository{
 	public void testNext() throws Exception {
 		ISequence seq = session.getSequence("test", "bleujin");
 		seq.reset() ;
+		seq.currVal() ;
 		long cval = seq.nextVal();
+		
+		Node seqNode = session.getWorkspace("_sequence").findOne(session, PropertyQuery.createByPath("/test_bleujin"), Columns.ALL) ;
+		assertEquals(true, seqNode != null) ;
+		assertEquals(1, seqNode.getAsInt("seq")) ;
 		assertEquals(1, cval) ;
 	}
 	
-
-	public void testCreate() throws Exception {
-		ISequence seq1 = session.getSequence("test", "bleujin");
-		ISequence seq2 = session.getSequence("test", "bleujin");
-		assertTrue(seq1 == seq2) ;
-	}
-	
-	public void testCache() throws Exception {
-		ISequence seq = session.getSequence("test", "bleujin");
-		seq.reset() ;
-		
-		for (int i = 0; i < 10 ; i++) {
-			assertEquals(i + 1, seq.nextVal()) ; 
-			assertEquals(10 - i - 1, seq.getCacheRemained()) ;
-		}
-	}
 
 	public void testUse() throws Exception {
 		session.changeWorkspace("my") ;
@@ -49,18 +45,16 @@ public class TestSequence extends TestBaseRepository{
 		Debug.debug(session.getCurrentWorkspaceName(), session.createQuery().find().toList(PageBean.ALL)) ;
 		assertEquals(1, session.createQuery().find().count() );
 
-		assertEquals(true, session.changeWorkspace("_sequence").createQuery().findByPath("/my_num") != null) ;
+		assertEquals(true, session.changeWorkspace("_sequence").createQuery().path("/my_num").existNode()) ;
 	}
 	
 	
-	public void xtestCacheLimit() throws Exception {
-		session.changeWorkspace("my") ;
-		session.dropWorkspace() ;
-		
+	public void testNextVal() throws Exception {
 		ISequence seq = session.getSequence("my", "test") ;
+		seq.reset() ;
 		
-		for (int i = 0; i < 5 ; i++) {
-			Debug.line(seq.nextVal()) ;
+		for (int i = 1; i <= 5 ; i++) {
+			assertEquals(i , seq.nextVal()) ;
 		}
 	}
 

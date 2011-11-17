@@ -3,6 +3,7 @@ package net.ion.radon.repository;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.ion.radon.repository.ics.TestAradonQuery;
 
 public class TestAllQuery extends TestCase{
 
@@ -14,6 +15,8 @@ public class TestAllQuery extends TestCase{
 		result.addTestSuite(TestAdvanceQuery.class) ;
 
 		
+		result.addTestSuite(TestAradonQuery.class) ;
+
 		return result;
 	}
 

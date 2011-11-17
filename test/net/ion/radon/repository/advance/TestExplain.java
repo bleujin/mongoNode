@@ -1,6 +1,5 @@
 package net.ion.radon.repository.advance;
 
-import net.ion.framework.util.Debug;
 import net.ion.radon.repository.Explain;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.TestBaseRepository;
@@ -23,7 +22,7 @@ public class TestExplain extends TestBaseRepository{
 		Node bleujin = root.createChild("bleujin").put("name", "bleujin") ;
 		session.commit() ;
 		
-		Node found = session.createQuery().findByPath("/root/bleujin") ;
+		Node found = session.createQuery().path("/root/bleujin").findOne() ;
 		
 		Explain explain = session.getAttribute(Explain.class.getCanonicalName(), Explain.class) ;
 		assertEquals(true, explain.useIndex()) ;

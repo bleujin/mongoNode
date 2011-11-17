@@ -1,34 +1,31 @@
 package net.ion.radon.repository;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bson.types.ObjectId;
-
-import com.mongodb.DBObject;
-
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
-import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.myapi.AradonQuery;
 
-public class LocalSession extends Session {
-
+public class LocalSession implements Session {
 
 	private Repository repository;
-	private Workspace workspace;
-	private Map<String, Node> modified = MapUtil.newMap();
+	private String currentWsName;
 	private final RootNode root;
-	private Map<String, Object> attributes = MapUtil.newCaseInsensitiveMap() ;
-	
+	private Map<String, Node> modified = MapUtil.newMap();
+	private Map<String, Object> attributes = MapUtil.newCaseInsensitiveMap();
+
 	private LocalSession(Repository repository, String wname) {
 		this.repository = repository;
-		this.workspace = repository.getWorkspace(wname);
-		this.root = new RootNode(this) ; 
+		this.root = new RootNode(this);
+		this.currentWsName = wname;
+	}
+
+	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
+
+	private static ThreadLocal<Session> getThreadLocal() {
+		return CURRENT;
 	}
 
 	static synchronized Session create(Repository repository, String wname) {
@@ -37,25 +34,24 @@ public class LocalSession extends Session {
 			session = new LocalSession(repository, wname);
 			getThreadLocal().set(session);
 		} else {
-			session.changeWorkspace(wname) ;
+			session.changeWorkspace(wname);
 		}
 		return session;
 	}
 
 	public Session changeWorkspace(String wname) {
-		this.workspace = repository.getWorkspace(wname);
-		return this ;
+		this.currentWsName = wname ;
+		return this;
 	}
-
 	
 	public ISequence getSequence(String prefix, String id) {
-		return ISequence.createOrLoad(repository.getWorkspace("_sequence"), prefix, id) ;
+		return Sequence.createOrLoad(this, prefix, id);
 	}
 
-	public static Session getCurrent() {
+	private static Session getCurrent() {
 		Session session = getThreadLocal().get();
-		
-		if (session == null){
+
+		if (session == null) {
 			throw new IllegalStateException("not logined");
 		}
 
@@ -63,107 +59,72 @@ public class LocalSession extends Session {
 	}
 
 	public int commit() {
-		int index = modified.size();
-		
-		Node[] targets = modified.values().toArray(new Node[0]);
-		
-		List<Node> forInsert = ListUtil.newList() ;
-		List<Node> forUpdate = ListUtil.newList() ;
-		for (Node node : targets) {
-			if (node.isNew()) {
-				forInsert.add(node) ;
-			} else {
-				forUpdate.add(node) ;
-			}
-		}
-		String canonicalName = NodeResult.class.getCanonicalName();
-		for (Node updateNode : forUpdate) {
-			NodeResult nodeResult = repository.getWorkspace(updateNode.getWorkspaceName()).save(updateNode);
-			setAttribute(canonicalName, nodeResult) ;
-		}
-		
-		for (Node insertNode : forInsert) {
-			NodeResult nodeResult = repository.getWorkspace(insertNode.getWorkspaceName()).append(insertNode);
-			setAttribute(canonicalName, nodeResult) ;
-		}
-		
+		int count = getCurrentWorkspace().mergeNodes(this, modified) ;
 		this.clear();
-		return index;
-	}
-	
-	public NodeResult getLastResultInfo(){
-		return getAttribute(NodeResult.class.getCanonicalName(), NodeResult.class) ;
+		return count;
 	}
 
-	void notify(Node target, NodeEvent event) {
+	public NodeResult getLastResultInfo() {
+		return getAttribute(NodeResult.class.getCanonicalName(), NodeResult.class);
+	}
+
+	public void notify(Node target, NodeEvent event) {
 		modified.put(target.getIdentifier(), target);
 	}
 
 	public void dropWorkspace() {
-		workspace.drop();
+		getCurrentWorkspace().drop();
 	}
 
 	public Node newNode() {
-		return workspace.newNode();
+
+		return getCurrentWorkspace().newNode(this);
 	}
 
-	public TempNode tempNode(){
-		return TempNodeImpl.create(NodeObject.create()) ;
+	public TempNode tempNode() {
+		return TempNodeImpl.create(this, NodeObject.create());
 	}
-	
+
 	public Node mergeNode(MergeQuery mergeQuery, String... props) {
-		
-		Node found = SessionQuery.create(this, PropertyQuery.load(NodeObject.load(mergeQuery.getDBObject()))).findOne(Columns.append().add(Columns.MetaColumns).add(props)) ;
-		if (found == null){
-			Node newNode = newNode() ;
+
+		Node found = SessionQuery.create(this, mergeQuery.getQuery()).findOne(Columns.append().add(Columns.MetaColumns).add(props));
+		if (found == null) {
+			Node newNode = newNode();
 			Map<String, ? extends Object> queryMap = mergeQuery.data();
 			for (Entry<String, ? extends Object> entry : queryMap.entrySet()) {
-				newNode.getDBObject().put(entry.getKey().toLowerCase(), entry.getValue()) ;
+				newNode.getDBObject().put(entry.getKey().toLowerCase(), entry.getValue());
 			}
-			return newNode ;
+			return newNode;
 		} else {
-			
+
 			NodeObject metaInfo = NodeObject.create();
 			for (String metakey : Columns.MetaColumns) {
-				metaInfo.putProperty( PropertyId.reserved(metakey), (Object)found.get(metakey)) ;
-			} 
-			for (String pkey : props) { // set
-				metaInfo.putProperty( PropertyId.create(pkey), (Object)found.get(pkey)) ;
+				metaInfo.putProperty(PropertyId.reserved(metakey), (Object) found.get(metakey));
 			}
-			return NodeImpl.load(PropertyQuery.load(mergeQuery), getCurrentWorkspaceName(), metaInfo) ;
+			for (String pkey : props) { // set
+				metaInfo.putProperty(PropertyId.create(pkey), (Object) found.get(pkey));
+			}
+			return NodeImpl.load(this, PropertyQuery.load(mergeQuery), getCurrentWorkspaceName(), metaInfo);
 		}
 	}
 
 	public Node newNode(String name) {
-		return workspace.newNode(name);
+		return getCurrentWorkspace().newNode(this, name);
 	}
-
-	List<Node> findAllWorkspace(AradonQuery query) {
-		if (query.getUId() != null){
-			Node node = createQuery().findOneInDB(query.getGroupId(), query.getUId()) ;
-			return (node == null) ? ListUtil.EMPTY : ListUtil.create(node) ;
-		} else {
-			List<Node> result = ListUtil.newList() ;
-			for(String wname : repository.getWorkspaceNames()){
-				result.addAll(repository.getWorkspace(wname).find(query.getQuery()).toList(PageBean.ALL)) ;
-			}
-			return result;
-		}
-	}
-	
 
 	public String getCurrentWorkspaceName() {
-		return workspace.getName();
+		return getCurrentWorkspace().getName();
 	}
 
 	public NodeResult remove(Node node) {
-		if (node == getRoot()) return NodeResult.NULL ;
-		return repository.getWorkspace(node.getWorkspaceName()).remove(node);
+		if (node == getRoot())
+			return NodeResult.NULL;
+		return getWorkspace(node.getWorkspaceName()).remove(this, PropertyQuery.createById(node.getIdentifier()));
 	}
 
-	Node createChild(Node parent, String name) {
-		final NodeImpl newNode = NodeImpl.create(workspace.getName(), NodeObject.create(), parent.getPath(), name);
-		newNode.toRelation(NodeConstants.PARENT, parent.selfRef()) ;
+	public Node createChild(Node parent, String name) {
+		final NodeImpl newNode = NodeImpl.create(this, getCurrentWorkspaceName(), NodeObject.create(), parent.getPath(), name);
+		newNode.toRelation(NodeConstants.PARENT, parent.selfRef());
 
 		return newNode;
 	}
@@ -176,56 +137,60 @@ public class LocalSession extends Session {
 		modified.clear();
 	}
 
-	
-	
 	public void logout() {
-		getCurrent().clear() ;
-		getThreadLocal().remove() ;
+		modified.clear() ;
+		getCurrent().clear();
+		getThreadLocal().remove();
 	}
 
-	
-	
 	public Workspace getCurrentWorkspace() {
-		return workspace;
+		return repository.getWorkspace(currentWsName);
 	}
-	
-	void dropDB() {
-		repository.getDB().dropDatabase() ;
-	}
-	
+
 	public Node getRoot() {
 		return root;
 	}
 
+	public SessionQuery createQuery(PropertyQuery definedQuery) {
+		return SessionQuery.create(this, definedQuery);
+	}
+
+	public NodeResult merge(String idOrPath, TempNode tnode) {
+		if (idOrPath == null) throw new IllegalArgumentException("query must be path or id") ;
+		return idOrPath.startsWith("/") ? merge(MergeQuery.createByPath(idOrPath), tnode) : merge(MergeQuery.createById(idOrPath), tnode) ;
+	}
+	
+	public NodeResult merge(MergeQuery query, TempNode tnode) {
+		return getCurrentWorkspace().merge(this, query, tnode);
+	}
+	
 	public SessionQuery createQuery() {
 		return SessionQuery.create(this);
 	}
 
-	SessionQuery createQuery(PropertyQuery definedQuery) {
-		return SessionQuery.create(this, definedQuery);
+	public void setAttribute(String key, Object value) {
+		attributes.put(key, value);
 	}
 
-	Repository getRepositorys() {
-		return repository;
-	}
-
-	void setAttribute(String key, Object value) {
-		attributes.put(key, value) ;
-	}
-	
 	public <T> T getAttribute(String key, Class<T> T) {
-		Object value = attributes.get(key) ;
-		if (T.isInstance(value)) return (T)value ;
+		Object value = attributes.get(key);
+		if (T.isInstance(value))
+			return (T) value;
 		return null;
 	}
 
 	void setLastResult(NodeResult result) {
-		setAttribute(NodeResult.class.getCanonicalName(), result) ;
+		setAttribute(NodeResult.class.getCanonicalName(), result);
 	}
 
-	@Override
 	public Workspace getWorkspace(String wname) {
-		return repository.getWorkspace(wname) ;
+		return repository.getWorkspace(wname);
 	}
+
+	public String[] getWorkspaceNames() {
+		return repository.getWorkspaceNames().toArray(new String[0]) ;
+	}
+	
+	
 	
 }

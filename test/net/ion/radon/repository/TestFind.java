@@ -1,17 +1,5 @@
 package net.ion.radon.repository;
 
-import java.util.List;
-
-import net.ion.framework.db.RepositoryException;
-import net.ion.framework.util.Debug;
-import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.myapi.AradonQuery;
-
-import org.bson.types.ObjectId;
-
-import com.mongodb.Mongo;
-
-import junit.framework.TestCase;
 
 public class TestFind extends TestBaseRepository{
 	
@@ -40,14 +28,14 @@ public class TestFind extends TestBaseRepository{
 		session.commit();
 
 		
-		Node load = session.createQuery().findByPath("/name/child") ;
+		Node load = session.createQuery().path("/name/child").findOne() ;
 		assertEquals("bleujin", load.getString("name")) ;
 		
 		Node gchild = load.createChild("gchild") ;
 		gchild.append("name", "hero") ;
 		session.commit();
 		
-		Node gload = session.createQuery().findByPath("/name/child/gchild") ;
+		Node gload = session.createQuery().path("/name/child/gchild").findOne() ;
 		assertEquals("hero", gload.getString("name")) ;
 		assertEquals(true, session.getAttribute(Explain.class.getCanonicalName(), Explain.class).useIndex()) ;
 	}
@@ -64,14 +52,15 @@ public class TestFind extends TestBaseRepository{
 	}
 	
 	
-	public void testCacheLoad() throws Exception {
+	public void testEqual() throws Exception {
 		Node bleujin = session.newNode("bleujin");
 		bleujin.put("name", "bleu");
+		session.commit() ;
 		
-		Node load = session.createQuery().findByPath("/bleujin") ;
-		assertTrue(bleujin == load) ;
-
-		// assertTrue(bleujin == session.createQuery().id(bleujin.getIdentifier()).findOne()) ;
+		Node load = session.createQuery().path("/bleujin").findOne() ;
+		
+		assertEquals(bleujin.getIdentifier(), load.getIdentifier()) ;
+		assertTrue(bleujin.equals(load)) ;
 	}
 
 	

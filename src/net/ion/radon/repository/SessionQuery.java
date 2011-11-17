@@ -1,8 +1,8 @@
 package net.ion.radon.repository;
 
 import static net.ion.radon.repository.NodeConstants.ID;
-import static net.ion.radon.repository.NodeConstants.PATH;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,23 +14,20 @@ import net.ion.framework.util.StringUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.ics.ActionQuery;
 import net.ion.radon.repository.mr.ReduceFormat;
-import net.ion.radon.repository.myapi.AradonQuery;
 
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 
-public class SessionQuery {
+public class SessionQuery implements Serializable{
 
-	private Session session ;
-	private Workspace workspace;
-	
+	private static final long serialVersionUID = -3597031257688988594L;
+	private transient Session session ;
 	private PropertyQuery inner ;
 	private PropertyFamily sort = PropertyFamily.create() ;
 
 	private SessionQuery(Session session, PropertyQuery inner){
 		this.session = session ;
-		this.workspace = session.getCurrentWorkspace();
 		this.inner = inner ;
 	}
 	
@@ -38,52 +35,24 @@ public class SessionQuery {
 		return new SessionQuery(session, PropertyQuery.create());
 	}
 	
-	static SessionQuery create(Session session, PropertyQuery definedQuery) {
+	public static SessionQuery create(Session session, PropertyQuery definedQuery) {
 		return new SessionQuery(session, definedQuery); 
 	}
-
-	
-	public Node findByAradonId(String groupId, Object uid){
-		inner.put(AradonQuery.newByGroupId(groupId, uid)) ;
-		return findOne() ;
-	}
-	
-	public Node findByPath(String path) {
-		String newPath = (path != null && path.startsWith("/")) ? path : "/" + path ;
-		if ("/".equals(newPath)) return session.getRoot() ;
-		for (Node node : session.getModified()) {
-			if (newPath.equals(node.getPath())) {
-				return node;
-			}
-		}
-		
-		return workspace.findOne(PropertyQuery.create(PATH, newPath), Columns.ALL);
-	}
-	
-	boolean existByPath(String path) {
-		String newPath = (path != null && path.startsWith("/")) ? path : "/" + path ;
-		if ("/".equals(newPath)) return true ;
-		return workspace.find(PropertyQuery.create(PATH, newPath), Columns.append().add(NodeConstants.NAME)).count() > 0;
-	}
-	
 	
 	public NodeCursor find() throws RepositoryException {
-		return workspace.find(inner, Columns.ALL).sort(sort);
+		return getWorkspace().find(session, inner, Columns.ALL).sort(sort);
 	}
 
 	public NodeCursor find(Columns columns) throws RepositoryException{
-		return workspace.find(inner, columns).sort(sort);
+		return getWorkspace().find(session, inner, columns).sort(sort);
 	}
 
-
-
-	
 	public Node findOne() throws RepositoryException {
-		return workspace.findOne(inner, Columns.ALL);
+		return getWorkspace().findOne(session, inner, Columns.ALL);
 	}
 
-	public Node findOne(Columns exclude) {
-		return workspace.findOne(inner, exclude);
+	public Node findOne(Columns columns) {
+		return getWorkspace().findOne(session, inner, columns);
 	}
 
 	
@@ -92,21 +61,27 @@ public class SessionQuery {
 	}
 
 	public int remove(){
-		NodeResult result = workspace.removeQuery(inner) ;
-		session.setLastResult(result) ;
+		NodeResult result = getWorkspace().remove(session, inner) ;
 		return result.getRowCount();
 	}
 
-	public SessionQuery aradonGroup(String groupid){
-		inner.put(AradonQuery.newByGroup(groupid)) ;
+	public SessionQuery aradonGroup(String groupId){
+		inner.aradonGroup(groupId) ;
 		return this ;
 	}
 
-	public SessionQuery aradonGroupId(String groupid, Object uid){
-		inner.put(AradonQuery.newByGroupId(groupid, uid)) ;
+	public SessionQuery aradonGroupId(String groupId, Object uId){
+		inner.aradonId(groupId, uId) ;
+		return this ;
+	}
+
+	public SessionQuery path(String path){
+		String newPath = (path != null && path.startsWith("/")) ? path : "/" + path ;
+		inner.path(newPath) ;
 		return this ;
 	}
 	
+
 	public SessionQuery eq(String key, Object value) {
 		inner.put(key, value);
 		return this;
@@ -245,13 +220,13 @@ public class SessionQuery {
 
 	// map에 없는 key의 property들은 지워짐
 	public boolean overwriteOne(Map<String, ?> map) {
-		NodeResult result = updateLastResult(workspace.findAndOverwrite(inner, map));
+		NodeResult result = getWorkspace().findAndOverwrite(session, inner, map);
 		return result != NodeResult.NULL;
 	}
 	
 	// map에 있는 값들만 set, map에 없는 key의 property들은 남아 있음. 
 	public boolean updateOne(Map<String, ?> map) {
-		NodeResult result = updateLastResult(workspace.findAndUpdate(inner, map)) ;
+		NodeResult result = getWorkspace().findAndUpdate(session, inner, map) ;
 		return result.getRowCount() > 0;
 	}
 
@@ -264,27 +239,21 @@ public class SessionQuery {
 	}
 
 	public NodeResult update(Map<String, ?> modValues){
-		return updateLastResult(workspace.set(inner, modValues));
+		return getWorkspace().set(session, inner, modValues);
 	}
 	
-	private NodeResult updateLastResult(NodeResult result) {
-		session.setLastResult(result) ;
-		return result;
-	}
-
 	public NodeResult increase(String propId){
 		return increase(propId, 1);
 	}
 	
 	public NodeResult increase(String propId, int incvalue){
-		return updateLastResult(workspace.inc(inner, StringUtil.lowerCase(propId), incvalue));
+		return getWorkspace().inc(session, inner, StringUtil.lowerCase(propId), incvalue);
 	}
 	
-	
-	public Node findOneInDB(String groupid, Object uid) {
+	public Node findOneInDB() {
 		
-		for(String wname : session.getRepositorys().getWorkspaceNames()){
-			Node node = session.getRepositorys().getWorkspace(wname).findOne(AradonQuery.newByGroupId(groupid, uid).getQuery(), Columns.ALL);
+		for(String wname : session.getWorkspaceNames()){
+			Node node = session.getWorkspace(wname).findOne(session, getQuery(), Columns.ALL);
 			if (node != null) return node ;
 		}
 		return null;
@@ -295,24 +264,33 @@ public class SessionQuery {
 	}
 	
 	public NodeCursor format(ReduceFormat format) {
-		return ProxyCursor.format(session, inner, format, workspace) ;
+		return ProxyCursor.format(session, inner, format, getWorkspace()) ;
 	}
 	
 	public NodeCursor mapreduce(String mapFunction, String reduceFunction, String finalFunction) {
-		return ProxyCursor.create(session, inner, mapFunction, reduceFunction, finalFunction, workspace);
+		return ProxyCursor.create(session, inner, mapFunction, reduceFunction, finalFunction, getWorkspace());
+	}
+
+	public NodeCursor mapreduce(String mapFunction, String reduceFunction, String finalFunction, CommandOption options) {
+		return ProxyCursor.create(session, inner, mapFunction, reduceFunction, finalFunction, getWorkspace(), options);
 	}
 
 	public Object apply(String mapFunction, String reduceFunction, String finalFunction, CommandOption options, ApplyHander handler) {
-		return workspace.applyMapReduce(mapFunction, reduceFunction, finalFunction, options, inner, handler);
+		NodeCursor nc = ProxyCursor.create(session, inner, mapFunction, reduceFunction, finalFunction, getWorkspace(), options) ;
+		
+		Object result = handler.handle(nc);
+		return result ;
 	}
 	
 
 	
 	public NodeCursor group(IPropertyFamily keys, IPropertyFamily initial, String reduce) {
-		return ProxyCursor.group(session, inner, keys, initial, reduce, workspace) ;
+		return ProxyCursor.group(session, inner, keys, initial, reduce, getWorkspace()) ;
 	}
 
-
+	private Workspace getWorkspace(){
+		return session.getCurrentWorkspace();
+	}
 
 
 

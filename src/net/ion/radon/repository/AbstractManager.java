@@ -1,21 +1,13 @@
 package net.ion.radon.repository;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.beanutils.ConstructorUtils;
-
 import net.ion.framework.db.RepositoryException;
-import net.ion.framework.util.Debug;
-import net.ion.radon.repository.Node;
-import net.ion.radon.repository.NodeImpl;
-import net.ion.radon.repository.NodeObject;
-import net.ion.radon.repository.Session;
-import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.orm.AbstractORM;
 import net.ion.radon.repository.orm.IDMethod;
-import net.ion.radon.repository.orm.People;
+
+import org.apache.commons.beanutils.ConstructorUtils;
 
 public abstract class AbstractManager<T extends AbstractORM> {
 
@@ -31,7 +23,8 @@ public abstract class AbstractManager<T extends AbstractORM> {
 		try {
 			IDRow<T> idRow = getIDRow(p);
 			
-			Node node = session.createQuery().findOneInDB(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());
+			Node node = session.createQuery(idRow.getAradonQuery()).findOneInDB();
+			
 			Class<? extends AbstractORM> clz = p.getClass();
 			AbstractORM result = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
 
@@ -50,21 +43,16 @@ public abstract class AbstractManager<T extends AbstractORM> {
 	public NodeResult save(T p) {
 		IDRow<T> idRow = getIDRow(p);
 
-		Node foundNode = session.createQuery().findOneInDB(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());
-		if (foundNode == null) {
-			foundNode = NodeImpl.create(wsname, p.getNodeObject(), idRow.getGroupNm(), p.getString(idRow.getKey()));
-			foundNode.setAradonId(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId());
-			session.commit() ;
-		}
+		Node foundNode = session.mergeNode(MergeQuery.createByAradon(idRow.getGroup(), idRow.getValue())) ;
+		int count = session.commit() ;
 
-		NodeResult result = session.createQuery().aradonGroupId(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId()).update(foundNode.toPropertyMap());
+		NodeResult result = session.createQuery(idRow.getAradonQuery()).update(p.getNodeObject().toMap());
 		return result ;
 	}
 
 	public Node toNode(T p) {
 		IDRow<T> idRow = getIDRow(p);
-		PropertyQuery query = session.createQuery().aradonGroupId(idRow.getAradonQuery().getGroupId(), idRow.getAradonQuery().getUId()).getQuery() ;
-		return NodeImpl.load(query, wsname, p.getNodeObject());
+		return NodeImpl.load(session, idRow.getAradonQuery(), wsname, p.getNodeObject());
 	}
 
 	protected Session getSession() {
@@ -107,13 +95,11 @@ class IDRow<T extends AbstractORM> {
 	private final T obj;
 	private final String key;
 	private final Object value;
-	private final AradonQuery query;
 
 	private IDRow(T obj, String key, Object value) {
 		this.obj = obj;
 		this.key = key;
 		this.value = value;
-		this.query = AradonQuery.newByGroupId(obj.getClass().getSimpleName(), value);
 	}
 
 	public final static <T extends AbstractORM> IDRow<T> create(T obj, String key, Object value) {
@@ -132,8 +118,12 @@ class IDRow<T extends AbstractORM> {
 		return value;
 	}
 
-	public AradonQuery getAradonQuery() {
-		return query;
+	public String getGroup(){
+		return obj.getClass().getSimpleName() ;
+	}
+	
+	public PropertyQuery getAradonQuery() {
+		return PropertyQuery.createByAradon(getGroup(), value);
 	}
 
 }

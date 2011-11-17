@@ -35,10 +35,10 @@ public class TestExtendNode extends TestBaseRepository{
 	
 	public void testName() throws Exception {
 		Node bleujin = session.newNode("bleujin").put("name", "bleujin") ;
-		bleujin.createChild("abc").put("name", "abc").createChild("") ;
+		bleujin.createChild("abc").put("name", "abc") ;
 		
 		session.commit() ;
-		Debug.debug(session.createQuery().findByPath("bleujin").getChild().limit(10).toList(PageBean.ALL) ) ;
+		Debug.debug(session.createQuery().path("bleujin").findOne().getChild().limit(10).toList(PageBean.ALL) ) ;
 	}
 	
 }

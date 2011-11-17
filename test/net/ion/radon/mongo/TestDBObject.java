@@ -2,8 +2,10 @@ package net.ion.radon.mongo;
 
 import java.util.List;
 
+import junit.framework.TestCase;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
+import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.RandomUtil;
 import net.sf.json.JSONObject;
 
@@ -11,11 +13,8 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
-
-import junit.framework.TestCase;
 
 public class TestDBObject extends TestCase {
 
@@ -83,12 +82,60 @@ public class TestDBObject extends TestCase {
 	}
 
 	
+	public void testSet() throws Exception {
+		BasicDBObject dbo = new BasicDBObject() ;
+		dbo.put("name", "bleujin") ;
+		dbo.put("address", "seoul") ;
+		
+		col.save(dbo) ;
+		
+		Debug.debug(col.findOne()) ;
+		
+		BasicDBObject mod = new BasicDBObject() ;
+		mod.put("$set", new BasicDBObject("name", "hero")) ;
+		
+		col.findAndModify(col.findOne(), mod) ;
+		Debug.debug(col.findOne()) ;
+	}
 	
 	
+	public void testGroup() throws Exception {
+		col.save(new ChainDBObject().put("grp", 1).put("name", "bleujin").put("rtime", 3).getDBObject() ) ;
+		col.save(new ChainDBObject().put("grp", 1).put("name", "bleujin").put("rtime", 2).getDBObject() ) ;
+		col.save(new ChainDBObject().put("grp", 1).put("name", "hero").put("rtime", 5).getDBObject() ) ;
+		
+		
+		DBObject key = new BasicDBObject("name", true);
+		DBObject cond = new BasicDBObject("grp", 1);
+		DBObject initial = new BasicDBObject(MapUtil.chainMap().put("count", 0).put("total", 0).toMap()) ;
+		String reduce = "function(doc, out){out.count++; out.total += doc.rtime; } ";
+		String finalize = "function(out) {out.avg = out.total / out.count; }";
+		
+		DBObject gresult = col.group(key, cond, initial, reduce, finalize);
+		Debug.line(gresult, gresult.getClass()) ;
+	}
+
 	
-	
-	
-	
+	public void testInGroup() throws Exception {
+		
+		ChainDBObject cdbo = new ChainDBObject().put("name", "bleujin").put("address", "seoul").inner("friend")
+			.push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20)) 
+			.push(MapUtil.chainKeyMap().put("name", "iihi").put("age", 25))
+			.push(MapUtil.chainKeyMap().put("name", "pm1200").put("age", 30)).getParent() ;
+		col.save(cdbo.getDBObject()) ;
+
+		
+		String compareFn = "var comfn = function(f1, f2){ var order = 1 ;  if (f1[out.sortkey] > f2[out.sortkey]) return 1 * order ; else if(f1[out.sortkey] < f2[out.sortkey]) return -1 * order; else return 0 }" ;
+
+		DBObject key = new BasicDBObject("name", true);
+		DBObject cond = new BasicDBObject("name", "bleujin");
+		DBObject initial = new BasicDBObject(MapUtil.chainMap().put("sortkey", "name").put("skip", 0).put("limit", 2).put("friends", new BasicDBList()).toMap()) ;
+		String reduce = "function(doc, out){ " + compareFn + ";  out.friends = Array.prototype.slice.call(Array.prototype.sort.call(doc.friend, comfn), out.skip, out.limit); }";
+		String finalize = "function(out) {;}";
+		
+		Debug.line(col.group(key, cond, initial, reduce, finalize)) ;
+	}
+
 	private BasicDBObject makePerson(String name, String address, int age) {
 		BasicDBObject dbo = new BasicDBObject();
 		dbo.append("name", name);
@@ -97,3 +144,9 @@ public class TestDBObject extends TestCase {
 		return dbo;
 	}
 }
+
+
+
+
+
+

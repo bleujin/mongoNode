@@ -3,12 +3,12 @@ package net.ion.radon.repository;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.Closure;
-
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
+
+import org.apache.commons.collections.Closure;
 
 public class TestNodeType extends TestBaseRepository{
 

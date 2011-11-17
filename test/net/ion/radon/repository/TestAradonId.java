@@ -1,18 +1,7 @@
 package net.ion.radon.repository;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import org.bson.types.ObjectId;
-
-import com.mongodb.DBObject;
-
-import net.ion.framework.db.Page;
 import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.myapi.AradonQuery;
-import net.ion.radon.repository.myapi.ICursor;
 
 public class TestAradonId extends TestBaseRepository{
 

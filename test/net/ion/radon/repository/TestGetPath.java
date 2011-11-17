@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 
 public class TestGetPath extends TestBaseRepository{
@@ -9,13 +8,13 @@ public class TestGetPath extends TestBaseRepository{
 	public void testNormalPath() throws Exception {
 		Session session = createSampleNode();
 
-		Node find = session.createQuery().findByPath("/root/bleujin") ;
+		Node find = session.createQuery().path("/root/bleujin").findOne() ;
 		assertEquals("bleujin", find.getString("name")) ;
 	}
 	
 	public void testname() throws Exception {
 		Session session = createSampleNode();
-		Node find = session.createQuery().findByPath("/root/bleujin") ;
+		Node find = session.createQuery().path("/root/bleujin").findOne() ;
 		
 		
 	}

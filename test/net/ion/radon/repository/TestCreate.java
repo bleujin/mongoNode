@@ -2,7 +2,6 @@ package net.ion.radon.repository;
 
 import java.util.Date;
 
-import net.ion.framework.util.Debug;
 import junit.framework.TestCase;
 
 public class TestCreate extends TestCase{
@@ -81,7 +80,7 @@ public class TestCreate extends TestCase{
 		session.commit() ;
 		
 		assertEquals(1, session.createQuery().eq("name", "bleujin").find().count()) ;
-		assertEquals("bleujin", session.createQuery().findByPath("/it").getString("name")) ;
+		assertEquals("bleujin", session.createQuery().path("/it").findOne().getString("name")) ;
 	}
 	
 	
@@ -99,7 +98,7 @@ public class TestCreate extends TestCase{
 		Node foundNode = session.createQuery().id(parent.getIdentifier()).findOne();
 		assertEquals(20, foundNode.get("age"));
 		
-		assertEquals("jin", session.createQuery().findByPath("/bleu/jin").getString("name")) ;
+		assertEquals("jin", session.createQuery().path("/bleu/jin").findOne().getString("name")) ;
 	}
 	
 

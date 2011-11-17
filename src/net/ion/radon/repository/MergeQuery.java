@@ -15,18 +15,19 @@ import com.mongodb.DBObject;
 
 public class MergeQuery implements IPropertyFamily{
 
-	private final DBObject iquery ;
+	private static final long serialVersionUID = -2440768087774324310L;
 	private DBObject blankData = new BasicDBObject() ;
+	private final PropertyQuery query ;
 	private MergeQuery(PropertyQuery query ) {
-		this.iquery = query.getDBObject() ;
+		this.query = query ;
 	}
 
 	public DBObject getDBObject() {
-		return iquery;
+		return query.getDBObject();
 	}
 
 	public Map<String, ? extends Object> toMap() {
-		return iquery.toMap();
+		return query.toMap();
 	}
 	
 	Map<String, ? extends Object> data(){
@@ -81,5 +82,9 @@ public class MergeQuery implements IPropertyFamily{
 			result[i] = StringUtil.join(groups, ".", 0, i + 1);
 		}
 		return result;
+	}
+	
+	public PropertyQuery getQuery(){
+		return query ;
 	}
 }

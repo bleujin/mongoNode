@@ -13,6 +13,7 @@ import net.ion.framework.db.manager.DBManager;
 import net.ion.framework.db.manager.OracleCacheDBManager;
 import net.ion.framework.db.procedure.IUserCommand;
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.RandomUtil;
 
 public class TestNodeCreateSpeed extends TestCase {
@@ -93,7 +94,7 @@ public class TestNodeCreateSpeed extends TestCase {
 		final Session session = rc.testLogin("speed");
 		session.dropWorkspace();
 		
-		for (int i = 0 ; i < 2000 ; i++) {
+		for (int i : ListUtil.rangeNum(2000)) {
 			Node node = session.newNode() ;
 			node.put( "a" + RandomUtil.nextRandomString(100), RandomUtil.nextRandomString(900));
 			if (i % 100 == 0) {

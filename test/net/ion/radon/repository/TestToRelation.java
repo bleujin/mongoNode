@@ -1,13 +1,12 @@
 package net.ion.radon.repository;
 
-import org.apache.commons.collections.Closure;
-import org.apache.commons.lang.ArrayUtils;
-
 import net.ion.framework.db.Rows;
 import net.ion.framework.db.procedure.Queryable;
-import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.relation.IRelation;
+
+import org.apache.commons.collections.Closure;
+import org.apache.commons.lang.ArrayUtils;
 
 public class TestToRelation extends TestBaseRepository {
 
@@ -147,8 +146,10 @@ public class TestToRelation extends TestBaseRepository {
 		NodeCursor nc = session.createQuery().aradonGroup("emp").find() ;
 		
 		Rows rows = NodeRows.createByCursor(Queryable.Fake, nc, NodeColumns.create("name", "nation", "#nation.ncode.{nation} nstring")) ;
-		Debug.line(rows) ;
-		
+		assertEquals(2, rows.getRowCount()) ;
+		assertEquals("hero", rows.firstRow().getString("name")) ;
+		assertEquals("eng", rows.firstRow().getString("nation")) ;
+		assertEquals("english", rows.firstRow().getString("nstring")) ;
 	}
 
 }

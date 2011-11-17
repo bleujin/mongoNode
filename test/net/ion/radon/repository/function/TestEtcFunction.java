@@ -1,20 +1,14 @@
 package net.ion.radon.repository.function;
 
-import net.ion.framework.db.DBController;
-import net.ion.framework.db.IDBController;
 import net.ion.framework.db.Rows;
-import net.ion.framework.db.manager.DBManager;
-import net.ion.framework.db.manager.OracleDBManager;
 import net.ion.framework.db.procedure.Queryable;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.NumberUtil;
-import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Column;
 import net.ion.radon.repository.IColumn;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeColumns;
 import net.ion.radon.repository.NodeRows;
-import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.TestBaseRepository;
 
 public class TestEtcFunction extends TestBaseRepository{

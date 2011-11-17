@@ -212,7 +212,7 @@ public class TestNodeVfs extends TestBaseRepository {
 		Node found = session.createQuery().eq("name", "dev2 team").findOne() ;
 		assertEquals("dev2 team", found.getString("name")) ;
 		
-		Node foundByPath = session.createQuery().findByPath("/dept/dev2") ;
+		Node foundByPath = session.createQuery().path("/dept/dev2").findOne() ;
 		
 		Debug.debug(foundByPath) ;
 		assertEquals("dev2 team", foundByPath.getString("name")) ;
@@ -227,7 +227,7 @@ public class TestNodeVfs extends TestBaseRepository {
 		VFile dept = entry.resolveFile("node://dept/dept.node");
 		IOUtil.copyNClose(new StringReader("{greeting:'한글', age:20}"), dept.getOutputStream(), "UTF-8") ;
 		
-		Node node = session.createQuery().findByPath("/dept") ;
+		Node node = session.createQuery().path("/dept").findOne() ;
 		
 		assertEquals("한글", node.getString("greeting")) ;
 		

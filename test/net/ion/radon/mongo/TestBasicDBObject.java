@@ -1,10 +1,9 @@
 package net.ion.radon.mongo;
 
+import junit.framework.TestCase;
 import net.ion.framework.util.Debug;
 
 import com.mongodb.BasicDBObject;
-
-import junit.framework.TestCase;
 
 public class TestBasicDBObject extends TestCase{
 

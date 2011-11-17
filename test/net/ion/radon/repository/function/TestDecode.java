@@ -7,7 +7,6 @@ import net.ion.framework.util.ObjectUtil;
 import net.ion.radon.repository.NodeColumns;
 import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.NodeRows;
-import net.ion.radon.repository.PropertyFamily;
 import net.ion.radon.repository.TestBaseRepository;
 
 import org.apache.commons.lang.ArrayUtils;

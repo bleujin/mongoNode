@@ -86,7 +86,7 @@ public class TestUpdate extends TestBaseRepository{
 	public void testResult() throws Exception {
 		testMultiUpdate() ;
 		
-		assertEquals(true, session.getLastResultInfo().getRowCount() > 0); 
+		assertEquals(true, session.getAttribute(NodeResult.class.getCanonicalName(), NodeResult.class).getRowCount() > 0); 
 	}
 	
 
@@ -94,7 +94,7 @@ public class TestUpdate extends TestBaseRepository{
 		session.newNode("name");
 		session.commit();
 		
-		NodeResult nresult = session.getLastResultInfo();
+		NodeResult nresult = session.getAttribute(NodeResult.class.getCanonicalName(), NodeResult.class) ;
 		assertTrue(nresult.getRowCount() >= 0) ;
 		assertTrue(StringUtil.isBlank(nresult.getErrorMessage())) ;
 	}

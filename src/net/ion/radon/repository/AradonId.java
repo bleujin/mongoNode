@@ -5,18 +5,12 @@ import static net.ion.radon.repository.NodeConstants.GROUP;
 import static net.ion.radon.repository.NodeConstants.UID;
 
 import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.Map;
-
-import org.bson.types.ObjectId;
 
 import net.ion.framework.util.HashFunction;
 import net.ion.framework.util.StringUtil;
-import net.ion.radon.repository.innode.InNodeImpl;
-import net.ion.radon.repository.myapi.AradonQuery;
 
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 public class AradonId implements IPropertyFamily{
 
@@ -58,11 +52,11 @@ public class AradonId implements IPropertyFamily{
 		
 		if (dbo == null) return EMPTY ;
 		
-		BasicDBList dlist = (BasicDBList) dbo.get(GROUP) ;
+		INode dlist = (INode) dbo.get(GROUP) ;
 		Object uid = dbo.get(UID) ;
 		Object ghash = dbo.get(GHASH) ;
 		
-		return new AradonId(dlist, uid, ghash);
+		return new AradonId((BasicDBList)dlist.getDBObject(), uid, ghash);
 	}
 
 	public static AradonId load(DBObject dbo) {
@@ -113,7 +107,7 @@ public class AradonId implements IPropertyFamily{
 	
 	
 	public IPropertyFamily toQuery(){
-		return AradonQuery.newByGroupId(getGroup(), getUid()) ;
+		return PropertyQuery.createByAradon(getGroup(), getUid()) ;
 	}
 	
 	

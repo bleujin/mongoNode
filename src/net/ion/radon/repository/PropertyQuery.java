@@ -2,16 +2,13 @@ package net.ion.radon.repository;
 
 import static net.ion.radon.repository.NodeConstants.ARADON_GROUP;
 import static net.ion.radon.repository.NodeConstants.ARADON_UID;
-import static net.ion.radon.repository.NodeConstants.ARADON_GHASH;
 import static net.ion.radon.repository.NodeConstants.ID;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.DoubleKeyHashMap;
-import net.ion.framework.util.HashFunction;
-import net.ion.radon.repository.myapi.AradonQuery;
 
 import org.bson.types.ObjectId;
 
@@ -24,6 +21,7 @@ public class PropertyQuery implements IPropertyFamily {
 	private static final long serialVersionUID = -4825662715495266491L;
 	private NodeObject nobject;
 	public final static PropertyQuery EMPTY = new PropertyQuery(NodeObject.create());
+	private transient DoubleKeyHashMap<String, PropertyQuery, Node> cacheMap = new DoubleKeyHashMap<String, PropertyQuery, Node>();
 
 	private PropertyQuery(NodeObject nobject) {
 		this.nobject = nobject;
@@ -38,32 +36,20 @@ public class PropertyQuery implements IPropertyFamily {
 	}
 
 	public static PropertyQuery createById(String objectId) {
-		return new PropertyQuery(NodeObject.create(ID, new ObjectId(objectId)));
+		return PropertyQuery.create().put(ID, new ObjectId(objectId));
 	}
 
 	public static PropertyQuery createByAradon(String groupId, Object uId) {
-		PropertyQuery query = PropertyQuery.create();
-		query.put(ARADON_GROUP, groupId);
-		query.put(ARADON_UID, uId);
-		query.put(ARADON_GHASH, HashFunction.hashGeneral(groupId));
-
-		return query;
+		return PropertyQuery.create().aradonId(groupId, uId) ;
 	}
 
 	public static PropertyQuery createByAradon(String groupId) {
-		PropertyQuery query = PropertyQuery.create();
-		query.put(ARADON_GROUP, groupId);
-
-		return query;
+		return PropertyQuery.create().aradonGroup(groupId);
 	}
 	
 	public static PropertyQuery createByPath(String path) {
-		PropertyQuery query = PropertyQuery.create();
-		query.put(NodeConstants.PATH, path);
-
-		return query;
+		return PropertyQuery.create().path(path);
 	}
-
 	
 	
 	public static PropertyQuery create(String key, Object val) {
@@ -74,15 +60,23 @@ public class PropertyQuery implements IPropertyFamily {
 		return new PropertyQuery(NodeObject.create());
 	}
 
-	// public Object put(String key, String val) {
-	// return bdbo.put(key, val) ;
-	// }
+	
+	public PropertyQuery aradonId(String groupId, Object uId){
+		put(ARADON_GROUP, groupId);
+		put(ARADON_UID, uId);
+		// put(ARADON_GHASH, HashFunction.hashGeneral(groupId));
 
-	public PropertyQuery put(AradonQuery query) {
-		nobject.put(ARADON_GROUP, query.getGroupId());
-		if (query.getUId() != null)
-			nobject.put(ARADON_UID, query.getUId());
-		return this;
+		return this ;
+	}
+	
+	public PropertyQuery aradonGroup(String groupId){
+		put(ARADON_GROUP, groupId);
+		return this ;
+	}
+	
+	public PropertyQuery path(String path){
+		put(NodeConstants.PATH, path);
+		return this ;
 	}
 
 	public PropertyQuery put(String key, Object val) {
@@ -224,12 +218,9 @@ public class PropertyQuery implements IPropertyFamily {
 		return nobject.equals(that.nobject);
 	}
 
-	private DoubleKeyHashMap<String, PropertyQuery, Node> cacheMap = new DoubleKeyHashMap<String, PropertyQuery, Node>();
-
-	Node findOne(Session session, String wsName, PropertyQuery parentQuery, PropertyQuery query) {
+	Node corelateNode(Session session, String wsName, PropertyQuery parentQuery, PropertyQuery query) {
 		if (!cacheMap.containsKey(wsName, query) || parentQuery == EMPTY) {
-			Debug.line() ;
-			Node node = session.getWorkspace(wsName).findOne(query);
+			Node node = session.getWorkspace(wsName).findOne(session, query, Columns.ALL);
 			cacheMap.put(wsName, query, node);
 		}
 		return cacheMap.get(wsName, query);

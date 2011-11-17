@@ -1,106 +1,57 @@
 package net.ion.radon.repository;
 
 import java.util.Collection;
-import java.util.List;
 
-import com.mongodb.DB;
+public interface Session {
 
-import net.ion.radon.repository.myapi.AradonQuery;
-import net.sf.json.JSONObject;
+	public Session changeWorkspace(String wname);
 
-public abstract class Session {
+	public ISequence getSequence(String prefix, String id);
 
-	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
+	public int commit();
 
-	public abstract Session changeWorkspace(String wname);
+	public void dropWorkspace();
 
-	public abstract ISequence getSequence(String prefix, String id);
+	public Node newNode();
 
-	public static Session getCurrent() {
-		Session session = CURRENT.get();
+	public Node newNode(String name);
 
-		if (session == null) {
-			throw new IllegalStateException("not logined");
-		}
+	public String getCurrentWorkspaceName();
 
-		return session;
-	}
+	public NodeResult remove(Node node);
 
-	protected static ThreadLocal<Session> getThreadLocal() {
-		return CURRENT;
-	}
+	public Node createChild(Node parent, String name);
 
-	public abstract int commit();
+	public Collection<Node> getModified();
 
-	public abstract NodeResult getLastResultInfo();
+	public void clear();
 
-	abstract void notify(Node target, NodeEvent event);
+	public void logout();
 
-	public abstract void dropWorkspace();
+	public Workspace getCurrentWorkspace();
 
-	public abstract Node newNode();
+	public Node getRoot();
 
-	public abstract Node newNode(String name);
-
-	abstract List<Node> findAllWorkspace(AradonQuery query);
-
-	public abstract String getCurrentWorkspaceName();
-
-	public abstract NodeResult remove(Node node);
-
-	abstract Node createChild(Node parent, String name);
-
-	public abstract Collection<Node> getModified();
-
-	public abstract void clear();
-
-	public abstract void logout();
-
-	public abstract Workspace getCurrentWorkspace();
-
-	public abstract Node getRoot();
-
-//	public abstract ReferenceManager getReferenceManager();
-
-//	public abstract ReferenceQuery createRefQuery();
-
-//	public Node addReference(Node src, String relType, Node target) {
-//		return getReferenceManager().addReference(src, relType, target);
-//	}
-
-	public SessionQuery createQuery() {
-		return SessionQuery.create(this);
-	}
-
-	SessionQuery createQuery(PropertyQuery definedQuery) {
-		return SessionQuery.create(this, definedQuery);
-	}
-
-	abstract Repository getRepositorys();
-
-	abstract void setAttribute(String key, Object value);
-
-	public abstract <T> T getAttribute(String key, Class<T> T);
-
-	void setLastResult(NodeResult result) {
-		setAttribute(NodeResult.class.getCanonicalName(), result);
-	}
-
-	abstract void dropDB();
-
-	public abstract TempNode tempNode();
-
-	public NodeResult merge(String idOrPath, TempNode tnode) {
-		if (idOrPath == null) throw new IllegalArgumentException("query must be path or id") ;
-		return idOrPath.startsWith("/") ? merge(MergeQuery.createByPath(idOrPath), tnode) : merge(MergeQuery.createById(idOrPath), tnode) ;
-	}
+	public SessionQuery createQuery() ; 
 	
-	public NodeResult merge(MergeQuery query, TempNode tnode) {
-		return getCurrentWorkspace().merge(query, tnode);
-	}
+	public <T> T getAttribute(String key, Class<T> T);
 
-	public abstract Node mergeNode(MergeQuery mergeQuery, String... props) ;
+	public TempNode tempNode();
 
-	public abstract Workspace getWorkspace(String wname) ;
+	public SessionQuery createQuery(PropertyQuery definedQuery) ;
+
+	public NodeResult merge(String idOrPath, TempNode tnode)  ;
+	
+	public NodeResult merge(MergeQuery query, TempNode tnode) ;
+
+	public Node mergeNode(MergeQuery mergeQuery, String... props) ;
+
+	public Workspace getWorkspace(String wname) ;
+
+	public void setAttribute(String key, Object value);
+	
+	public String[] getWorkspaceNames() ;
+	
+	public void notify(Node target, NodeEvent event);
 
 }

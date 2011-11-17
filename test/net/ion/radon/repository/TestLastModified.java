@@ -21,7 +21,7 @@ public class TestLastModified extends TestBaseRepository{
 		Thread.sleep(100) ;
 		session.commit() ;
 		
-		Node found = session.createQuery().findByPath("/bleujin");
+		Node found = session.createQuery().path("/bleujin").findOne();
 		assertEquals(true, found.getLastModified() > 50 + ctime) ;
 	}
 	
@@ -40,7 +40,7 @@ public class TestLastModified extends TestBaseRepository{
 		session.clear() ;
 		
 		
-		Node found = session.createQuery().findByPath("/bleujin");
+		Node found = session.createQuery().path("/bleujin").findOne();
 		Debug.debug(ctime, found.getLastModified()) ;
 		assertEquals(true, found.getLastModified() > ctime) ;
 	}

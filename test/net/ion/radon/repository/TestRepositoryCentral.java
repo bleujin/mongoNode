@@ -1,7 +1,7 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 import junit.framework.TestCase;
+import net.ion.framework.util.Debug;
 
 public class TestRepositoryCentral extends TestCase{
 

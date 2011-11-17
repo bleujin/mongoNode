@@ -58,6 +58,10 @@ public class RepositoryCentral {
 		return new RepositoryCentral(host, port);
 	}
 	
+	public static RepositoryCentral create(String host, int port, String dbName) throws UnknownHostException, MongoException {
+		return new RepositoryCentral(host, port, dbName);
+	}
+	
 
 	Mongo getMongo(){
 		return mongo ;
@@ -67,24 +71,17 @@ public class RepositoryCentral {
 		return host + "/" + port;
 	}
 
-	@Deprecated
-	public Session testLogin(String dbName, String defaultWorkspace) {
-		this.currentDBName = dbName ;
-		return login(dbName, defaultWorkspace, new SimpleCredential());
-	}
-	
 	public RepositoryCentral changeDB(String dbName){
 		this.currentDBName = dbName ;
 		return this ;
 	}
 	
 	public Session testLogin(String wname) {
-		return testLogin(currentDBName, wname) ;
+		return login(currentDBName, wname, new SimpleCredential()) ;
 	}
 
 	public Session login(String dbName, String defaultWorkspace, ICredential credential) {
-		final Repository repository = Repository.create(mongo.getDB(dbName));
-		return LocalSession.create(repository, defaultWorkspace);
+		return LocalSession.create(Repository.create(mongo.getDB(dbName)), defaultWorkspace);
 	}
 	
 	public Session login(String dbName, String defaultWorkspace) {

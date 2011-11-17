@@ -6,16 +6,12 @@ import net.ion.framework.db.Rows;
 import net.ion.framework.db.procedure.Queryable;
 import net.ion.framework.util.DateUtil;
 import net.ion.framework.util.Debug;
-import net.ion.framework.util.ObjectUtil;
 import net.ion.radon.repository.Column;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeColumns;
 import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.NodeRows;
-import net.ion.radon.repository.PropertyFamily;
 import net.ion.radon.repository.TestBaseRepository;
-
-import org.apache.commons.lang.ArrayUtils;
 
 public class TestFunction extends TestBaseRepository{
 	
@@ -77,7 +73,7 @@ public class TestFunction extends TestBaseRepository{
 		NodeCursor cursor = session.createQuery().descending("date").find() ;
 		Rows rows = NodeRows.createByCursor(Queryable.Fake, cursor, NodeColumns.create("date", "name")) ;
 		
-		Debug.debug(rows) ;
+		assertEquals("d2", rows.firstRow().getString("name")) ;
 	}
 	
 	public void testPrefix() throws Exception {

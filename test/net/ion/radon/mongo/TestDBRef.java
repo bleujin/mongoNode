@@ -1,9 +1,9 @@
 package net.ion.radon.mongo;
 
-import org.bson.types.ObjectId;
-
+import junit.framework.TestCase;
 import net.ion.framework.util.Debug;
-import net.ion.radon.repository.AradonId;
+
+import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -11,8 +11,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.Mongo;
-
-import junit.framework.TestCase;
 
 public class TestDBRef extends TestCase{
 	

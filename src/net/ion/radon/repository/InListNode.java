@@ -3,8 +3,6 @@ package net.ion.radon.repository;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.mongodb.DBObject;
-
 import net.ion.framework.util.ChainMap;
 
 public interface InListNode extends IPropertyFamily, Serializable{

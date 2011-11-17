@@ -5,8 +5,10 @@ import java.util.Map;
 
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Node;
+import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.NodeScreen;
 import net.ion.radon.repository.PropertyComparator;
+import net.ion.radon.repository.PropertyFamily;
 
 import org.apache.commons.collections.Closure;
 
@@ -35,5 +37,9 @@ public interface ICursor {
 	public List<Node> toList(PageBean page);
 
 	public List<Node> toList(PageBean page,  PropertyComparator comparator);
+
+	public NodeCursor sort(PropertyFamily family) ;
+	public NodeCursor ascending(String... propIds);
+	public NodeCursor descending(String... propIds);
 
 }

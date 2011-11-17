@@ -34,11 +34,4 @@ public class TestRootNode extends TestBaseRepository{
 		assertEquals("/bleujin", node.getPath()) ;
 	}
 	
-	
-	public void testFindByPath() throws Exception {
-		Node node = session.createQuery().findByPath("/") ;
-		
-		assertEquals(true, node == session.getRoot()) ;
-	}
-	
 }

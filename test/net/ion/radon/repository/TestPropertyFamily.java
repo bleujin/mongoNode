@@ -1,7 +1,5 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
-import junit.framework.TestCase;
 
 public class TestPropertyFamily extends TestBaseRepository{
 	

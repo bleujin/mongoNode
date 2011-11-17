@@ -22,53 +22,46 @@ import net.ion.radon.repository.util.MyNumberUtil;
 
 import com.mongodb.DBObject;
 
-public class TempNodeImpl implements TempNode{
+public class TempNodeImpl implements TempNode {
 
 	private static final long serialVersionUID = -9085850570829905483L;
-	private transient Session session ;
+	private final transient Session session;
 	private NodeObject nobject;
 
 	private TempNodeImpl(Session session, NodeObject no) {
-		this.session = session ;
+		this.session = session;
 		this.setNodeMetaInfo(no);
 	}
 
-	static TempNodeImpl create(NodeObject no) {
-		Session currentSession = Session.getCurrent();
-
-		final TempNodeImpl result = new TempNodeImpl(currentSession, no);
+	static TempNodeImpl create(Session session, NodeObject no) {
+		final TempNodeImpl result = new TempNodeImpl(session, no);
 
 		return result;
 	}
 
 	public Session getSession() {
-		if (session != null){
-			return session ;
-		} else {
-			return Session.getCurrent() ;
-		}
+		return session;
 	}
 
-	// @TODO if prop has '.' 
+	// @TODO if prop has '.'
 	public Serializable get(String propId) {
-		return nobject.get(propId, this) ;
+		return nobject.get(propId, this);
 	}
-	
+
 	public TempInNode inner(String name) {
-		return (TempInNode)nobject.inner(name, this) ;
+		return (TempInNode) nobject.inner(name, this);
 	}
-	
+
 	public InListNode inlist(String name) {
-		return nobject.inlist(name, this) ;
+		return nobject.inlist(name, this);
 	}
 
 	public Serializable get(String propId, int index) {
 		return nobject.get(propId, index, this);
 	}
 
-	
 	public int getAsInt(String propId) {
-		return MyNumberUtil.getAsInt(get(propId)) ;
+		return MyNumberUtil.getAsInt(get(propId));
 	}
 
 	public DBObject getDBObject() {
@@ -84,7 +77,6 @@ public class TempNodeImpl implements TempNode{
 		return CipherUtil.isMatch(value, encrypted);
 	}
 
-	
 	public void putAll(Map<String, ? extends Object> props) {
 		for (Entry<String, ?> prop : props.entrySet()) {
 			this.put(prop.getKey(), prop.getValue());
@@ -95,9 +87,8 @@ public class TempNodeImpl implements TempNode{
 		putAll(props.toMap());
 	}
 
-	
 	public synchronized TempNode put(String key, Object val) {
-		return putProperty(PropertyId.create(key), (val != null && val instanceof IStringObject) ? ((IStringObject)val).getString() : val );
+		return putProperty(PropertyId.create(key), (val != null && val instanceof IStringObject) ? ((IStringObject) val).getString() : val);
 	}
 
 	public TempNode putProperty(PropertyId propId, Object val) {
@@ -114,11 +105,11 @@ public class TempNodeImpl implements TempNode{
 
 		this.nobject = _dbo;
 
-//		ObjectId newId = new ObjectId() ;
-//		if (_dbo.get(ID) == null || (!(_dbo.get(ID) instanceof ObjectId))) {
-//			putProperty(PropertyId.reserved(ID), newId);
-//		}
-//
+		// ObjectId newId = new ObjectId() ;
+		// if (_dbo.get(ID) == null || (!(_dbo.get(ID) instanceof ObjectId))) {
+		// putProperty(PropertyId.reserved(ID), newId);
+		// }
+		//
 		if (_dbo.get(CREATED) == null) {
 			setCreated(GregorianCalendar.getInstance());
 		}
@@ -127,9 +118,7 @@ public class TempNodeImpl implements TempNode{
 			setOwner("_unknown");
 		}
 	}
-	
 
-	
 	private void setCreated(Calendar c) {
 		putProperty(PropertyId.reserved(CREATED), c.getTimeInMillis());
 		putProperty(PropertyId.reserved(TIMEZONE), TimeZone.getDefault().toString());
@@ -140,15 +129,15 @@ public class TempNodeImpl implements TempNode{
 	}
 
 	public Map toMap() {
-		return nobject.toMap(this) ;
+		return nobject.toMap(this);
 	}
 
 	public Map<String, ? extends Object> toPropertyMap() {
-		return nobject.toPropertyMap(this );
+		return nobject.toPropertyMap(this);
 	}
 
 	public Map<String, ? extends Object> toPropertyMap(NodeColumns cols) {
-		return nobject.toPropertyMap(cols, this) ;
+		return nobject.toPropertyMap(cols, this);
 	}
 
 	public String toString() {

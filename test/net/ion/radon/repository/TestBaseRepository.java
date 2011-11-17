@@ -12,7 +12,7 @@ public class TestBaseRepository  extends TestCase{
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		rc = RepositoryCentral.create("61.250.201.78", 27017) ;
+		rc = RepositoryCentral.testCreate() ;
 		session = rc.testLogin(WORKSPACE_NAME) ;
 		session.dropWorkspace();
 //		session.getReferenceManager().reset() ;

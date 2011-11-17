@@ -1,11 +1,6 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
-import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.myapi.AradonQuery;
-import net.sf.json.JSONObject;
-import junit.framework.TestCase;
 
 public class TestTemporaryNode extends TestBaseRepository {
 
@@ -97,11 +92,11 @@ public class TestTemporaryNode extends TestBaseRepository {
 		session.merge(MergeQuery.createByPath("/bleujin"), session.tempNode().put("age", 20).put("name", "hello").put("greeting", "hi!").inner("address").put("city", "seoul").getParent()) ;
 		
 		assertEquals(1, session.createQuery().count()) ;
-		assertEquals(20, session.createQuery().findByPath("/bleujin").getAsInt("age")) ;
-		assertEquals("bleujin", session.createQuery().findByPath("/bleujin").getString("id")) ;
-		assertEquals("hello", session.createQuery().findByPath("/bleujin").getString("name")) ;
-		assertEquals("hi!", session.createQuery().findByPath("/bleujin").getString("greeting")) ;
-		assertEquals("seoul", session.createQuery().findByPath("/bleujin").getString("address.city")) ;
+		assertEquals(20, session.createQuery().path("/bleujin").findOne().getAsInt("age")) ;
+		assertEquals("bleujin", session.createQuery().path("/bleujin").findOne().getString("id")) ;
+		assertEquals("hello", session.createQuery().path("/bleujin").findOne().getString("name")) ;
+		assertEquals("hi!", session.createQuery().path("/bleujin").findOne().getString("greeting")) ;
+		assertEquals("seoul", session.createQuery().path("/bleujin").findOne().getString("address.city")) ;
 		
 	}
 	
@@ -109,7 +104,7 @@ public class TestTemporaryNode extends TestBaseRepository {
 		session.merge("/emp/bleujin", session.tempNode().put("age", 20).put("name", "hello").inner("address").put("city", "seoul").getParent()) ;
 		
 		
-		Node found = session.createQuery().findByPath("/emp/bleujin") ;
+		Node found = session.createQuery().path("/emp/bleujin").findOne() ;
 		assertEquals("/emp/bleujin", found.getPath()) ;
 		assertEquals("seoul", found.getString("address.city")) ;
 		assertEquals("/emp/bleujin", session.createQuery().id(found.getIdentifier()).findOne().getPath()) ;

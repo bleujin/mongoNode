@@ -2,7 +2,6 @@ package net.ion.radon.repository.function;
 
 import net.ion.framework.db.Rows;
 import net.ion.framework.db.procedure.Queryable;
-import net.ion.framework.util.Debug;
 import net.ion.radon.repository.Column;
 import net.ion.radon.repository.IColumn;
 import net.ion.radon.repository.Node;

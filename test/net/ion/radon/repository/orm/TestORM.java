@@ -1,6 +1,5 @@
 package net.ion.radon.repository.orm;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import net.ion.framework.util.Debug;
@@ -28,7 +27,6 @@ public class TestORM extends TestBaseRepository{
 		
 
 		Node node = pm.toNode(bleu) ;
-		assertEquals("bleu", node.getName()) ; 
 		assertEquals("bleu", node.get("userId")) ; 
 		assertEquals("seoul", node.get("address")) ; 
 		assertEquals("white", node.get("fcolor")) ; 

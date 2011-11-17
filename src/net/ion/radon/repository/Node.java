@@ -2,16 +2,12 @@ package net.ion.radon.repository;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.db.procedure.IStringObject;
 import net.ion.framework.util.ChainMap;
-import net.ion.framework.util.ListUtil;
-import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.innode.NormalInNode;
-import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.myapi.ICursor;
 import net.ion.radon.repository.relation.IRelation;
 
@@ -99,10 +95,6 @@ class RootNode implements Node {
 		this.session = session ;
 	}
 	
-	public boolean addReference(String refType, AradonQuery query) {
-		throw new IllegalArgumentException("root node is read only") ;
-	}
-
 	public Node append(String key, Object val) {
 		throw new IllegalArgumentException("root node is read only") ;
 	}
@@ -120,7 +112,7 @@ class RootNode implements Node {
 	}
 
 	public Node getChild(String name) {
-		return session.createQuery().findByPath("/" + name);
+		return session.createQuery().path("/" + name).findOne();
 	}
 
 	public Object getId() {
@@ -144,11 +136,6 @@ class RootNode implements Node {
 		return PropertyQuery.EMPTY;
 	}
 
-	public ReferenceTaragetCursor getReferencedNodes(String aradonGroup) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public Session getSession() {
 		return session;
 	}
@@ -165,31 +152,8 @@ class RootNode implements Node {
 		throw new IllegalArgumentException("root node is read only") ;
 	}
 
-	public List<Node> removeChild() {
-		List<Node> result = session.createQuery().find().toList(PageBean.ALL) ;
-		session.dropWorkspace();
-		return result ;
-	}
-
-	public List<Node> removeChild(String nameOrId) {
-		return ListUtil.EMPTY ;
-	}
-
-	public List<Node> removeDescendant() {
-		return removeChild();
-	}
-
-	public int removeReference(String refType, AradonQuery query) {
-		; // no action 
-		return 0;
-	}
-
 	public Node setAradonId(String groupid, Object uid) {
 		return this;
-	}
-
-	public ReferenceObject toRef() {
-		return null;
 	}
 
 	public DBObject getDBObject() {
@@ -253,11 +217,6 @@ class RootNode implements Node {
 
 	public Map<String, ? extends Object> toPropertyMap(NodeColumns cols) {
 		return Collections.EMPTY_MAP;
-	}
-
-	public boolean setReference(String refType, AradonQuery preQuery, AradonQuery newQuery) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	public long getLastModified() {

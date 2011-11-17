@@ -2,16 +2,11 @@ package net.ion.radon.repository.mr;
 
 
 import junit.framework.TestCase;
-import net.ion.framework.util.Debug;
-import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.ApplyHander;
-import net.ion.radon.repository.CommandOption;
 import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.RepositoryCentral;
 import net.ion.radon.repository.Session;
-import net.ion.radon.repository.TestBaseRepository;
 
 /**
  * <p>Title: TestGroupMap.java</p>
@@ -27,8 +22,8 @@ import net.ion.radon.repository.TestBaseRepository;
 public class TestGroupMap extends TestCase {
 
 	public void testFirst() throws Exception {
-		RepositoryCentral rc = RepositoryCentral.create("61.250.201.78", 27017) ;
-		Session session = rc.testLogin("ICS_MONGO", "ics_content_bleujin") ;
+		RepositoryCentral rc = RepositoryCentral.create("61.250.201.78", 27017, "ICS_MONGO") ;
+		Session session = rc.testLogin("ics_content_bleujin") ;
 		
 //		session.createQuery().find().debugPrint(PageBean.ALL) ;
 		

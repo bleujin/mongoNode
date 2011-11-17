@@ -2,6 +2,7 @@ package net.ion.radon.repository.mr;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.ion.radon.repository.TestApplyHandler;
 
 public class TestAllMapReduce extends TestCase{
 
@@ -10,6 +11,8 @@ public class TestAllMapReduce extends TestCase{
 		
 		result.addTestSuite(TestGroup.class) ;
 		result.addTestSuite(TestMapReduce.class) ;
+		result.addTestSuite(TestApplyHandler.class) ;
+		// result.addTestSuite(TestOutputType.class) ;
 		
 		result.addTestSuite(TestNodeFormat.class) ;
 		result.addTestSuite(TestMRSpeed.class) ;

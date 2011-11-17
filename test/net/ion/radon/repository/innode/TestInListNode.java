@@ -1,9 +1,10 @@
 package net.ion.radon.repository.innode;
 
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.MapUtil;
+import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
-import net.ion.radon.repository.TestBaseRepository;
-import net.sf.json.JSONObject;
 
 public class TestInListNode extends  TestBaseInListQuery{
 
@@ -75,5 +76,33 @@ public class TestInListNode extends  TestBaseInListQuery{
 		Debug.line(pvalue.getClass(), pvalue) ;
 	}
 
+	public void testComplicate() throws Exception {
+		Node node = session.newNode().put("name", "bleujin") ;
+		node.inlist("friend").push(MapUtil.chainMap().put("name", "novision")) ;
+		node.inlist("friend").push(MapUtil.chainMap().put("name", "pm1200")) ;
+		
+		((InNode)node.inlist("friend").get(0)).inner("address").put("city", "seoul") ;
+		
+		session.commit() ;
+		
+		session.createQuery().find().debugPrint(PageBean.ALL) ;
+		
+		Node found = session.createQuery().findOne() ;
+		InNode novision = found.inlist("friend").createQuery().findOne() ;
+		assertEquals("seoul", novision.inner("address").get("city")) ;
+	}
+
+
+	public void testIndex() throws Exception {
+		Node node = session.newNode().put("name", "bleujin") ;
+		node.inlist("friend").push(MapUtil.chainMap().put("name", "novision")) ;
+		node.inlist("friend").push(MapUtil.chainMap().put("name", "pm1200")) ;
+		
+		InNode inode = node.inlist("friend").createQuery().eq("name", "pm1200").findOne() ;
+		assertEquals(1, inode.getIndex()) ;
+
+		assertEquals(0, node.inlist("friend").createQuery().eq("name", "novision").findOne().getIndex()) ;
+	}
+	
 	
 }

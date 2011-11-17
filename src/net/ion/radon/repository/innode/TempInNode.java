@@ -22,8 +22,8 @@ public interface TempInNode extends InNode {
 class TempInNodeImpl extends InNodeImpl implements TempInNode {
 	private static final long serialVersionUID = 6451705402355689255L;
 
-	TempInNodeImpl(DBObject dbo, String pname, INode parent) {
-		super(dbo, pname, parent) ;
+	TempInNodeImpl(DBObject dbo, String pname, INode parent, int index) {
+		super(dbo, pname, parent, index) ;
 	}
 	
 	public TempNode getParent(){

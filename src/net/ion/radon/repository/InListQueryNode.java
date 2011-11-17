@@ -29,14 +29,14 @@ public class InListQueryNode {
 	}
 
 	public NodeResult pull() {
-		return session.getCurrentWorkspace().unset(squery.getQuery(), new BasicDBObject(field, 1)) ;
+		return session.getCurrentWorkspace().unset(session, squery.getQuery(), new BasicDBObject(field, 1)) ;
 	}
 
 	public NodeResult pull(PropertyQuery query) {
 		BasicDBObject dbo = new BasicDBObject() ;
 		dbo.put(field, query.getDBObject()) ;
 		
-		return session.getCurrentWorkspace().pull(squery.getQuery(), dbo) ;
+		return session.getCurrentWorkspace().pull(session, squery.getQuery(), dbo) ;
 	}
 
 	public NodeResult push(ChainMap values) {
@@ -47,7 +47,7 @@ public class InListQueryNode {
 		BasicDBObject dbo = new BasicDBObject() ;
 		dbo.put(field, NodeObject.load(values).getDBObject()) ;
 		
-		return session.getCurrentWorkspace().push(squery.getQuery(), dbo) ;
+		return session.getCurrentWorkspace().push(session, squery.getQuery(), dbo) ;
 	}
 
 	public NodeResult update(PropertyQuery query, ChainMap cmap) {

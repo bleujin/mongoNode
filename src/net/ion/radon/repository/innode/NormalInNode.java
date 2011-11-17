@@ -2,7 +2,6 @@ package net.ion.radon.repository.innode;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.radon.repository.INode;
-import net.ion.radon.repository.InListNode;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
 
@@ -26,8 +25,8 @@ class NormalInNodeImpl extends InNodeImpl implements NormalInNode{
 
 	private static final long serialVersionUID = 6451705402355689255L;
 
-	NormalInNodeImpl(DBObject dbo, String pname, INode parent) {
-		super(dbo, pname, parent) ;
+	NormalInNodeImpl(DBObject dbo, String pname, INode parent, int index) {
+		super(dbo, pname, parent, index) ;
 	}
 	
 	public Node getParent(){

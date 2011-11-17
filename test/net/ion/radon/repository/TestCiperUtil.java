@@ -1,11 +1,7 @@
 package net.ion.radon.repository;
 
-import java.util.Date;
-
 import junit.framework.TestCase;
 import net.ion.framework.util.Debug;
-import net.ion.framework.util.HashFunction;
-import net.ion.framework.util.HashUtil;
 import net.ion.radon.repository.util.CipherUtil;
 
 import org.apache.commons.codec.binary.Hex;

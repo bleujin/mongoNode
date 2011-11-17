@@ -27,6 +27,18 @@ public class TestInListQueryNodeMDL extends TestBaseInListQuery{
 	}
 	
 	
+	public void testPullAll() throws Exception {
+		createNodes() ;
+		Node before = session.createQuery().lte("oindex", 1).findOne() ;
+		assertEquals(5, before.inlist("people").createQuery().find().size()) ;
+		NodeResult nr = session.createQuery().lte("oindex", 1).inlist("people").pull() ;
+		
+		Node after = session.createQuery().lte("oindex", 1).findOne() ;
+		assertEquals(0, after.inlist("people").createQuery().find().size()) ;
+	}
+	
+	
+	
 	public void testPush() throws Exception {
 		session.newNode().put("name", "bleujin") ;
 		session.newNode().put("name", "hero");
@@ -55,8 +67,8 @@ public class TestInListQueryNodeMDL extends TestBaseInListQuery{
 
 	public void testInListUpdate() throws Exception {
 		Node node = session.newNode().put("name", "bleujin") ;
-		node.inlist("hobby").push(MapUtil.<String, Object>chainMap().put("name", "promodel").toMap()) ;
-		node.inlist("hobby").push(MapUtil.<String, Object>chainMap().put("name", "navy").toMap()) ;
+		node.inlist("hobby").push(MapUtil.chainKeyMap().put("name", "promodel").toMap()) ;
+		node.inlist("hobby").push(MapUtil.chainKeyMap().put("name", "navy").toMap()) ;
 		
 		session.commit() ;
 		

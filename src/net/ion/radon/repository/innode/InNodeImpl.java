@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.ChainMap;
-import net.ion.framework.util.NumberUtil;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.INode;
 import net.ion.radon.repository.InListNode;
@@ -31,17 +30,24 @@ public abstract class InNodeImpl implements InNode {
 	private NodeObject nobject;
 	private String pname;
 	private INode parent;
+	private int index ;
 
-	protected InNodeImpl(DBObject dbo, String pname, INode parent) {
+	protected InNodeImpl(DBObject dbo, String pname, INode parent, int index) {
 		this.nobject = (dbo == null) ? NodeObject.create() : NodeObject.load(dbo);
 		this.pname = pname;
 		this.parent = parent;
+		this.index = index ;
 	}
 
 	public static InNode create(DBObject inner, String pname, INode parent) {
-		return (parent instanceof Node) ? new NormalInNodeImpl(inner, pname, parent) : new TempInNodeImpl(inner, pname, parent);
+		return create(inner, pname, parent, 0) ;
+	}
+	
+	public static InNode create(DBObject inner, String pname, INode parent, int index) {
+		return (parent instanceof Node) ? new NormalInNodeImpl(inner, pname, parent, index) : new TempInNodeImpl(inner, pname, parent, index);
 	}
 
+	
 	public InNode inner(String name) {
 		if (hasProperty(name) && get(name) instanceof InNode) {
 			return (InNode) get(name);
@@ -96,7 +102,9 @@ public abstract class InNodeImpl implements InNode {
 	}
 
 	public Serializable get(String propId) {
-		return (Serializable) nobject.get(propId.toLowerCase());
+		Object object = nobject.get(propId.toLowerCase());
+		if (object instanceof DBObject) return create((DBObject)object, propId, this) ;
+		return (Serializable) object;
 	}
 
 	public Serializable get(String propId, int index) {
@@ -173,6 +181,10 @@ public abstract class InNodeImpl implements InNode {
 			InNodeImpl that = (InNodeImpl)_that ;
 			return nobject.getDBObject().equals(that.getDBObject()) ;
 		} else return false ;
+	}
+	
+	public int getIndex(){
+		return index ;
 	}
 }
 

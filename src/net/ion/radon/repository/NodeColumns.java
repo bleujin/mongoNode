@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.sql.RowSetMetaData;
 
 import net.ion.framework.db.rowset.RowSetMetaDataImpl;
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 

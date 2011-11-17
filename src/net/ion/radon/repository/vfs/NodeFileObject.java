@@ -38,7 +38,7 @@ public final class NodeFileObject extends AbstractFileObject {
 	protected NodeFileObject(FileName name, NodeFileSystem fs) throws FileSystemException {
 		super(name, fs);
 		this.nfs = fs;
-		this.currentNode = getSession().createQuery().findByPath(getName().getNodePath());
+		this.currentNode = getSession().createQuery().path(getName().getNodePath()).findOne();
 		
 	}
 
@@ -167,7 +167,7 @@ public final class NodeFileObject extends AbstractFileObject {
 	}
 
 	private Node findParentNode() {
-		return getSession().createQuery().findByPath(getName().getParent().getPath());
+		return getSession().createQuery().path(getName().getParent().getPath()).findOne();
 	}
 
 	protected void doRename(FileObject newfile) throws Exception {
@@ -202,7 +202,7 @@ public final class NodeFileObject extends AbstractFileObject {
 	
 	public void refresh() throws FileSystemException{
 		super.refresh() ;
-		this.currentNode = getSession().createQuery().findByPath(getName().getNodePath());
+		this.currentNode = getSession().createQuery().path(getName().getNodePath()).findOne();
 	}
 	
 
@@ -220,7 +220,7 @@ public final class NodeFileObject extends AbstractFileObject {
 	public boolean exists() throws FileSystemException {
 		if (getName().getDepth() == 0)
 			return true;
-		return ((getType() == FileType.FILE) && getSession().createQuery().findByPath(getName().getParent().getPath()) != null) || ((getType() == FileType.FOLDER) && getSession().createQuery().findByPath(getName().getPath()) != null);
+		return ((getType() == FileType.FILE) && getSession().createQuery().path(getName().getParent().getPath()).existNode()) || ((getType() == FileType.FOLDER) && getSession().createQuery().path(getName().getPath()).existNode());
 	}
 
 	protected FileContent doCreateFileContent() throws FileSystemException {

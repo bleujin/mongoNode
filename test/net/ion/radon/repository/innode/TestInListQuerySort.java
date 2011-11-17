@@ -6,8 +6,6 @@ import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
-import net.ion.radon.repository.TestBaseRepository;
-import net.sf.json.JSONObject;
 
 public class TestInListQuerySort extends  TestBaseInListQuery {
 	

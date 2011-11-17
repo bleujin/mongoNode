@@ -14,7 +14,7 @@ public class TestGetRelation extends TestBaseRepository {
 	public void testRegular() throws Exception {
 
 		String str = "hi {name} {ab.bc} hm..";
-		Map<String, ? extends Object> vals = MapUtil.<String, Object>chainMap().put("name", "bleujin").put("greeting", "hi").put("ab.bc", "...").toMap();
+		Map<String, ? extends Object> vals = MapUtil.chainKeyMap().put("name", "bleujin").put("greeting", "hi").put("ab.bc", "...").toMap();
 
 		Pattern p = Pattern.compile("\\{[a-zA-Z][a-zA-Z0-9.]*\\}");
 		Matcher m = p.matcher(str);

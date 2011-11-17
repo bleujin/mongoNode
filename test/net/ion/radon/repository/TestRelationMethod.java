@@ -2,9 +2,7 @@ package net.ion.radon.repository;
 
 import java.util.Date;
 
-import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.myapi.AradonQuery;
 
 public class TestRelationMethod extends TestBaseRepository{
 
@@ -68,8 +66,8 @@ public class TestRelationMethod extends TestBaseRepository{
 		assertEquals(0, node1.relation("ref").fetchs().count()) ;
 		
 		
-		int notapplid = session.createQuery().id(node1.getIdentifier()).findOne().relation("ref").fetchs().count() ;
-		assertEquals(1, notapplid) ;
+		int notApplied = session.createQuery().id(node1.getIdentifier()).findOne().relation("ref").fetchs().count() ;
+		assertEquals(1, notApplied) ;
 		
 		session.commit() ;
 		assertEquals(0, session.createQuery().id(node1.getIdentifier()).findOne().relation("ref").fetchs().count());

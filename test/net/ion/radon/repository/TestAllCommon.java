@@ -1,9 +1,9 @@
 package net.ion.radon.repository;
 
-import net.ion.radon.repository.util.TestJSONMessage;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.ion.radon.repository.util.TestJSONMessage;
 
 public class TestAllCommon extends TestCase{
 

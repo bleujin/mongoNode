@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import net.ion.framework.util.ChainMap;
-import net.ion.framework.util.ObjectUtil;
 import net.ion.radon.repository.INode;
 import net.ion.radon.repository.InListNode;
 import net.ion.radon.repository.InListQuery;
@@ -72,7 +71,7 @@ public class InListNodeImpl implements InListNode{
 	public Object get(int index){
 		Object result = list.get(index);
 		if (result instanceof DBObject){
-			return InNodeImpl.create((DBObject)result, String.valueOf(index), parent) ;
+			return InNodeImpl.create((DBObject)result, String.valueOf(index), parent, index) ;
 		}
 		return result ;
 	}

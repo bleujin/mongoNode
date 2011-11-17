@@ -34,6 +34,9 @@ public class NodeResult {
 		return wr.isLazy() ;
 	}
 	
+	public PropertyQuery getQuery(){
+		return query ;
+	}
 
 	private static class EmptyResult extends NodeResult {
 		

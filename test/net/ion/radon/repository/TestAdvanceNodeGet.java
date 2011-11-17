@@ -1,6 +1,6 @@
 package net.ion.radon.repository;
 
-import org.apache.commons.lang.ArrayUtils;
+import net.ion.framework.util.MapUtil;
 
 public class TestAdvanceNodeGet extends TestBaseRepository{
 
@@ -89,6 +89,21 @@ public class TestAdvanceNodeGet extends TestBaseRepository{
 		
 		Node found = session.createQuery().aradonGroupId("emp", "bleujin").findOne() ;
 		assertEquals("korea", found.get("${wsname}:{agroup}:{auid}.{nation}")) ;
+	}
+	
+	public void testInListNodeExpression() throws Exception {
+		
+		session.newNode().put("connnm", "MyOracle").setAradonId("dev_oracle", "dev_oracle") ;
+		
+		session.newNode().put("repid", "test").put("connid", "dev_oracle").inlist("context")
+		.push(MapUtil.chainMap().put("connid", "dev_oracle")) 
+		.push(MapUtil.chainMap().put("connid", "dev_oracle")) ;
+		session.commit() ;
+		
+		Node found = session.createQuery().eq("repid", "test").findOne() ;
+		
+		assertEquals("MyOracle", found.get("${context.1.connid}:{context.1.connid}.connnm")) ;
+		assertEquals("MyOracle", found.get("${context.0.connid}:{context.1.connid}.connnm")) ;
 	}
 	
 	

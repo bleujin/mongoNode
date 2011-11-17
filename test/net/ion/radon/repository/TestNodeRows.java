@@ -7,7 +7,6 @@ import java.sql.Types;
 
 import net.ion.framework.db.Rows;
 import net.ion.framework.db.procedure.Queryable;
-import net.ion.radon.repository.myapi.AradonQuery;
 import net.ion.radon.repository.myapi.ICursor;
 
 public class TestNodeRows extends TestBaseRepository {

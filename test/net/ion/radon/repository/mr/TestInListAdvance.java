@@ -74,15 +74,15 @@ public class TestInListAdvance extends TestBaseRepository{
 	private void createDummyData() throws Exception {
 		session.newNode().put("name", "bleujin").put("address", "seoul").
 			inlist("friend").
-				push(MapUtil.chainMap().put("name", "hero").put("age", 20)).
-				push(MapUtil.chainMap().put("name", "novision").put("age", 30)).
-				push(MapUtil.chainMap().put("name", "minato").put("age", 25)) ;
+				push(MapUtil.chainKeyMap().put("name", "hero").put("age", 20)).
+				push(MapUtil.chainKeyMap().put("name", "novision").put("age", 30)).
+				push(MapUtil.chainKeyMap().put("name", "minato").put("age", 25)) ;
 		
 		session.newNode().put("name", "hero").put("address", "seoul").
 			inlist("friend").
-				push(MapUtil.chainMap().put("name", "iihi").put("age", 25)).
-				push(MapUtil.chainMap().put("name", "pm1200").put("age", 32)).
-				push(MapUtil.chainMap().put("name", "bleujin").put("age", 25)) ;
+				push(MapUtil.chainKeyMap().put("name", "iihi").put("age", 25)).
+				push(MapUtil.chainKeyMap().put("name", "pm1200").put("age", 32)).
+				push(MapUtil.chainKeyMap().put("name", "bleujin").put("age", 25)) ;
 		
 		session.commit();
 	}

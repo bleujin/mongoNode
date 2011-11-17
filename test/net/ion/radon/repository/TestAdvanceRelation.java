@@ -45,7 +45,7 @@ public class TestAdvanceRelation extends TestBaseRepository {
 		bleujin.toRelation("dept", dev.selfRef()) ;
 		session.commit() ;
 		
-		Node found = session.createQuery().findOneInDB("employee", "bleujin") ;
+		Node found = session.createQuery().aradonGroupId("employee", "bleujin").findOneInDB() ;
 
 		assertEquals("dev", found.get("#dept.dname")) ;
 	}

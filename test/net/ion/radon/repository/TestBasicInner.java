@@ -28,7 +28,7 @@ public class TestBasicInner extends TestBaseRepository{
 	
 	public void xtestInListQuery() throws Exception {
 		Node node = session.newNode() ;
-		node.setAradonId("article", "abcd.1").put("artid", 1).put("catid", "abcd").inlist("afield").push(MapUtil.chainMap().put("afieldId", "address").put("xloc", 30).put("yloc", 30)) ;
+		node.setAradonId("article", "abcd.1").put("artid", 1).put("catid", "abcd").inlist("afield").push(MapUtil.chainKeyMap().put("afieldId", "address").put("xloc", 30).put("yloc", 30)) ;
 		
 		session.commit() ;
 		session.createQuery().eleMatch("afield", PropertyQuery.create().eq("afieldId", "address").eq("xloc", 30)).find().debugPrint(PageBean.ALL) ;

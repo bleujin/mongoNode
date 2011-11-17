@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 
 
 public class TestAradonRefImpl extends TestBaseRepository {
