@@ -247,11 +247,11 @@ public class Workspace {
 		return updateNode(session, query, mod, true, true) ;
 	}
 
-	NodeResult set(Session session, PropertyQuery query, Map<String, ?> values) {
+	NodeResult setMerge(Session session, PropertyQuery query, Map<String, ?> values) {
 		DBObject mod = new BasicDBObject() ;
 		mod.put("$set", appendLastModified(values)) ;
 		
-		return updateNode(session, query, mod, false, true) ;
+		return updateNode(session, query, mod, true, true) ;
 	}
 	
 	NodeResult unset(Session session, PropertyQuery query, BasicDBObject value) {

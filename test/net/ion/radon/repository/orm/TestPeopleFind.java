@@ -5,19 +5,28 @@ import java.util.List;
 import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Node;
-import net.ion.radon.repository.Session;
+import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.TestBaseRepository;
 
-public class TestORM extends TestBaseRepository{
+public class TestPeopleFind extends TestBaseRepository{
 
-	public void testUse() throws Exception {
 
+	private PeopleManager<People> pm ;
+	@Override protected void setUp() throws Exception {
+		// TODO Auto-generated method stub
+		super.setUp();
 		session.changeWorkspace("peoples") ;
 		session.dropWorkspace();
-		PeopleManager<People> pm = MaangerFactory.create(session, "peoples", PeopleManager.class) ;
-		
-		
-		initPerson(session, pm) ;
+		pm = ManagerFactory.create(session, "peoples", PeopleManager.class) ;
+	}
+	
+
+	public void testToNode() throws Exception {
+		pm.save(People.create("bleu", 20, "seoul", "white")) ;
+		pm.save(People.create("hero", 30, "busan", "black")) ;
+		pm.save(People.create("jin", 40, "busan", "red")) ;
+		pm.save(People.create("bee", 29, "busan", "red")) ;
+
 		
 		People bleu = pm.findById(new People("bleu")) ;
 		assertEquals("bleu", bleu.getId()) ;
@@ -31,6 +40,8 @@ public class TestORM extends TestBaseRepository{
 		assertEquals("seoul", node.get("address")) ; 
 		assertEquals("white", node.get("fcolor")) ; 
 		assertEquals(20, node.get("age")) ; 
+		
+		Debug.line(node.getAradonId()) ;
 
 		List<People> peoples = pm.findByAddress("seoul") ;
 		assertEquals(1, peoples.size()) ;
@@ -39,29 +50,9 @@ public class TestORM extends TestBaseRepository{
 		assertEquals("bleu", f.getId()) ;
 		assertEquals(20, f.getAge()) ;
 		
-		
-		
-		List<People> busanPeople = pm.createQuery().eq("address", "busan").gt("age", 20).ascending("age").descending("userId").find().toList(PageBean.create(2, 1), People.class) ;
+		List<People> busanPeople = pm.find(PropertyQuery.create().eq("address", "busan").gt("age", 20)).ascending("age").descending("userId").toList(PageBean.create(2, 1), People.class) ;
 		for (People peo : busanPeople) {
 			Debug.debug(peo) ;
 		}
-		
 	}
-	
-	
-	private void initPerson(Session session, PeopleManager<People> pm) {
-		pm.save(People.create("bleu", 20, "seoul", "white")) ;
-		
-		pm.save(People.create("hero", 30, "busan", "black")) ;
-		pm.save(People.create("jin", 40, "busan", "red")) ;
-		pm.save(People.create("bee", 29, "busan", "red")) ;
-		
-		assertEquals(4, session.createQuery().find().count()) ;
-	}
-	
-	
-	
-	
-	
-	
 }

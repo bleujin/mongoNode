@@ -5,7 +5,7 @@ public final class People extends AbstractORM{
 
 	
 	private final static String keyPropId = "userId";
-	public People(){} ;
+//	public People(){} ;
 	
 	public People(String userId) {
 		super.put(keyPropId, userId) ;

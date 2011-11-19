@@ -4,11 +4,12 @@ import java.util.List;
 
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.AbstractManager;
+import net.ion.radon.repository.PropertyQuery;
 
 public class PeopleManager<T extends AbstractORM> extends AbstractManager<T> {
 
 	public List<People> findByAddress(String address) {
-		return super.createQuery().eq("address", address).gt("age", 19).find().toList(PageBean.TEN, People.class);
+		return find(PropertyQuery.create().eq("address", address)).toList(PageBean.TEN, People.class);
 	}
 	
 

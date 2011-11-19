@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.util.HashFunction;
 import net.ion.radon.repository.orm.AbstractORM;
 import net.ion.radon.repository.orm.IDMethod;
 
@@ -23,10 +24,11 @@ public abstract class AbstractManager<T extends AbstractORM> {
 		try {
 			IDRow<T> idRow = getIDRow(p);
 			
-			Node node = session.createQuery(idRow.getAradonQuery()).findOneInDB();
+			Node node = session.getWorkspace(wsname).findOne(session, idRow.getAradonQuery(), Columns.ALL);
 			
 			Class<? extends AbstractORM> clz = p.getClass();
-			AbstractORM result = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
+			
+			AbstractORM result = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[]{idRow.getValue()}));
 
 			return (T) result.load(node);
 		} catch (IllegalAccessException e) {
@@ -42,11 +44,7 @@ public abstract class AbstractManager<T extends AbstractORM> {
 
 	public NodeResult save(T p) {
 		IDRow<T> idRow = getIDRow(p);
-
-		Node foundNode = session.mergeNode(MergeQuery.createByAradon(idRow.getGroup(), idRow.getValue())) ;
-		int count = session.commit() ;
-
-		NodeResult result = session.createQuery(idRow.getAradonQuery()).update(p.getNodeObject().toMap());
+		NodeResult result = session.getWorkspace(wsname).setMerge(session, idRow.aradonId(), p.getNodeObject().toPropertyMap(session.getRoot())) ;
 		return result ;
 	}
 
@@ -84,8 +82,13 @@ public abstract class AbstractManager<T extends AbstractORM> {
 		}
 	}
 
-	public SessionQuery createQuery() {
-		return session.createQuery() ; 
+	
+	public NodeCursor find(PropertyQuery query){
+		return session.getWorkspace(wsname).find(session, query, Columns.ALL) ;
+	}
+	
+	public void drop(){
+		session.getWorkspace(wsname).drop() ;
 	}
 
 }
@@ -126,4 +129,7 @@ class IDRow<T extends AbstractORM> {
 		return PropertyQuery.createByAradon(getGroup(), value);
 	}
 
+	PropertyQuery aradonId(){
+		return PropertyQuery.create().eq(NodeConstants.ARADON_GROUP, new String[]{getGroup()}).eq(NodeConstants.ARADON_UID, value).eq(NodeConstants.ARADON_GHASH, HashFunction.hashGeneral(getGroup())) ;
+	}
 }

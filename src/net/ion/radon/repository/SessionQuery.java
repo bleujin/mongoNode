@@ -239,7 +239,7 @@ public class SessionQuery implements Serializable{
 	}
 
 	public NodeResult update(Map<String, ?> modValues){
-		return getWorkspace().set(session, inner, modValues);
+		return getWorkspace().setMerge(session, inner, modValues);
 	}
 	
 	public NodeResult increase(String propId){

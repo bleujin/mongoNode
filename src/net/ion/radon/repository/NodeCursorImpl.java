@@ -160,7 +160,8 @@ public class NodeCursorImpl implements NodeCursor{
 		try {
 			List<T> result = ListUtil.newList();
 			for (Node node : toList(page)) {
-				AbstractORM obj = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
+				
+				AbstractORM obj = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[]{node.getAradonId().getUid()}));
 				result.add((T) obj.load(node));
 			}
 

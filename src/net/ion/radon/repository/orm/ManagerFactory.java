@@ -7,10 +7,10 @@ import net.ion.radon.repository.Session;
 
 import org.apache.commons.beanutils.ConstructorUtils;
 
-public class MaangerFactory {
+public class ManagerFactory {
 
 	public static <T extends AbstractManager> T create(Session session, String wsname, Class<T> clz) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-		session.changeWorkspace(wsname) ;
+		// session.changeWorkspace(wsname) ;
 		T result = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
 		result.init(session, wsname) ;
 		return result ;
