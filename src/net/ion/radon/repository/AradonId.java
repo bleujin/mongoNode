@@ -110,6 +110,9 @@ public class AradonId implements IPropertyFamily{
 		return PropertyQuery.createByAradon(getGroup(), getUid()) ;
 	}
 	
+	public String toString(){
+		return inner.toString() ;
+	}
 	
 //	public ObjectId toObjectId(){
 //		return new ObjectId(toByteArray()) ;

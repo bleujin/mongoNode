@@ -1,135 +1,128 @@
 package net.ion.radon.repository;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.HashFunction;
 import net.ion.radon.repository.orm.AbstractORM;
+import net.ion.radon.repository.orm.BeanCursor;
 import net.ion.radon.repository.orm.IDMethod;
 
 import org.apache.commons.beanutils.ConstructorUtils;
 
 public abstract class AbstractManager<T extends AbstractORM> {
 
-	private String wsname;
 	private Session session;
+	private IDMethod idm;
 
-	public void init(Session session, String wsname) {
+	public AbstractManager(Session session) {
 		this.session = session;
-		this.wsname = wsname;
+		this.idm = getClass().getAnnotation(IDMethod.class);
 	}
 
-	public T findById(T p) {
-		try {
-			IDRow<T> idRow = getIDRow(p);
-			
-			Node node = session.getWorkspace(wsname).findOne(session, idRow.getAradonQuery(), Columns.ALL);
-			
-			Class<? extends AbstractORM> clz = p.getClass();
-			
-			AbstractORM result = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[]{idRow.getValue()}));
+	public T findById(Object keyPropValue) {
+		IDRow idRow = getIDRow(keyPropValue);
+		Node node = getWorkspace().findOne(session, idRow.getAradonQuery(), Columns.ALL);
+		return toBean(node);
+	}
 
+	
+	public T toBean(Node node) throws RepositoryException {
+		try {
+			AbstractORM result = idm.managerClz().cast(ConstructorUtils.invokeConstructor(idm.managerClz(), new Object[0]));
 			return (T) result.load(node);
-		} catch (IllegalAccessException e) {
-			throw RepositoryException.throwIt(e) ;
 		} catch (NoSuchMethodException e) {
-			throw RepositoryException.throwIt(e) ;
+			throw RepositoryException.throwIt(e);
+		} catch (IllegalAccessException e) {
+			throw RepositoryException.throwIt(e);
 		} catch (InvocationTargetException e) {
-			throw RepositoryException.throwIt(e) ;
+			throw RepositoryException.throwIt(e);
 		} catch (InstantiationException e) {
-			throw RepositoryException.throwIt(e) ;
+			throw RepositoryException.throwIt(e);
 		}
 	}
 
-	public NodeResult save(T p) {
-		IDRow<T> idRow = getIDRow(p);
-		NodeResult result = session.getWorkspace(wsname).setMerge(session, idRow.aradonId(), p.getNodeObject().toPropertyMap(session.getRoot())) ;
-		return result ;
+	public int save(T p) {
+		IDRow idRow = getIDRow(p);
+		NodeResult result = getWorkspace().setMerge(session, idRow.aradonId(), p.getNodeObject().toPropertyMap(session.getRoot()));
+		return result.getRowCount();
 	}
 
 	public Node toNode(T p) {
-		IDRow<T> idRow = getIDRow(p);
-		return NodeImpl.load(session, idRow.getAradonQuery(), wsname, p.getNodeObject());
+		IDRow idRow = getIDRow(p);
+		return NodeImpl.load(session, idRow.getAradonQuery(), idm.workspaceName(), p.getNodeObject());
 	}
 
 	protected Session getSession() {
 		return session;
 	}
 
-	protected IDRow<T> getIDRow(T p) {
-		try {
-			IDRow<T> idrow = null;
-			Method[] methods = p.getClass().getDeclaredMethods();
-			for (Method method : methods) {
-				IDMethod idm = method.getAnnotation(IDMethod.class);
-				if (idm != null) {
-					idrow = IDRow.create(p, idm.nodeName(), method.invoke(p, new Object[0]));
-				}
-			}
+	private IDRow getIDRow(Object propValue) {
+		return IDRow.create(groupId(), propValue);
+	}
 
-			if (idrow == null) {
-				throw new IllegalArgumentException(p + " has not id object");
-			}
+	protected IDRow getIDRow(T p) {
+		return IDRow.create(groupId(), p.get(idm.keyPropId()));
+	}
 
-			return idrow;
-		} catch (IllegalAccessException e) {
-			throw new IllegalArgumentException(e.getCause());
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(e.getCause());
-		} catch (InvocationTargetException e) {
-			throw new IllegalArgumentException(e.getCause());
-		}
+	public BeanCursor<T> find(PropertyQuery query) {
+		return BeanCursor.create(getWorkspace().find(session, query.aradonGroup(groupId()), Columns.ALL), this);
 	}
 
 	
-	public NodeCursor find(PropertyQuery query){
-		return session.getWorkspace(wsname).find(session, query, Columns.ALL) ;
+	
+	public int remove(Object keyPropValue) {
+		return getWorkspace().remove(session, getIDRow(keyPropValue).aradonId()).getRowCount();
+	}
+
+	public int remove(PropertyQuery query) {
+		NodeResult nr = getWorkspace().remove(session, query.aradonGroup(groupId()));
+		return nr.getRowCount();
 	}
 	
-	public void drop(){
-		session.getWorkspace(wsname).drop() ;
+	public int removeAll() {
+		NodeResult nr = getWorkspace().remove(session, PropertyQuery.createByAradon(groupId()));
+		return nr.getRowCount();
+	}
+
+
+	private Workspace getWorkspace() {
+		return session.getWorkspace(idm.workspaceName());
+	}
+
+	public String groupId() {
+		return idm.groupId();
 	}
 
 }
 
-class IDRow<T extends AbstractORM> {
+class IDRow {
 
-	private final T obj;
-	private final String key;
-	private final Object value;
+	private final String groupId;
+	private final Object uId;
 
-	private IDRow(T obj, String key, Object value) {
-		this.obj = obj;
-		this.key = key;
-		this.value = value;
+	private IDRow(String groupId, Object uId) {
+		this.groupId = groupId;
+		this.uId = uId;
 	}
 
-	public final static <T extends AbstractORM> IDRow<T> create(T obj, String key, Object value) {
-		return new IDRow<T>(obj, key, value);
-	}
-
-	public String getGroupNm() {
-		return obj.getClass().getSimpleName();
-	}
-
-	public String getKey() {
-		return key;
+	public final static IDRow create(String groupId, Object uId) {
+		return new IDRow(groupId, uId);
 	}
 
 	public Object getValue() {
-		return value;
+		return uId;
 	}
 
-	public String getGroup(){
-		return obj.getClass().getSimpleName() ;
+	public String getGroup() {
+		return groupId;
 	}
-	
+
 	public PropertyQuery getAradonQuery() {
-		return PropertyQuery.createByAradon(getGroup(), value);
+		return PropertyQuery.createByAradon(getGroup(), uId);
 	}
 
-	PropertyQuery aradonId(){
-		return PropertyQuery.create().eq(NodeConstants.ARADON_GROUP, new String[]{getGroup()}).eq(NodeConstants.ARADON_UID, value).eq(NodeConstants.ARADON_GHASH, HashFunction.hashGeneral(getGroup())) ;
+	PropertyQuery aradonId() {
+		return PropertyQuery.create().eq(NodeConstants.ARADON_GROUP, new String[] { getGroup() }).eq(NodeConstants.ARADON_UID, uId).eq(NodeConstants.ARADON_GHASH, HashFunction.hashGeneral(getGroup()));
 	}
 }

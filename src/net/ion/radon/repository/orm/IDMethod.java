@@ -7,9 +7,11 @@ import java.lang.annotation.Target;
 
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD) 
+@Target(ElementType.TYPE) 
 
 public @interface IDMethod {
-
-	String nodeName();
+	String workspaceName() default "myspace";
+	String groupId() ;
+	String keyPropId();
+	Class<? extends AbstractORM> managerClz() ;
 }

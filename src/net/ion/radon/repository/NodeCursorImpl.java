@@ -1,5 +1,6 @@
 package net.ion.radon.repository;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,18 +22,18 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MapReduceOutput;
 
-public class NodeCursorImpl implements NodeCursor{
+public class NodeCursorImpl implements NodeCursor {
 
-	private Session session ;
+	private Session session;
 	private String workspaceName;
 	private DBCursor cursor;
-	private final PropertyQuery iquery ;
+	private final PropertyQuery iquery;
 
 	protected NodeCursorImpl(Session session, PropertyQuery iquery, String workspaceName, DBCursor cursor) {
-		this.session = session ;
+		this.session = session;
 		this.workspaceName = workspaceName;
 		this.cursor = cursor;
-		this.iquery = iquery ;
+		this.iquery = iquery;
 	}
 
 	static NodeCursorImpl create(Session session, PropertyQuery iquery, String workspaceName, DBCursor cursor) {
@@ -82,9 +83,9 @@ public class NodeCursorImpl implements NodeCursor{
 		return sort(pf);
 	}
 
-//	public int size() {
-//		return cursor.size();
-//	}
+	// public int size() {
+	// return cursor.size();
+	// }
 
 	public List<Node> toList(PageBean page) {
 		this.skip(page.getSkipScreenCount()).limit(page.getMaxScreenCount() + 1);
@@ -158,10 +159,10 @@ public class NodeCursorImpl implements NodeCursor{
 
 	public <T> List<T> toList(PageBean page, Class<? extends AbstractORM> clz) {
 		try {
+
 			List<T> result = ListUtil.newList();
 			for (Node node : toList(page)) {
-				
-				AbstractORM obj = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[]{node.getAradonId().getUid()}));
+				AbstractORM obj = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
 				result.add((T) obj.load(node));
 			}
 
@@ -176,9 +177,9 @@ public class NodeCursorImpl implements NodeCursor{
 			throw RepositoryException.throwIt(e);
 		}
 	}
-	
-	protected String getWorkspaceName(){
-		return workspaceName ;
+
+	protected String getWorkspaceName() {
+		return workspaceName;
 	}
 
 	protected DBObject nextIternal() {
@@ -186,30 +187,29 @@ public class NodeCursorImpl implements NodeCursor{
 	}
 }
 
-
 class ApplyCursor implements NodeCursor {
 
-	private Session session ;
-	private String workspaceName ;
-	private Iterator<DBObject> iterator ;
+	private Session session;
+	private String workspaceName;
+	private Iterator<DBObject> iterator;
 	private final PropertyQuery iquery;
-	
-	protected ApplyCursor(Session session , PropertyQuery iquery, String workspaceName, Iterator<DBObject> iterator) {
-		this.session = session ;
-		this.workspaceName = workspaceName  ;
-		this.iterator = iterator ;
-		this.iquery = iquery ; 
+
+	protected ApplyCursor(Session session, PropertyQuery iquery, String workspaceName, Iterator<DBObject> iterator) {
+		this.session = session;
+		this.workspaceName = workspaceName;
+		this.iterator = iterator;
+		this.iquery = iquery;
 	}
-	
+
 	static ApplyCursor create(Session session, PropertyQuery iquery, MapReduceOutput out) {
-		String workspaceName = out.getOutputCollection() == null ? null : out.getOutputCollection().getName() ;
+		String workspaceName = out.getOutputCollection() == null ? null : out.getOutputCollection().getName();
 
 		return new ApplyCursor(session, iquery, workspaceName, out.results().iterator());
 	}
 
 	public Node next() {
-		DBObject dbo = iterator.next() ;
-		return NodeImpl.load(session, iquery, workspaceName, (DBObject)dbo.get("value") );
+		DBObject dbo = iterator.next();
+		return NodeImpl.load(session, iquery, workspaceName, (DBObject) dbo.get("value"));
 	}
 
 	public int count() {
@@ -217,15 +217,15 @@ class ApplyCursor implements NodeCursor {
 	}
 
 	public void debugPrint(PageBean page) {
-		each(page, new DebugPrinter()) ;
+		each(page, new DebugPrinter());
 	}
 
 	public NodeCursor ascending(String... propIds) {
-		throw new IllegalStateException("already created : illegal state") ;
+		throw new IllegalStateException("already created : illegal state");
 	}
-	
+
 	public NodeCursor descending(String... propIds) {
-		throw new IllegalStateException("already created : illegal state") ;
+		throw new IllegalStateException("already created : illegal state");
 	}
 
 	public void each(PageBean page, Closure closure) {
@@ -248,7 +248,7 @@ class ApplyCursor implements NodeCursor {
 
 	public NodeCursor limit(int n) {
 		; // already applied
-		return this ;
+		return this;
 	}
 
 	public NodeScreen screen(PageBean page) {
@@ -258,14 +258,13 @@ class ApplyCursor implements NodeCursor {
 
 	public NodeCursor skip(int n) {
 		; // already applied
-		return this ;
+		return this;
 	}
-
 
 	public NodeCursor sort(PropertyFamily family) {
-		throw new IllegalStateException("already created : illegal state") ;
+		throw new IllegalStateException("already created : illegal state");
 	}
-	
+
 	public List<Node> toList(PageBean page) {
 		this.skip(page.getSkipScreenCount()).limit(page.getMaxScreenCount() + 1);
 		return toList(page.getPageIndexOnScreen() * page.getListNum(), page.getListNum());
@@ -334,5 +333,4 @@ class ApplyCursor implements NodeCursor {
 		return result;
 	}
 
-	
 }

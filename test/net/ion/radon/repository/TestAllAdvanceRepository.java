@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.ion.radon.repository.mr.TestAllMapReduce;
+import net.ion.radon.repository.orm.TestAllORM;
 
 public class TestAllAdvanceRepository extends TestCase{
 	
@@ -12,6 +13,7 @@ public class TestAllAdvanceRepository extends TestCase{
 		
 		suite.addTest(TestAllRelation.suite()) ;
 		suite.addTest(TestAllMapReduce.suite()) ;
+		suite.addTest(TestAllORM.suite()) ;
 
 		return suite;
 	}

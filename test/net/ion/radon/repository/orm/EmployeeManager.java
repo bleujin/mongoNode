@@ -7,10 +7,10 @@ import net.ion.radon.repository.AbstractManager;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.Session;
 
-@IDMethod(workspaceName="peoples", groupId="people", keyPropId="userId", managerClz=People.class)
-public class PeopleManager<T extends AbstractORM> extends AbstractManager<T> {
+@IDMethod(workspaceName="peoples", groupId="employee", keyPropId="empNo", managerClz=Employee.class)
+public class EmployeeManager<T extends AbstractORM> extends AbstractManager<T> {
 
-	public PeopleManager(Session session) {
+	public EmployeeManager(Session session) {
 		super(session) ;
 	}
 

@@ -1,28 +1,29 @@
 package net.ion.radon.repository.orm;
 
 
+
 public final class People extends AbstractORM{
 
-	
+	private static final long serialVersionUID = -2889183273379267256L;
 	private final static String keyPropId = "userId";
-//	public People(){} ;
-	
-	public People(String userId) {
-		super.put(keyPropId, userId) ;
-	}
+
+	public People(){} ;
 	
 	public static People create(String id, int age, String address, String fcolor) {
-		People newPeople = new People(id) ;
+		People newPeople = new People() ;
+		newPeople.setUserId(id) ;
 		newPeople.setAge(age) ;
 		newPeople.setAddress(address) ;
 		newPeople.setFavoriateColor(fcolor) ;
 		
 		return newPeople ;
 	}
-	
+		
+	public void setUserId(String id) {
+		put(keyPropId, id) ;
+	}
 
-	
-	@IDMethod(nodeName=keyPropId) 
+
 	public String getId(){
 		return super.getString(keyPropId);
 	}
@@ -49,7 +50,7 @@ public final class People extends AbstractORM{
 	}
 
 	public int getAge() {
-		return (Integer)get("age") ;
+		return getAsInt("age") ;
 	}
 	
 	
@@ -68,5 +69,6 @@ public final class People extends AbstractORM{
 	public String toString(){
 		return "id:" + getId() + ", age:" + getAge() ;
 	}
+
 
 }

@@ -1,62 +1,66 @@
 package net.ion.radon.repository.orm;
 
-import net.ion.radon.repository.Columns;
-import net.ion.radon.repository.Node;
-import net.ion.radon.repository.NodeResult;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.TestBaseRepository;
 
-public class TestPeople extends TestBaseRepository{
+public class TestPeople extends TestBaseRepository {
 
+	private PeopleManager<People> pm;
+	private String wsname ;
 
-	private PeopleManager<People> pm ;
-	private String wsname = "peoples";
-	@Override protected void setUp() throws Exception {
-		// TODO Auto-generated method stub
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
-		pm = ManagerFactory.create(session, wsname, PeopleManager.class) ;
-		pm.drop() ;
+		pm = new PeopleManager<People>(session);
+		pm.removeAll();
+		this.wsname = PeopleManager.class.getAnnotation(IDMethod.class).workspaceName() ;
 	}
-	
+
 	public void testCurrentWorkspace() throws Exception {
-		assertEquals(false, wsname.equals(session.getCurrentWorkspaceName())) ;
+		assertEquals(false, wsname.equals(session.getCurrentWorkspaceName()));
 	}
 	
 	public void testCreate() throws Exception {
-		People p = new People("bleujin") ;
-		p.setAge(20) ;
-		p.setAddress("seoul") ;
-		p.setFavoriateColor("bleu") ;
-		NodeResult nr = pm.save(p) ;
-		
-		assertEquals(1, nr.getRowCount()) ;
-		assertEquals(1, session.getWorkspace(wsname).find(session, PropertyQuery.create(), Columns.ALL).count()) ;
-		Node found = session.getWorkspace(wsname).findOne(session, PropertyQuery.create(), Columns.ALL) ;
-		
-		assertEquals("bleujin", found.get("userId")) ;
-		assertEquals(20, found.get("age")) ;
-		assertEquals("seoul", found.get("address")) ;
-		assertEquals("bleu", found.get("fcolor")) ;
-	}
-	
-	
-	public void testUpdate() throws Exception {
-		pm.save(People.create("bleu", 20, "seoul", "white")) ;
-		
-		People bleu = pm.findById(new People("bleu")) ;
-		bleu.setAge(25) ;
-		NodeResult nr = pm.save(bleu) ;
-		
-		assertEquals(25, bleu.getAge()) ;
+		People p = People.create("bleujin", 20, "seoul", "bleu");
+		assertEquals(1, pm.save(p));
 
-		People found = pm.findById(new People("bleu")) ;
-		assertEquals(25, found.getAge()) ;
+		assertEquals(1, pm.find(PropertyQuery.create()).count()) ;
+		
+		pm.findById("bleujin") ;
+		
 	}
+
+	public void testUpdate() throws Exception {
+		pm.save(People.create("bleu", 20, "seoul", "white"));
+
+		People bleu = pm.findById("bleu");
+		bleu.setAge(25);
+		pm.save(bleu);
+
+		assertEquals(25, bleu.getAge());
+
+		People found = pm.findById("bleu");
+		assertEquals(25, found.getAge());
+	}
+
 	
 	public void testDelete() throws Exception {
-		pm.save(People.create("bleu", 20, "seoul", "white")) ;
+		pm.save(People.create("bleu", 20, "seoul", "white"));
+		assertEquals(1, pm.find(PropertyQuery.create()).count()) ;
+		
+		assertEquals(1, pm.remove("bleu")) ;
+		assertEquals(0, pm.find(PropertyQuery.create()).count()) ;
+	}
+
+	
+	public void testList() throws Exception {
+		pm.save(People.create("bleu", 20, "seoul", "white"));
+		pm.save(People.create("jin", 25, "pusan", "red"));
+		pm.save(People.create("hero", 30, "inchon", "blue"));
+		
+		BeanCursor<People> bc = pm.find(PropertyQuery.create()) ;
+		assertEquals(3, bc.count()) ;
 	}
 	
 	
-
 }

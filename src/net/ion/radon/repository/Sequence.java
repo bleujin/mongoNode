@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 
 public class Sequence implements ISequence{
@@ -32,7 +31,6 @@ public class Sequence implements ISequence{
 	public long nextVal() {
 		getWorkspace().inc(session, getSeqQuery(), PROP_ID, 1L) ;
 		Node node = getWorkspace().findOne(session, getSeqQuery(), Columns.ALL) ;
-		Debug.line(node.get(PROP_ID), node.get(PROP_ID).getClass()) ;
 		return ((Long)node.get(PROP_ID)).longValue() ;
 	}
 
