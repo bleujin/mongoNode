@@ -23,8 +23,8 @@ public class TestTemporaryNode extends TestBaseRepository {
 	public void testAppend() throws Exception {
 		TempNode tnode = session.tempNode().append("color", "red").append("color", "red").append("address", "seoul") ;
 		
-		assertEquals(true, tnode.get("address") instanceof String) ;
 		assertEquals(true, tnode.get("color") instanceof InListNode) ;
+		assertEquals(true, tnode.get("address") instanceof InListNode) ;
 		
 		assertEquals(true, tnode.inlist("color").get(0) instanceof String) ;
 		assertEquals("red", tnode.inlist("color").get(0)) ;

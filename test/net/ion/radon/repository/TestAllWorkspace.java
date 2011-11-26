@@ -12,6 +12,7 @@ public class TestAllWorkspace extends TestCase{
 		suite.addTestSuite(TestRepositoryCentral.class) ;
 		suite.addTestSuite(TestSession.class);
 		suite.addTestSuite(TestWorkspace.class);
+		// suite.addTestSuite(TestCappedWorkspace.class) ;  // only 64bit
 		// suite.addTestSuite(TestDB.class) ;
 		return suite;
 	}

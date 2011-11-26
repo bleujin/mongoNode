@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
+import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.myapi.ICredential;
 
 import com.mongodb.BasicDBObject;
@@ -25,8 +26,7 @@ public class RepositoryCentral {
 	}
 
 	public RepositoryCentral(String host, int port, String defaultDBName) throws UnknownHostException, MongoException{
-		this.mongo = loadMongo(host, port) ;
-		this.currentDBName = defaultDBName ;
+		this(host, port, defaultDBName, null, null);
 	}
 	
 	public RepositoryCentral(String host, int port, String defaultDBName, String user, String pwd) throws UnknownHostException, MongoException{
@@ -36,6 +36,15 @@ public class RepositoryCentral {
 		this.pwd = pwd;
 	}	
 
+	public RepositoryCentral(String url, String user, String pwd) throws UnknownHostException, MongoException{
+		String[] urls = StringUtil.split(url, ":");
+		
+		this.mongo = loadMongo(urls[0], Integer.parseInt(urls[1])) ;
+		this.currentDBName = urls[2];
+		this.user = user;
+		this.pwd = pwd;
+	}
+	
 	private static Map<String, Mongo> STORE = MapUtil.newMap();
 	private synchronized static Mongo loadMongo(String host, int port) throws UnknownHostException, MongoException {
 		Mongo m = STORE.get(getKey(host, port)) ;
@@ -81,7 +90,7 @@ public class RepositoryCentral {
 	}
 
 	public Session login(String dbName, String defaultWorkspace, ICredential credential) {
-		return LocalSession.create(Repository.create(mongo.getDB(dbName)), defaultWorkspace);
+		return LocalSession.create(RepositoryImpl.create(mongo.getDB(dbName)), defaultWorkspace);
 	}
 	
 	public Session login(String dbName, String defaultWorkspace) {
@@ -91,10 +100,10 @@ public class RepositoryCentral {
 		DB db = mongo.getDB(dbName);
 		if(!db.isAuthenticated()){
 			boolean isLogin = db.authenticate(user, pwd.toCharArray());
-			if(!isLogin) new Exception("Authenticate is false");	
+			if(!isLogin) throw new IllegalArgumentException("Authenticate is false");	
 		}
 
-		final Repository repository = Repository.create(db);
+		final Repository repository = RepositoryImpl.create(db);
 		return LocalSession.create(repository, defaultWorkspace);
 	}
 	
@@ -121,14 +130,6 @@ public class RepositoryCentral {
 			Debug.warn("Mongo ShutDown....");
 		} catch (MongoException ignore) {
 			Debug.debug(ignore.getMessage());
-		}
-	}
-
-	public static void main(String[] args) {
-		try {
-			// RepositoryCentral.testLoad().shutDown();
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 	}
 

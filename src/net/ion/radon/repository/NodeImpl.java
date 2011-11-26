@@ -64,7 +64,7 @@ public class NodeImpl implements Node {
 		return result;
 	}
 
-	static NodeImpl load(Session session, PropertyQuery query, String workspaceName, NodeObject no) {
+	public static NodeImpl load(Session session, PropertyQuery query, String workspaceName, NodeObject no) {
 		final String path = no.getString(PATH);
 		String parentPath = StringUtil.substringBeforeLast(path, "/");
 		if (StringUtil.isBlank(parentPath))
@@ -331,7 +331,7 @@ public class NodeImpl implements Node {
 	}
 
 	public String getString(String key) {
-		return StringUtil.toString(get(key));
+		return StringUtil.toString(get(key, 0));
 	}
 
 	public NodeCursor getChild() {

@@ -25,7 +25,7 @@ public class Sequence implements ISequence{
 	}
 
 	public void reset() {
-		getWorkspace().setMerge(session, getSeqQuery(), MapUtil.create(PROP_ID, 0L)) ;
+		getWorkspace().update(session, getSeqQuery(), MapUtil.create(PROP_ID, 0L), true) ;
 	}
 
 	public long nextVal() {

@@ -10,6 +10,7 @@ public class LocalSession implements Session {
 
 	private Repository repository;
 	private String currentWsName;
+	private WorkspaceOption option = WorkspaceOption.EMPTY ;
 	private final RootNode root;
 	private Map<String, Node> modified = MapUtil.newMap();
 	private Map<String, Object> attributes = MapUtil.newCaseInsensitiveMap();
@@ -20,21 +21,14 @@ public class LocalSession implements Session {
 		this.currentWsName = wname;
 	}
 
-	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
-
-	private static ThreadLocal<Session> getThreadLocal() {
-		return CURRENT;
-	}
+//	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
+//
+//	private static ThreadLocal<Session> getThreadLocal() {
+//		return CURRENT;
+//	}
 
 	static synchronized Session create(Repository repository, String wname) {
-		Session session = getThreadLocal().get();
-		if (session == null) {
-			session = new LocalSession(repository, wname);
-			getThreadLocal().set(session);
-		} else {
-			session.changeWorkspace(wname);
-		}
-		return session;
+		return new LocalSession(repository, wname);
 	}
 
 	public Session changeWorkspace(String wname) {
@@ -42,18 +36,16 @@ public class LocalSession implements Session {
 		return this;
 	}
 	
-	public ISequence getSequence(String prefix, String id) {
-		return Sequence.createOrLoad(this, prefix, id);
+	public Session changeWorkspace(String wname, WorkspaceOption option){
+		this.currentWsName = wname ;
+		this.option = option ;
+		return this;
 	}
 
-	private static Session getCurrent() {
-		Session session = getThreadLocal().get();
 
-		if (session == null) {
-			throw new IllegalStateException("not logined");
-		}
-
-		return session;
+	
+	public ISequence getSequence(String prefix, String id) {
+		return Sequence.createOrLoad(this, prefix, id);
 	}
 
 	public int commit() {
@@ -137,12 +129,10 @@ public class LocalSession implements Session {
 
 	public void logout() {
 		modified.clear() ;
-		getCurrent().clear();
-		getThreadLocal().remove();
 	}
 
 	public Workspace getCurrentWorkspace() {
-		return repository.getWorkspace(currentWsName);
+		return repository.getWorkspace(currentWsName, option);
 	}
 
 	public Node getRoot() {
@@ -152,6 +142,12 @@ public class LocalSession implements Session {
 	public SessionQuery createQuery(PropertyQuery definedQuery) {
 		return SessionQuery.create(this, definedQuery);
 	}
+	
+	public SessionQuery createQuery(String wname) {
+		return SessionQuery.create(this, wname);
+	}
+	
+
 
 	public NodeResult merge(String idOrPath, TempNode tnode) {
 		if (idOrPath == null) throw new IllegalArgumentException("query must be path or id") ;
@@ -182,11 +178,13 @@ public class LocalSession implements Session {
 	}
 
 	public Workspace getWorkspace(String wname) {
-		return repository.getWorkspace(wname);
+		return repository.getWorkspace(wname, option);
 	}
 
 	public String[] getWorkspaceNames() {
 		return repository.getWorkspaceNames().toArray(new String[0]) ;
 	}
+
+	
 	
 }

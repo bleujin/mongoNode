@@ -14,8 +14,11 @@ public class NodeResult {
 		this.wr = wr ; 
 	}
 
-	public static NodeResult create(PropertyQuery query, WriteResult wr) {
-		return new NodeResult(query, wr);
+	private final static String RESULT_KEY = NodeResult.class.getCanonicalName() ;
+	public static NodeResult create(Session session, PropertyQuery query, WriteResult wr) {
+		NodeResult result = new NodeResult(query, wr);
+		session.setAttribute(RESULT_KEY, result);
+		return result;
 	}
 
 	public String getErrorMessage(){

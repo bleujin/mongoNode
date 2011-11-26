@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.StringUtil;
@@ -24,6 +25,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MapReduceCommand;
 import com.mongodb.MapReduceOutput;
+import com.mongodb.QueryOperators;
 import com.mongodb.WriteResult;
 import com.mongodb.MapReduceCommand.OutputType;
 
@@ -125,8 +127,7 @@ public class Workspace {
 	}
 	
 	public NodeResult remove(Session session, PropertyQuery query) {
-		NodeResult result = NodeResult.create(query, getCollection().remove(query.getDBObject())) ;
-		setLastResult(session, result) ;
+		NodeResult result = NodeResult.create(session, query, getCollection().remove(query.getDBObject())) ;
 		return result;
 	}
 	
@@ -228,7 +229,7 @@ public class Workspace {
 		
 		// collection.findAndModify(query.getDBObject(), NodeObject.load(props).getDBObject()) ;
 		
-		return NodeResult.create(query, getCollection().save(find));
+		return NodeResult.create(session, query, getCollection().save(find));
 	}
 
 	NodeResult findAndUpdate(Session session, PropertyQuery query, Map<String, ?> props) {
@@ -243,11 +244,17 @@ public class Workspace {
 		return updateNode(session, query, mod, true, true) ;
 	}
 
-	NodeResult setMerge(Session session, PropertyQuery query, Map<String, ?> values) {
+	NodeResult update(Session session, PropertyQuery query, Map<String, ?> values, boolean upset) {
 		DBObject mod = new BasicDBObject() ;
 		mod.put("$set", appendLastModified(values)) ;
 		
-		return updateNode(session, query, mod, true, true) ;
+		return updateNode(session, query, mod, upset, true) ;
+	}
+	
+	NodeResult updateInner(Session session, PropertyQuery query, DBObject values, boolean upset){
+		WriteResult wr = getCollection().update(query.getDBObject(), values, upset, true);
+		return NodeResult.create(session, query, wr);
+	
 	}
 	
 	NodeResult unset(Session session, PropertyQuery query, BasicDBObject value) {
@@ -279,8 +286,7 @@ public class Workspace {
 
 	private NodeResult updateNode(Session session, PropertyQuery query, DBObject values, boolean upset, boolean multi){
 		WriteResult wr = getCollection().update(query.getDBObject(), values, upset, multi);
-		NodeResult result = NodeResult.create(query, wr);
-		setLastResult(session, result) ;
+		NodeResult result = NodeResult.create(session, query, wr);
 		return result ;
 	}
 
@@ -291,11 +297,6 @@ public class Workspace {
 
 	private Node newNode(Session session, String name, PropertyFamily props) {
 		return NodeImpl.create(session, this.getName(), NodeObject.load(props.getDBObject()), "/", name);
-	}
-
-	private final static String RESULT_KEY = NodeResult.class.getCanonicalName() ;
-	private void setLastResult(Session session, NodeResult result) {
-		session.setAttribute(RESULT_KEY, result);
 	}
 
 	private NodeResult save(Session session, Node node) {
@@ -312,8 +313,7 @@ public class Workspace {
 		inmod.put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis()) ;
 		
 		WriteResult wr = getCollection().insert(inmod);
-		NodeResult result = NodeResult.create(node.getQuery(), wr);
-		setLastResult(session, result) ;
+		NodeResult result = NodeResult.create(session, node.getQuery(), wr);
 		return result ;
 	}
 
@@ -325,6 +325,10 @@ public class Workspace {
 
 	public String toString(){
 		return getCollection().getFullName() ;
+	}
+	
+	DBCollection innerCollection(){
+		return collection ;
 	}
 
 }

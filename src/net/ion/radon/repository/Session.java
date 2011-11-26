@@ -6,6 +6,8 @@ public interface Session {
 
 	public Session changeWorkspace(String wname);
 
+	public Session changeWorkspace(String wname, WorkspaceOption options);
+
 	public ISequence getSequence(String prefix, String id);
 
 	public int commit();
@@ -53,5 +55,8 @@ public interface Session {
 	public String[] getWorkspaceNames() ;
 	
 	public void notify(Node target, NodeEvent event);
+
+	public SessionQuery createQuery(String wname);
+
 
 }

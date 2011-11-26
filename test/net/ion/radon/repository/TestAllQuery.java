@@ -16,6 +16,8 @@ public class TestAllQuery extends TestCase{
 
 		
 		result.addTestSuite(TestAradonQuery.class) ;
+		result.addTestSuite(TestSessionQuery.class) ;
+		result.addTestSuite(TestUpdateChain.class) ;
 
 		return result;
 	}

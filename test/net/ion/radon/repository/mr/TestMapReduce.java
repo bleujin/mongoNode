@@ -76,20 +76,90 @@ public class TestMapReduce extends TestBaseRepository {
 	
 	private void createSample() {
 		session.newNode().put("name", "bleujin").put("address", "seoul").inlist("friend")
-		.push(MapUtil.chainMap().put("name", "novision").put("age", 20)) 
-		.push(MapUtil.chainMap().put("name", "pm1200").put("age", 30)) 
-		.push(MapUtil.chainMap().put("name", "iihi").put("age", 25)) ;
+		.push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20)) 
+		.push(MapUtil.chainKeyMap().put("name", "pm1200").put("age", 30)) 
+		.push(MapUtil.chainKeyMap().put("name", "iihi").put("age", 25)) ;
 		
 		session.newNode().put("name", "hero").put("address", "seoul").inlist("friend")
-		.push(MapUtil.chainMap().put("name", "baegi").put("age", 20)) 
-		.push(MapUtil.chainMap().put("name", "minato").put("age", 25))
-		.push(MapUtil.chainMap().put("name", "air").put("age", 30)) ;
+		.push(MapUtil.chainKeyMap().put("name", "baegi").put("age", 20)) 
+		.push(MapUtil.chainKeyMap().put("name", "minato").put("age", 25))
+		.push(MapUtil.chainKeyMap().put("name", "air").put("age", 30)) ;
 		
 		session.commit() ;
 		
 		assertEquals(2, session.createQuery().eq("address", "seoul").find().count()) ;
+	}
+	
+	
+	public void testScope() throws Exception {
+		session.newNode().put("address", "seoul").put("name", "1") ;
+		session.newNode().put("address", "seoul").put("name", "1") ;
+		session.newNode().put("address", "seoul").put("name", "2") ;
 		
+		session.newNode().put("address", "busan").put("name", "11") ;
+		session.newNode().put("address", "busan").put("name", "11") ;
+		session.newNode().put("address", "busan").put("name", "11") ;
+		session.newNode().put("address", "busan").put("name", "11") ;
+		session.newNode().put("address", "busan").put("name", "11") ;
+
+		session.newNode().put("address", "inchon").put("name", "112") ;
+		session.newNode().put("address", "inchon").put("name", "112") ;
+		session.newNode().put("address", "inchon").put("name", "111") ;
+		session.newNode().put("address", "inchon").put("name", "111") ;
+
+		session.commit() ;
 		
+		String mapFunction =
+			"function() { " +
+			"	emit(" +
+			"		this.address,{self: this, viewcount: 1, visitcount: 1, counter: {}}" +
+			"	); " +
+			"}";
+
+		String reduceFunction =
+			"function(key, values) { " +
+			"	MyMap = function(){ this.map = new Object(); }; " +
+			"	MyMap.prototype = { " +
+			"		inc: function(key) { " +
+			"			this.put(key, 1);" +
+			"		}, " +
+			"		put: function(key, inc) {" +
+			"			if (this.map[key] == null) { this.map[key] = inc; } " +
+			"			else this.map[key] = this.map[key] + inc; " +
+			"		}, " +
+			"		size: function() { " +
+			"			var count = 0; " +
+			"			for(var prop in this.map) count++; " +
+			"			return count;" +
+			"		}, " +
+			"		total: function() { " +
+			"			var count = 0; " +
+			"			for(var prop in this.map) count += map[prop];" +
+			"			return count;" +
+			"		} " +
+			"	}; " +
+			"	var result = {viewcount: 0, visitcount: 0} ;" +
+			"	var counter = new MyMap() ;" +
+			"	values.forEach( function(row) {" +
+			"		result.key = key; " +
+			"		result.self = row.self; " +
+			"		for (var prop in row.counter.map) {" +
+			"			counter.put(prop, row.counter.map[prop]); " +
+			"		} " +
+			"		counter.inc(row.self.address + '/' + row.self.name); " +
+			"		result.viewcount += row.viewcount; " +
+			"	}); " +
+			"	result.counter = counter ;" +
+			"	result.visitcount = result.counter.size(); " +
+			"	return result; " +
+			"}";
+	
+		String finalFunction =
+			"";
+
+		NodeCursor nc = session.createQuery().mapreduce(mapFunction, reduceFunction, finalFunction).limit(500);
+		System.out.println(nc.count());
+		nc.debugPrint(PageBean.ALL);
 		
 	}
 	

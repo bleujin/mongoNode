@@ -3,7 +3,6 @@ package net.ion.radon.repository.orm;
 import java.util.List;
 
 import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.AbstractManager;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.Session;
 

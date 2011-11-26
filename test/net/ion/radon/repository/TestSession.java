@@ -27,20 +27,36 @@ public class TestSession extends TestCase{
 		Session session1 =  rc.testLogin("abcd") ;
 		Session session2 =  rc.testLogin("abcd") ;
 		
-		assertTrue(session1 == session2) ;
+		assertTrue(session1 != session2) ;
 	}
 	
 	public void testSessionLogout() throws Exception {
-
 		RepositoryCentral rc = RepositoryCentral.testCreate() ;
 		Session session1 =  rc.testLogin("abcd") ;
 		session1.logout() ;
 		Session session2 =  rc.testLogin("abcd") ;
-		
 		assertTrue(session1 != session2) ;
 	}
 	
+
 	
+	public void testSessionAsObject() throws Exception {
+		RepositoryCentral rc = RepositoryCentral.testCreate() ;
+		Session s1 =  rc.testLogin("abcd") ;
+		s1.dropWorkspace() ;
+		
+		Session s2 =  rc.testLogin("other") ;
+		s2.dropWorkspace() ;
+		
+		s1.newNode().put("name", "bleujin") ;
+		s2.changeWorkspace("other") ;
+		s1.commit() ;
+		
+		assertEquals(0, s2.createQuery().find().count()) ;
+		
+	}
+	
+
 	
 	public void xtestOtherSession() throws Exception {
 		

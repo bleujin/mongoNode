@@ -60,12 +60,13 @@ public class NodeObject implements Serializable, IPropertyFamily {
 
 	public NodeObject put(String key, Object value) {
 
+		String transKey = key.startsWith("$") ? key : key.toLowerCase() ;
 		if (value instanceof IPropertyFamily) {
-			inner.put(key.toLowerCase(), ((IPropertyFamily) value).getDBObject());
+			inner.put(transKey, ((IPropertyFamily) value).getDBObject());
 		} else if (value instanceof JSONObject) {
-			inner.put(key.toLowerCase(), JSONUtil.toDBObject((JSONObject) value));
+			inner.put(transKey, JSONUtil.toDBObject((JSONObject) value));
 		} else {
-			inner.put(key.toLowerCase(), value);
+			inner.put(transKey, value);
 		}
 		return this ;
 	}
@@ -83,6 +84,15 @@ public class NodeObject implements Serializable, IPropertyFamily {
 	}
 
 	public Object get(String key) {
+		if (key.startsWith("$")){
+			DBObject value = (DBObject) inner.get(key) ;
+			if (value == null) {
+				
+				inner.put(key, value) ;
+			}
+			return value ;
+		}
+		
 		String[] propIds = StringUtil.split(key, ".");
 
 		int i = 0;
@@ -139,6 +149,8 @@ public class NodeObject implements Serializable, IPropertyFamily {
 	
 	public InListNode inlist(String name, INode parent) {
 		Object result = get(name) ;
+//		if (result == null) result = new BasicDBList();
+//		put(name, result) ;
 		return inlist(name, result, parent) ;
 	}
 	
@@ -170,9 +182,9 @@ public class NodeObject implements Serializable, IPropertyFamily {
 				putProperty(pid, list);
 			}
 		} else {
-//			BasicDBList list = new BasicDBList();
-//			list.add(val);
-			putProperty(pid, val);
+			BasicDBList list = new BasicDBList();
+			list.add(val);
+			putProperty(pid, list);
 		}
 
 	}

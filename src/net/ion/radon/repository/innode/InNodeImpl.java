@@ -127,7 +127,7 @@ public abstract class InNodeImpl implements InNode {
 	}
 
 	public String getString(String key) {
-		return StringUtil.toString(get(key));
+		return StringUtil.toString(get(key, 0));
 	}
 
 	public boolean hasProperty(String key) {

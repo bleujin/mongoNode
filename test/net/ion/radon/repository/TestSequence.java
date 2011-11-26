@@ -6,14 +6,8 @@ import net.ion.radon.core.PageBean;
 
 public class TestSequence extends TestBaseRepository{
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		session.changeWorkspace("_sequence").dropWorkspace() ;
-	}
-	
 	public void testInit() throws Exception {
-		
+		session.changeWorkspace("_sequence").dropWorkspace() ;
 		ISequence seq = session.getSequence("test", "bleujin");
 		seq.reset() ;
 
@@ -24,7 +18,6 @@ public class TestSequence extends TestBaseRepository{
 	public void testNext() throws Exception {
 		ISequence seq = session.getSequence("test", "bleujin");
 		seq.reset() ;
-		seq.currVal() ;
 		long cval = seq.nextVal();
 		
 		Node seqNode = session.getWorkspace("_sequence").findOne(session, PropertyQuery.createByPath("/test_bleujin"), Columns.ALL) ;

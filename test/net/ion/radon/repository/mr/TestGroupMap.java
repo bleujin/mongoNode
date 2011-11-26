@@ -22,47 +22,78 @@ import net.ion.radon.repository.Session;
 public class TestGroupMap extends TestCase {
 
 	public void testFirst() throws Exception {
+		
+		try {
+			
 		RepositoryCentral rc = RepositoryCentral.create("61.250.201.78", 27017, "ICS_MONGO") ;
-		Session session = rc.testLogin("ics_content_bleujin") ;
+		Session session = rc.testLogin("ics_content_4ec49bc4aa2ca5f57158ca94") ;
 		
 //		session.createQuery().find().debugPrint(PageBean.ALL) ;
 		
 		String mapFunction = "function(){ emit(this.catid + this.artid, {self:this});}" ;
-		String reduceFunction = "function(key, values){ " +
-				"var doc = {'afields':[]} ;  " +
-				"  doc.artid = key ; " +
-				"  doc.afieldcount = values.length - 1; " +
-				"  for (var i in values) {" +
-				"	 var cont = values[i].self ;   " +
-				"	 if (cont.afieldid) { " +
-				" 	   doc.afields.push(cont);" +
-				"	 } else {" +
-				" 	   doc.catid = cont.catid ;" +
-				" 	   doc.artid = cont.artid ;" +
-				" 	   doc.action = cont.action ;" +
-				" 	   doc.expireday = cont.expireday ;" +
-				" 	   doc.operday = cont.operday ;" +
-				" 	   doc.creday = cont.creday ;" +
-				" 	   doc.modday = cont.modday ;" +
-				" 	   doc.artsubject = cont.artsubject ;" +
-				" 	   doc.artcont = cont.artcont ;" +
-				" 	   doc.keyword = cont.keyword ;" +
-				" 	   doc.reguserid = cont.reguserid ;" +
-				" 	   doc.moduserid = cont.moduserid ;" +
-				" 	   doc.thumbnail = cont.thumbnail ;" +
-				"    }" + 
-				"  }  " +
-				"return doc ;   } ";
+
 		String finalFunction = "function(key, reduced) {" +
-				" if (reduced.self) {" +
-				" 	 return reduced.self ;" +
-				" } else {" +
-				" 	return reduced ;" +
-				" }" +
-				"}";
-		NodeCursor nc = session.createQuery().or(PropertyQuery.create("artid", 1172124), PropertyQuery.create("artid", 1172144)).mapreduce(mapFunction, reduceFunction, finalFunction) ;
+		" if (reduced.self) {" +
+		" 	 return reduced.self ;" +
+		" } else {" +
+		" 	return reduced ;" +
+		" }" +
+		"}";
 		
+		StringBuilder sb = new StringBuilder();
+		sb.append("function Reduce(key, values) { ");
+		sb.append("    var doc = {} ; ");
+		sb.append("    for (var i in values) {  ");
+		sb.append("        var cont = values[i].self ;  ");
+		sb.append("        if(cont) {  ");
+		sb.append("            if (cont.afieldid) {  "); 
+		sb.append("                doc[cont.afieldid] = {} ;  ");
+		sb.append("                doc[cont.afieldid].afieldid = cont.afieldid ;  ");
+		sb.append("                doc[cont.afieldid].typecd = cont.typecd ;  ");
+		sb.append("                if(cont.typecd == 'Number' || cont.typecd == 'Currency') {  ");
+		sb.append("                    doc[cont.afieldid].value = new NumberLong(cont.value) ;  ");
+		sb.append("                } else {  ");
+		sb.append("                    doc[cont.afieldid].value = cont.value ;  ");
+		sb.append("                }  ");
+		sb.append("            } else {  ");
+		sb.append("                doc.sync_transaction_sequence = cont.sync_transaction_sequence;  ");
+		sb.append("                doc.catid = cont.catid;  ");
+		sb.append("                doc.artid = new NumberLong(cont.artid);  ");
+		sb.append("                doc.modserno = new NumberLong(cont.modserno);  ");
+		sb.append("                doc.action = cont.action;  ");
+		sb.append("                doc.expireday = cont.expireday;  ");
+		sb.append("                doc.operday = cont.operday;  ");
+		sb.append("                doc.creday = cont.creday;  ");
+		sb.append("                doc.modday = cont.modday;  ");
+		sb.append("                doc.artsubject = cont.artsubject;  ");
+		sb.append("                doc.artcont = cont.artcont;  ");
+		sb.append("                doc.keyword = cont.keyword;  ");
+		sb.append("                doc.reguserid = cont.reguserid;  ");
+		sb.append("                doc.moduserid = cont.moduserid;  ");
+		sb.append("                doc.thumbnail = cont.thumbnail;  ");
+		sb.append("                doc.statuscd = cont.statuscd;  ");
+		sb.append("            }  ");
+		sb.append("        } else {  ");
+		sb.append("            var value = values[i];  ");
+		sb.append("            for(var key in value) {  ");
+		sb.append("                doc[key] = value[key];  ");
+		sb.append("            }  ");
+		sb.append("        }  ");
+		sb.append("    }  ");
+		sb.append("    return doc;  ");
+		sb.append("}  ");
+		
+
+		//NodeCursor nc = session.createQuery().or(PropertyQuery.create("artid", 1172124), PropertyQuery.create("artid", 1172144)).mapreduce(mapFunction, sb.toString(), finalFunction) ;
+		//NodeCursor nc = session.createQuery().eq("artid", 1172144).mapreduce(mapFunction, sb.toString(), finalFunction) ;
+		NodeCursor nc = session.createQuery().mapreduce(mapFunction, sb.toString(), finalFunction) ;
+
 		nc.debugPrint(PageBean.ALL) ;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 }

@@ -35,12 +35,12 @@ public class TestUpdate extends TestBaseRepository{
 	public void testFindUpdate() throws Exception {
 		Node savedNode = createTestNode() ;
 		
-		Map map = MapUtil.create("location", "seoul") ;
-		session.createQuery().eq("name", "bleujin").updateOne(map) ;
+		session.createQuery().eq("name", "bleujin").updateOne(MapUtil.create("location", "seoul")) ;
 		; // no commit
 		
 		assertEquals("bleujin", session.createQuery().id(savedNode.getIdentifier()).findOne().getString("name")) ;
 		assertEquals("seoul", session.createQuery().id(savedNode.getIdentifier()).findOne().getString("location")) ;	
+		assertEquals("hello", session.createQuery().id(savedNode.getIdentifier()).findOne().getString("greeting")) ;
 	}
 
 

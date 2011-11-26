@@ -43,7 +43,6 @@ public class TestLastModified extends TestBaseRepository{
 		Node found = session.createQuery().path("/bleujin").findOne();
 		Debug.debug(ctime, found.getLastModified()) ;
 		assertEquals(true, found.getLastModified() > ctime) ;
-		assertEquals(20, found.get("age")) ;
 	}
 	
 	

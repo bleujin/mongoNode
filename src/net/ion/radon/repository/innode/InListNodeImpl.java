@@ -47,22 +47,20 @@ public class InListNodeImpl implements InListNode{
 			throw new IllegalStateException("only use on new state");
 		}
 
-		DBObject dbo = list;
+		list.add(NodeObject.load(values).getDBObject()) ;
+		parent.put(this.field, list) ;
 		
-		if (dbo instanceof BasicBSONList) {
-			((BasicBSONList) dbo).add(NodeObject.load(values).getDBObject()) ;
-			parent.put(this.field, dbo) ;
-		} else if (dbo.keySet().size() == 0) {
-			BasicDBList list = new BasicDBList() ;
-			list.add(NodeObject.load(values).getDBObject());
-			dbo = list ;
-			parent.put(this.field, dbo);
-		} else {
-			throw new IllegalStateException("mismathc type : must be array type");
-		}
 		return this ;
 	}
 
+	public InListNode pull(Map<String, ? extends Object> values) {
+		parent.put(this.field, NodeObject.load(values).getDBObject()) ;
+		
+		return this ;
+	}
+
+
+	
 	public String toString(){
 		return list.toString() ;
 	}

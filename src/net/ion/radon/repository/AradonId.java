@@ -51,12 +51,19 @@ public class AradonId implements IPropertyFamily{
 	static AradonId create(InNode dbo) {
 		
 		if (dbo == null) return EMPTY ;
-		
-		INode dlist = (INode) dbo.get(GROUP) ;
+		Object group = dbo.get(GROUP) ;
+		BasicDBList glist = null;
+		if (group instanceof String){
+			BasicDBList newList = new BasicDBList() ;
+			newList.add(group) ;
+			glist = newList ;
+		} else {
+			glist = (BasicDBList) ((INode)dbo.get(GROUP)).getDBObject() ;
+		}
 		Object uid = dbo.get(UID) ;
 		Object ghash = dbo.get(GHASH) ;
 		
-		return new AradonId((BasicDBList)dlist.getDBObject(), uid, ghash);
+		return new AradonId(glist, uid, ghash);
 	}
 
 	public static AradonId load(DBObject dbo) {

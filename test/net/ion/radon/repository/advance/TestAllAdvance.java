@@ -7,7 +7,7 @@ import net.ion.radon.repository.TestNodeListCursor;
 import net.ion.radon.repository.TestNodeRows;
 import net.ion.radon.repository.TestNodeSerialize;
 import net.ion.radon.repository.TestSequence;
-import net.ion.radon.repository.orm.TestPeople;
+import net.ion.radon.repository.TestSession;
 
 public class TestAllAdvance extends TestCase {
 
@@ -18,12 +18,11 @@ public class TestAllAdvance extends TestCase {
 		suite.addTestSuite(TestExplain.class);
 		suite.addTestSuite(TestIndex.class);
 		suite.addTestSuite(TestNodeRows.class);
+		suite.addTestSuite(TestMapListRows.class) ;
 		suite.addTestSuite(TestNodeSerialize.class);
 		
-		
+		suite.addTestSuite(TestSession.class) ;
 		suite.addTestSuite(TestNodeListCursor.class) ;
-		
-		suite.addTestSuite(TestPeople.class) ;
 		
 		return suite ;
 	}

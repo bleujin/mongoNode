@@ -23,21 +23,29 @@ public class SessionQuery implements Serializable{
 
 	private static final long serialVersionUID = -3597031257688988594L;
 	private transient Session session ;
+	private String targetWName ;
 	private PropertyQuery inner ;
 	private PropertyFamily sort = PropertyFamily.create() ;
 
-	private SessionQuery(Session session, PropertyQuery inner){
+	private SessionQuery(Session session, String targetWName, PropertyQuery inner){
 		this.session = session ;
+		this.targetWName = targetWName ;
 		this.inner = inner ;
 	}
 	
 	public static SessionQuery create(Session session) {
-		return new SessionQuery(session, PropertyQuery.create());
+		return new SessionQuery(session, session.getCurrentWorkspaceName(), PropertyQuery.create());
 	}
 	
 	public static SessionQuery create(Session session, PropertyQuery definedQuery) {
-		return new SessionQuery(session, definedQuery); 
+		return new SessionQuery(session, session.getCurrentWorkspaceName(), definedQuery); 
 	}
+	
+	public static SessionQuery create(Session session, String wname) {
+		return new SessionQuery(session, wname, PropertyQuery.create()); 
+	}
+
+	
 	
 	public NodeCursor find() throws RepositoryException {
 		return getWorkspace().find(session, inner, Columns.ALL).sort(sort);
@@ -239,13 +247,24 @@ public class SessionQuery implements Serializable{
 	}
 
 	public NodeResult update(Map<String, ?> modValues){
-		return getWorkspace().setMerge(session, inner, modValues);
+		return getWorkspace().update(session, inner, modValues, false);
+	}
+
+	public NodeResult merge(ChainMap modValues) {
+		return merge(modValues.toMap());
 	}
 	
+	public NodeResult merge(Map<String, ?> modValues) {
+		return getWorkspace().update(session, inner, modValues, true);
+	}
+
+	
+	// upset = true, 즉 query에 해당하는 row가 없으면 새로 만든다. 
 	public NodeResult increase(String propId){
 		return increase(propId, 1);
 	}
 	
+	// upset = true, 즉 query에 해당하는 row가 없으면 새로 만든다. 
 	public NodeResult increase(String propId, int incvalue){
 		return getWorkspace().inc(session, inner, StringUtil.lowerCase(propId), incvalue);
 	}
@@ -289,8 +308,14 @@ public class SessionQuery implements Serializable{
 	}
 
 	private Workspace getWorkspace(){
-		return session.getCurrentWorkspace();
+		return session.getWorkspace(targetWName);
 	}
+
+	public UpdateChain updateChain() {
+		return new UpdateChain(session, targetWName, inner);
+	}
+
+
 
 
 

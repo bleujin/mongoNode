@@ -1,12 +1,18 @@
-package net.ion.radon.repository;
+package net.ion.radon.repository.orm;
 
 import java.lang.reflect.InvocationTargetException;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.HashFunction;
-import net.ion.radon.repository.orm.AbstractORM;
-import net.ion.radon.repository.orm.BeanCursor;
-import net.ion.radon.repository.orm.IDMethod;
+import net.ion.radon.repository.Node;
+import net.ion.radon.repository.NodeConstants;
+import net.ion.radon.repository.NodeCursor;
+import net.ion.radon.repository.NodeImpl;
+import net.ion.radon.repository.NodeResult;
+import net.ion.radon.repository.PropertyQuery;
+import net.ion.radon.repository.Session;
+import net.ion.radon.repository.SessionQuery;
+import net.ion.radon.repository.Workspace;
 
 import org.apache.commons.beanutils.ConstructorUtils;
 
@@ -22,7 +28,7 @@ public abstract class AbstractManager<T extends AbstractORM> {
 
 	public T findById(Object keyPropValue) {
 		IDRow idRow = getIDRow(keyPropValue);
-		Node node = getWorkspace().findOne(session, idRow.getAradonQuery(), Columns.ALL);
+		Node node = createQuery().and(idRow.getAradonQuery()).findOne();
 		return toBean(node);
 	}
 
@@ -44,7 +50,7 @@ public abstract class AbstractManager<T extends AbstractORM> {
 
 	public int save(T p) {
 		IDRow idRow = getIDRow(p);
-		NodeResult result = getWorkspace().setMerge(session, idRow.aradonId(), p.getNodeObject().toPropertyMap(session.getRoot()));
+		NodeResult result = createQuery().and(idRow.aradonId()).merge(p.getNodeObject().toPropertyMap(session.getRoot()));
 		return result.getRowCount();
 	}
 
@@ -66,28 +72,31 @@ public abstract class AbstractManager<T extends AbstractORM> {
 	}
 
 	public BeanCursor<T> find(PropertyQuery query) {
-		return BeanCursor.create(getWorkspace().find(session, query.aradonGroup(groupId()), Columns.ALL), this);
+		NodeCursor nc = createQuery().and(query.aradonGroup(groupId())).find() ;
+		return BeanCursor.create(nc, this);
 	}
 
 	
 	
 	public int remove(Object keyPropValue) {
-		return getWorkspace().remove(session, getIDRow(keyPropValue).aradonId()).getRowCount();
+		return  createQuery().and(getIDRow(keyPropValue).aradonId()).remove() ;
 	}
 
 	public int remove(PropertyQuery query) {
-		NodeResult nr = getWorkspace().remove(session, query.aradonGroup(groupId()));
-		return nr.getRowCount();
+		return createQuery().and(query.aradonGroup(groupId())).remove() ;
 	}
 	
 	public int removeAll() {
-		NodeResult nr = getWorkspace().remove(session, PropertyQuery.createByAradon(groupId()));
-		return nr.getRowCount();
+		return createQuery().aradonGroup(groupId()).remove();
 	}
 
 
-	private Workspace getWorkspace() {
+	protected Workspace getWorkspace() {
 		return session.getWorkspace(idm.workspaceName());
+	}
+	
+	protected SessionQuery createQuery(){
+		return session.createQuery(idm.workspaceName()) ;
 	}
 
 	public String groupId() {
