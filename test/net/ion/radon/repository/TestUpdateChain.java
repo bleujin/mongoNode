@@ -1,8 +1,12 @@
 package net.ion.radon.repository;
 
+import java.util.List;
+
 import org.apache.commons.collections.Closure;
 
+import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
 
@@ -106,6 +110,18 @@ public class TestUpdateChain extends TestBaseRepository{
 		
 	}
 	
+	public void testInList2() throws Exception {
+		session.newNode().setAradonId("emp", "bleujin").put("name", "bleujin");
+		session.newNode().setAradonId("emp", "hero").put("name", "hero");
+		session.commit() ;
+		
+		session.createQuery().aradonGroupId("emp", "bleujin").updateChain().put("address", "seoul")
+			.inlist("memos", MapUtil.chainKeyMap().put("subject", "ics").put("content", "ics6")).update() ;
+		
+		assertEquals(2, session.createQuery().find().count()) ;
+		assertEquals(1, session.createQuery().aradonGroupId("emp", "bleujin").findOne().inlist("memos").size()) ;
+	}
+	
 	public void testInListWhenNotExist() throws Exception {
 		session.newNode().put("name", "bleujin").put("address", "seoul").put("view", 2) ;
 		session.commit() ;
@@ -131,20 +147,58 @@ public class TestUpdateChain extends TestBaseRepository{
 	}
 	
 	
-	public void testInlistPull() throws Exception {
-		session.newNode().put("name", "bleujin").put("address", "seoul").put("view", 2)
-			.inlist("friend").
-				push(MapUtil.chainKeyMap().put("name", "jin").put("age", 25)).
-				push(MapUtil.chainKeyMap().put("name", "hero").put("age", 20)).
-				push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20));
-		
-		session.commit() ;
+	public void testRemoveInlist() throws Exception {
+		createSampleNode();
 		
 		session.createQuery().updateChain().put("address", "busan").removeInlist("friend", PropertyQuery.create().lte("age", 20)).update() ;
 		
 		Node found = session.createQuery().findOne() ;
 		assertEquals("busan", found.getString("address")) ;
 		assertEquals(1, ((InListNode)found.get("friend")).size()) ;
+	}
+
+	private void createSampleNode() {
+		session.newNode().put("name", "bleujin").put("address", "seoul").put("view", 2)
+			.inlist("friend").
+				push(MapUtil.chainKeyMap().put("name", "jin").put("age", 25).put("city", "busan")).
+				push(MapUtil.chainKeyMap().put("name", "hero").put("age", 20).put("city", "busan")).
+				push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20).put("city", "busan"));
+		
+		session.commit() ;
+	}
+	
+	public void xtestUpdateInList() throws Exception {
+		createSampleNode() ;
+		//session.createQuery().updateChain().put("address", "busan").updateInlist("friend", PropertyQuery.create().lte("age", 20), MapUtil.chainKeyMap().put("city", "seoul")).update() ;
+		
+		Node node = session.createQuery().eq("name", "bleujin").findOne() ;
+		updateInlist(node);
+
+		List<InNode> innodes = node.inlist("friend").createQuery().find() ;
+		assertEquals(3, innodes.size()) ;
+		assertEquals("busan", innodes.get(0).getString("city")) ;
+		assertEquals("seoul", innodes.get(1).getString("city")) ;
+		assertEquals("seoul", innodes.get(2).getString("city")) ;
+		
+		
+		
+	}
+
+	private void updateInlist(Node node) {
+		final PropertyQuery inlistQuery = PropertyQuery.create().lte("age", 20);
+		final String inlistKey = "friend";
+
+		List<InNode> innodes = node.inlist(inlistKey).createQuery().addFilter(inlistQuery).find() ;
+		
+		UpdateChain updateChain = session.createQuery(node.getWorkspaceName()).id(node.getIdentifier()).updateChain();
+		updateChain.removeInlist(inlistKey, inlistQuery).update() ;
+
+		updateChain = session.createQuery(node.getWorkspaceName()).id(node.getIdentifier()).updateChain();
+		for (InNode innode : innodes) {
+			innode.put("city", "seoul") ;
+			updateChain.inlist(inlistKey, MapUtil.chainKeyMap().put(innode.toMap())) ;
+		}
+		updateChain.update() ;
 	}
 	
 	public void testInlistPullWhenNotExist() throws Exception {
@@ -159,10 +213,48 @@ public class TestUpdateChain extends TestBaseRepository{
 	
 	
 	public void testMerge() throws Exception {
-		session.createQuery().aradonGroupId("emp", "bleujin") .updateChain().put("address", "busan").removeInlist("friend", PropertyQuery.create().lte("age", 20)).merge() ;
+		NodeResult nr = session.createQuery().aradonGroupId("emp", "bleujin").updateChain().put("address", "busan").put("age", 20).merge() ;
+		
+		session.createQuery().find().debugPrint(PageBean.ALL) ;
+		
 		Node found = session.createQuery().findOne() ;
 		assertEquals("busan", found.getString("address")) ;
 		assertEquals("emp", found.getAradonId().getGroup()) ;
 		assertEquals("bleujin", found.getAradonId().getUid()) ;
+		
+		assertEquals(false, found.isNew()) ;
 	}
+	
+	public void testUpdate() throws Exception {
+		session.newNode().put("ename", "bleujin").put("index", 1) ;
+		session.commit() ;
+		for (int i : ListUtil.rangeNum(5)) {
+			session.createQuery().eq("ename", "bleujin").updateChain().put("index", i).update() ;
+		}
+		Node found = session.createQuery().findOne() ;
+		assertEquals(4, found.getAsInt("index")) ;
+	}
+
+	public void testUpdateMerge() throws Exception {
+		session.newNode().put("ename", "bleujin").put("index", 1) ;
+		session.commit() ;
+		for (int i : ListUtil.rangeNum(5)) {
+			session.createQuery().eq("ename", "bleujin").updateChain().put("index", i).merge() ;
+		}
+		Node found = session.createQuery().findOne() ;
+		assertEquals(4, found.getAsInt("index")) ;
+	}
+
+
+	public void testMerge2() throws Exception {
+		for (int i : ListUtil.rangeNum(5)) {
+			session.createQuery().eq("emp", i).updateChain().put("address", "busan").put("index", i).put("d" + i, "..").merge() ;
+		}
+		session.createQuery().find().debugPrint(PageBean.ALL) ;
+		assertEquals(5, session.createQuery().find().count()) ;
+	}
+	
 }
+
+
+

@@ -10,7 +10,11 @@ public interface InListNode extends IPropertyFamily, Serializable{
 
 	InListNode push(ChainMap values);
 	InListNode push(Map<String, ? extends Object> values);
+	
+	InListNode pull(ChainMap values);
+	InListNode pull(Map<String, ? extends Object> map);
 
 	public Object get(int index) ;
 	public int size() ;
+
 }

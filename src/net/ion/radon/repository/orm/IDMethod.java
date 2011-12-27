@@ -13,5 +13,5 @@ public @interface IDMethod {
 	String workspaceName() default "myspace";
 	String groupId() ;
 	String keyPropId();
-	Class<? extends AbstractORM> managerClz() ;
+	Class<? extends NodeORM> managerClz() ;
 }

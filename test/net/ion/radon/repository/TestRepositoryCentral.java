@@ -28,4 +28,30 @@ public class TestRepositoryCentral extends TestCase{
 		
 	}
 	
+	
+	public void xtestNullAuthMongo() throws Exception {
+		try{
+			RepositoryCentral rc_fail_auth = new RepositoryCentral("127.0.0.1", 10505, "auth") ;
+			rc_fail_auth.login("test").createQuery().count();
+			fail();
+		}catch(Exception e){
+			
+		}
+	}
+	
+	public void xtestPassAuthMongo() throws Exception {
+		RepositoryCentral rc_pass_auth = new RepositoryCentral("127.0.0.1", 10505, "auth", "test", "1234") ;
+		assertNotNull(rc_pass_auth.login("test").createQuery().count());
+	}
+	
+	public void xtestFailAuthMongo() throws Exception {
+		try{
+			RepositoryCentral rc_fail_auth = new RepositoryCentral("127.0.0.1", 10505, "auth", "test", "12345") ;
+			rc_fail_auth.login("test").createQuery().count();
+			fail();
+		}catch(Exception e){
+			
+		}
+	}
+	
 }

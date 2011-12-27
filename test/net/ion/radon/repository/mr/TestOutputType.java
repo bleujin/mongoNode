@@ -25,14 +25,23 @@ public class TestOutputType extends TestCase{
 	}
 	
 	public void testDebugHandler() throws Exception {
+		
 		String mapFunction = "function(){ var parent = this ; this.friend.forEach(function(p) {  emit(p.name, {self:p, count:1}); } );}" ;
 		String reduceFunction = "function(key, values){var doc={} ; var count = 0 ; doc.key = key ; values.forEach(function(val){ count += val.count; }) ; doc['count'] = count; return doc ; }";
 		String finalFunction = "function(key, value){var doc={}; doc['fname'] = key ; doc['count'] = value.count;  return doc }";
 		
 		NodeCursor nc = session.createQuery().mapreduce(mapFunction, reduceFunction, finalFunction, CommandOption.create(OutputType.REPLACE, "myjob")) ;
-		nc.debugPrint(PageBean.ALL) ;
+	//	nc.debugPrint(PageBean.ALL) ;
 	}
 
+	public void xtestDrop() throws Exception {
+		session.changeWorkspace("myjob").dropWorkspace() ;
+	}
+	
+	public void xtestConfirm() throws Exception {
+		session.changeWorkspace("myjob").createQuery().find().debugPrint(PageBean.ALL) ;
+	}
+	
 	
 	private void createSample() {
 		session.newNode().put("name", RandomUtil.nextRandomString(8)).put("address", "seoul").inlist("friend")

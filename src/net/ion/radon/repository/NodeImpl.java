@@ -12,6 +12,7 @@ import static net.ion.radon.repository.NodeConstants.TIMEZONE;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.Map.Entry;
@@ -52,8 +53,10 @@ public class NodeImpl implements Node {
 	}
 
 	static NodeImpl create(Session currentSession, String workspaceName, NodeObject no, String parentPath, String name) {
-		if (currentSession.createQuery().path(makePath(parentPath, name)).existNode() )
-			RepositoryException.throwIt("duplicate path : " + makePath(parentPath, name));
+		if (!StringUtil.equals(name, no.getString("_id"))) {
+//			if (currentSession.createQuery().path(makePath(parentPath, name)).existNode())
+//				RepositoryException.throwIt("duplicate path : " + makePath(parentPath, name));
+		}
 		if (!isSmallAlphaNumUnderBarComma(name))
 			throw new IllegalArgumentException(name + " must be smallAlphaNumUnderBarComma");
 
@@ -104,7 +107,8 @@ public class NodeImpl implements Node {
 	}
 
 	public Session getSession() {
-		if (session == null) throw new IllegalStateException("not logined session.") ;
+		if (session == null)
+			throw new IllegalStateException("not logined session.");
 		return session;
 	}
 
@@ -134,7 +138,7 @@ public class NodeImpl implements Node {
 		}
 		String groupId = StringUtil.substringBefore(aidExpr, ":");
 		String uidExpr = StringUtil.substringAfter(aidExpr, ":");
-		Object uid = (uidExpr != null && uidExpr.startsWith("%")) ? Integer.parseInt(uidExpr.substring(1)) : uidExpr;
+		Object uid = (uidExpr != null && uidExpr.startsWith("%")) ? Integer.parseInt(uidExpr.substring(1)) : uidExpr.replace("%", "") ;
 
 		Node targetNode = getQuery().corelateNode(getSession(), wsName, getQuery(), PropertyQuery.createByAradon(groupId, uid));
 		return targetNode == null ? null : targetNode.get(remain);
@@ -164,22 +168,6 @@ public class NodeImpl implements Node {
 	}
 
 	private static Pattern p = Pattern.compile("\\{[a-zA-Z][a-zA-Z0-9_\\.]*\\}");
-
-	private String transRegular(String key) {
-		if (!key.contains("{"))
-			return key;
-
-		Matcher m = p.matcher(key);
-
-		StringBuffer sb = new StringBuffer();
-		while (m.find()) {
-			Serializable value = get(StringUtil.substringBetween(m.group(), "{", "}"));
-			m.appendReplacement(sb, ObjectUtil.toString(value));
-		}
-		m.appendTail(sb);
-		return sb.toString();
-	}
-
 	private String transNumRegular(String key) {
 		if (!key.contains("{"))
 			return key;
@@ -274,8 +262,7 @@ public class NodeImpl implements Node {
 	}
 
 	public Node setAradonId(String groupid, Object uid) {
-		if (existAradonId(groupid, uid))
-			throw RepositoryException.throwIt("duplicated groupId/uid : " + groupid + "/" + uid);
+//		if (existAradonId(groupid, uid)) throw RepositoryException.throwIt("duplicated groupId/uid : " + groupid + "/" + uid);
 
 		putProperty(PropertyId.reserved(ARADON), AradonId.create(groupid, uid).toNodeObject());
 		return this;
@@ -331,7 +318,11 @@ public class NodeImpl implements Node {
 	}
 
 	public String getString(String key) {
-		return StringUtil.toString(get(key, 0));
+		Object obj = get(key);
+		if (obj instanceof InListNode) {
+			return StringUtil.toString(((InListNode) obj).get(0));
+		}
+		return StringUtil.toString(get(key));
 	}
 
 	public NodeCursor getChild() {
@@ -421,17 +412,22 @@ public class NodeImpl implements Node {
 		return NodeRef.create(this);
 	}
 
-	public int hashCode(){
-		return getIdentifier().hashCode() ;
+	public int hashCode() {
+		return getIdentifier().hashCode();
 	}
-	
-	public boolean equals(Object obj){
-		if (! (obj instanceof Node)) return false ;
-		Node that = (Node) obj ;
-		return getIdentifier().equals(that.getIdentifier()) ;
+
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Node))
+			return false;
+		Node that = (Node) obj;
+		return getIdentifier().equals(that.getIdentifier());
 	}
-	
-	// public int removeChild() {
-	// return getSession().createQuery(relation(NodeConstants.PARENT).froms().getQuery()).remove() ;
+
+	public TempNode toTemp() {
+		return TempNodeImpl.create(getSession(), NodeObject.load(nobject.toPropertyMap(this)));
+	}
+
+	// public int remove(){
+	// return getSession().createQuery(getWorkspaceName()).id(getIdentifier()).remove();
 	// }
 }

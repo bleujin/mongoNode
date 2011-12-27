@@ -5,7 +5,7 @@ import java.util.Map;
 
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.ICursor;
-import net.ion.radon.repository.orm.AbstractORM;
+import net.ion.radon.repository.orm.NodeORM;
 
 import org.apache.commons.collections.Closure;
 
@@ -41,8 +41,8 @@ public interface NodeCursor extends ICursor {
 
 	public PropertyQuery getQuery() ;
 
-	public List<Node> toList(PageBean page, PropertyComparator<Node> comparator) ;
+	public List<Node> toList(PageBean page, PropertyComparator comparator) ;
 
-	public <T> List<T> toList(PageBean page, Class<? extends AbstractORM> clz) ;
+	public <T> List<T> toList(PageBean page, Class<? extends NodeORM> clz) ;
 
 }

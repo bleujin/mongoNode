@@ -35,7 +35,6 @@ public class InListNodeImpl implements InListNode{
 
 	public InListQuery createQuery() {
 		return InListQuery.create(NodeObject.load(list), this.field, parent) ;
-		// return ((InNodeImpl)parent.get(this.field)).inListQuery() ;
 	}
 
 	public InListNode push(ChainMap values) {
@@ -53,13 +52,15 @@ public class InListNodeImpl implements InListNode{
 		return this ;
 	}
 
+	public InListNode pull(ChainMap values) {
+		return push(values.toMap()) ;
+	}
+
 	public InListNode pull(Map<String, ? extends Object> values) {
 		parent.put(this.field, NodeObject.load(values).getDBObject()) ;
 		
 		return this ;
 	}
-
-
 	
 	public String toString(){
 		return list.toString() ;

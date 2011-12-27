@@ -9,6 +9,7 @@ import net.ion.radon.repository.innode.TestInListQueryNode;
 import net.ion.radon.repository.innode.TestInListQueryNodeMDL;
 import net.ion.radon.repository.innode.TestInListQuerySort;
 import net.ion.radon.repository.innode.TestInPut;
+import net.ion.radon.repository.innode.TestInListQuery;
 
 public class TestAllInList extends TestCase{
 
@@ -18,6 +19,7 @@ public class TestAllInList extends TestCase{
 		
 		result.addTestSuite(TestInPut.class) ;
 		result.addTestSuite(TestInListNode.class) ;
+		result.addTestSuite(TestInListQuery.class) ;
 		result.addTestSuite(TestInListQuerySort.class) ;
 		result.addTestSuite(TestInListMDL.class) ;
 		result.addTestSuite(TestInListQueryNode.class) ;

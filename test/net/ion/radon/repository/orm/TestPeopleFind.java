@@ -8,21 +8,21 @@ import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.TestBaseRepository;
+import net.ion.radon.repository.orm.bean.People;
+import net.ion.radon.repository.orm.manager.PeopleManager;
 
 import org.apache.commons.beanutils.ConstructorUtils;
 
 public class TestPeopleFind extends TestBaseRepository {
 
-	private PeopleManager<People> pm;
+	private PeopleManager pm;
 
-	@Override
-	protected void setUp() throws Exception {
-		// TODO Auto-generated method stub
+	@Override protected void setUp() throws Exception {
 		super.setUp();
 		session.changeWorkspace("peoples");
 		session.dropWorkspace();
-		pm = new PeopleManager<People>(session);
-		pm.removeAll() ;
+		pm = new PeopleManager(session);
+		pm.createQuery().remove() ;
 	}
 
 	public void xtestConstructor() throws Exception {
@@ -38,22 +38,16 @@ public class TestPeopleFind extends TestBaseRepository {
 	}
 	
 	public void testToNode() throws Exception {
-		pm.save(People.create("bleu", 20, "seoul", "white"));
-		pm.save(People.create("hero", 30, "busan", "black"));
-		pm.save(People.create("jin", 40, "busan", "red"));
-		pm.save(People.create("bee", 29, "busan", "red"));
+		pm.createPeople("bleu", 20, "seoul", "white").save();
+		pm.createPeople("hero", 30, "busan", "black").save();
+		pm.createPeople("jin", 40, "busan", "red").save();
+		pm.createPeople("bee", 29, "busan", "red").save();
 
 		People bleu = pm.findById("bleu");
 		assertEquals("bleu", bleu.getId());
 		assertEquals(20, bleu.getAge());
 		assertEquals("seoul", bleu.getAddress());
 		assertEquals("white", bleu.getFavoriateColor());
-
-		Node node = pm.toNode(bleu);
-		assertEquals("bleu", node.get("userId"));
-		assertEquals("seoul", node.get("address"));
-		assertEquals("white", node.get("fcolor"));
-		assertEquals(20, node.get("age"));
 
 		List<People> peoples = pm.findByAddress("seoul");
 		assertEquals(1, peoples.size());
@@ -62,7 +56,7 @@ public class TestPeopleFind extends TestBaseRepository {
 		assertEquals("bleu", f.getId());
 		assertEquals(20, f.getAge());
 
-		List<People> busanPeople = pm.find(PropertyQuery.create().eq("address", "busan").gt("age", 20)).ascending("age").descending("userId").toList(PageBean.create(2, 1));
+		List<People> busanPeople = pm.createQuery().eq("address", "busan").gt("age", 20).ascending("age").descending("userId").toList(PageBean.create(2, 1));
 		for (People peo : busanPeople) {
 			Debug.debug(peo);
 		}

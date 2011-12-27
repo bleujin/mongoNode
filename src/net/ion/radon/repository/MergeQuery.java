@@ -8,6 +8,7 @@ import static net.ion.radon.repository.NodeConstants.UID;
 import java.util.Map;
 
 import net.ion.framework.util.HashFunction;
+import net.ion.framework.util.ObjectId;
 import net.ion.framework.util.StringUtil;
 
 import com.mongodb.BasicDBObject;
@@ -37,14 +38,14 @@ public class MergeQuery implements IPropertyFamily{
 	public static MergeQuery createByAradon(String groupId, Object uid) {
 		MergeQuery result = new MergeQuery(PropertyQuery.createByAradon(groupId, uid));
 
-		result.putBlankData(makeAradonId(groupId, uid), "/" + groupId + uid, groupId + uid) ;
+		result.putBlankData(makeAradonId(groupId, uid), "/" + groupId + "_" + uid, groupId + uid) ;
 		return result;
 	}
 
 	public static MergeQuery createById(String oid) {
 		MergeQuery result = new MergeQuery(PropertyQuery.createById(oid));
 		
-		result.putBlankData(makeAradonId("__empty", oid), "/" + oid, oid) ;
+		result.putBlankData(makeAradonId(EMPTY_GROUP, oid), "/" + oid, oid) ;
 		return result;
 	}
 
@@ -52,7 +53,16 @@ public class MergeQuery implements IPropertyFamily{
 	public static MergeQuery createByPath(String path) {
 		MergeQuery result = new MergeQuery(PropertyQuery.create(PATH, path));
 
-		result.putBlankData(makeAradonId("__empty", path), path, StringUtil.defaultIfEmpty(StringUtil.substringAfter(path, "/"), path)) ;
+		result.putBlankData(makeAradonId(EMPTY_GROUP, path), path, StringUtil.defaultIfEmpty(StringUtil.substringAfter(path, "/"), path)) ;
+		return result;
+	}
+
+
+	static String EMPTY_GROUP = "__empty";
+	static MergeQuery load(PropertyQuery query) {
+		MergeQuery result = new MergeQuery(query) ;
+		String oid = new ObjectId().toString() ;
+		result.putBlankData(makeAradonId(EMPTY_GROUP, oid), "/" + oid, oid) ;
 		return result;
 	}
 
@@ -64,7 +74,7 @@ public class MergeQuery implements IPropertyFamily{
 	}
 	
 	
-	private static NodeObject makeAradonId(String groupid, Object uid) {
+	static NodeObject makeAradonId(String groupid, Object uid) {
 		NodeObject inner = NodeObject.create();
 
 		inner.put(GROUP, makeGroups(groupid));
@@ -87,4 +97,5 @@ public class MergeQuery implements IPropertyFamily{
 	public PropertyQuery getQuery(){
 		return query ;
 	}
+
 }

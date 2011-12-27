@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import net.ion.framework.util.ChainMap;
@@ -29,6 +30,7 @@ import net.ion.radon.repository.innode.OrFilter;
 import org.bson.types.BasicBSONList;
 
 import com.mongodb.DBObject;
+import com.mongodb.QueryOperators;
 
 public class InListQuery implements Serializable{
 
@@ -46,39 +48,39 @@ public class InListQuery implements Serializable{
 		this.parent = parent ;
 	}
 	
-	public InListQuery eq(String path, Object value) {
-		return addFilter(EqualFilter.create(path, value));
+	public InListQuery eq(String key, Object value) {
+		return addFilter(EqualFilter.create(key, value));
 	}
-	public InListQuery ne(String path, Object value) {
-		return addFilter(NotEqualFilter.create(path, value));
+	public InListQuery ne(String key, Object value) {
+		return addFilter(NotEqualFilter.create(key, value));
 	}
 
-	public InListQuery gt(String path, Object value) {
-		return addFilter(GreaterFilter.create(path, value));
+	public InListQuery gt(String key, Object value) {
+		return addFilter(GreaterFilter.create(key, value));
 	}
-	public InListQuery gte(String path, Object value) {
-		return addFilter(GreaterThanFilter.create(path, value));
+	public InListQuery gte(String key, Object value) {
+		return addFilter(GreaterThanFilter.create(key, value));
 	}
-	public InListQuery lt(String path, Object value) {
-		return addFilter(LessFilter.create(path, value));
+	public InListQuery lt(String key, Object value) {
+		return addFilter(LessFilter.create(key, value));
 	}
-	public InListQuery lte(String path, Object value) {
-		return addFilter(LessThanFilter.create(path, value));
+	public InListQuery lte(String key, Object value) {
+		return addFilter(LessThanFilter.create(key, value));
 	}
-	public InListQuery between(String path, Object from, Object to) {
-		return addFilter(BetweenFilter.create(path, from, to));
+	public InListQuery between(String key, Object from, Object to) {
+		return addFilter(BetweenFilter.create(key, from, to));
 	}
-	public InListQuery in(String path, Object[] values) {
-		return addFilter(InFilter.create(path, values));
+	public InListQuery in(String key, Object[] values) {
+		return addFilter(InFilter.create(key, values));
 	}
-	public InListQuery nin(String path, Object[] values) {
-		return addFilter(NotInFilter.create(path, values));
+	public InListQuery nin(String key, Object[] values) {
+		return addFilter(NotInFilter.create(key, values));
 	}
-	public InListQuery exist(String path) {
-		return addFilter(ExistFilter.create(path));
+	public InListQuery exist(String key) {
+		return addFilter(ExistFilter.create(key));
 	}
-	public InListQuery notExist(String path) {
-		return addFilter(NotExistFilter.create(path));
+	public InListQuery notExist(String key) {
+		return addFilter(NotExistFilter.create(key));
 	}
 	public InListQuery and(InNodeFilter... qs){
 		return addFilter(AndFilter.create(qs)) ;
@@ -108,6 +110,48 @@ public class InListQuery implements Serializable{
 
 	public List<InNode> find() {
 		return myfind(PageBean.ALL) ;
+	}
+	
+	public InListQuery addFilter(PropertyQuery query){
+		DBObject dbo = query.getDBObject() ;
+		addFilter(dbo);
+		
+		return this ;
+	}
+
+	private void addFilter(DBObject dbo) {
+		Set<String> keys = dbo.keySet() ;
+		
+		for (String key : keys) {
+			Object value = dbo.get(key) ;
+			if (value instanceof DBObject){
+				Map incons = ((DBObject)value).toMap() ;
+				Set<String> inkeys = incons.keySet() ;
+				for (String inkey : inkeys) {
+					if (QueryOperators.GT.equals(inkey)){
+						gt(key, incons.get(inkey)) ;
+					} else if (QueryOperators.GTE.equals(inkey)){
+						gte(key, incons.get(inkey)) ;
+					} else if (QueryOperators.LT.equals(inkey)){
+						lt(key, incons.get(inkey)) ;
+					} else if (QueryOperators.LTE.equals(inkey)){
+						lte(key, incons.get(inkey)) ;
+					} else if (QueryOperators.EXISTS.equals(inkey)){
+						if (incons.get(inkey).equals(Boolean.TRUE)) {
+							exist(key) ; 
+						} else {
+							notExist(key);
+						}
+					} else if (QueryOperators.IN.equals(inkey)){
+						in(key, ((List)incons.get(inkey)).toArray(new Object[0]) ) ;
+					} else if (QueryOperators.NIN.equals(inkey)){
+						nin(key, ((List)incons.get(inkey)).toArray(new Object[0])) ;
+					}
+				}
+			} else {
+				eq(key, value) ;
+			}
+		}
 	}
 
 	

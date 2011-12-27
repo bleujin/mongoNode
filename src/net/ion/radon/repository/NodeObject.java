@@ -132,10 +132,15 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		}
 	}
 	
-	InNode inner(String name, INode parent) {
+//	public void inner(String inname, NodeObject inner) {
+//		this.put(inname, inner.getDBObject()) ;
+//	}
+
+	public InNode inner(String name, INode parent) {
 		Object result = get(name) ;
 		return inner(name, result, parent);
 	}
+	
 	
 	private InNode inner(String name, Object result, INode parent){
 		
@@ -246,6 +251,7 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		NodeObject that = (NodeObject) obj ;
 		return inner.equals(that.inner) ;
 	}
+
 	
 }
 

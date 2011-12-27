@@ -15,8 +15,8 @@ public class TestMapListRows extends TestBaseRepository{
 
 	public void testInList() throws Exception {
 		session.newNode().put("name", "bleujin").inlist("friend")
-			.push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20))
-			.push(MapUtil.chainKeyMap().put("name", "iihi").put("age", 21)) ;
+			.push(MapUtil.chainMap().put("name", "novision").put("age", 20))
+			.push(MapUtil.chainMap().put("name", "iihi").put("age", 21)) ;
 		session.commit() ;
 		
 		Node found = session.createQuery().findOne() ;

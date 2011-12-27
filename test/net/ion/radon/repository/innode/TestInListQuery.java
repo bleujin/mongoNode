@@ -1,68 +1,35 @@
 package net.ion.radon.repository.innode;
 
-import net.ion.radon.repository.Node;
+import java.util.List;
 
-public class TestInListQuery extends  TestBaseInListQuery{
+import net.ion.framework.util.Debug;
+import net.ion.framework.util.MapUtil;
+import net.ion.radon.repository.InListNode;
+import net.ion.radon.repository.InNode;
+import net.ion.radon.repository.PropertyQuery;
+import net.ion.radon.repository.TestBaseRepository;
 
-	public void testEqualFilter() throws Exception {
-		createNode() ;
-		Node found = session.createQuery().findOne() ;
+public class TestInListQuery extends TestBaseRepository {
+
+	public void testPropertyQuery() throws Exception {
+		session.newNode().put("name", "bleujin").put("address", "seoul").put("view", 2).inlist("friend")
+				.push(MapUtil.chainKeyMap().put("name", "jin").put("age", 25).put("city", "busan"))
+				.push(MapUtil.chainKeyMap().put("name", "hero").put("age", 20).put("city", "busan"))
+				.push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20).put("city", "busan"));
+
+		session.commit();
 		
-		assertEquals(0, found.inlist("people").createQuery().eq("index", 0).findOne().get("index")) ;
-		assertEquals(1, found.inlist("people").createQuery().eq("index", 1).findOne().get("index")) ;
-		assertEquals(4, found.inlist("people").createQuery().eq("index", 4).findOne().get("index")) ;
-
-		assertEquals(1, found.inlist("people").createQuery().eq("index", 1).find().size()) ;
-		assertEquals(5, found.inlist("people").createQuery().eq("address.city", "seoul").find().size()) ;
-		assertEquals(1, found.inlist("people").createQuery().eq("address.city", "seoul").eq("index", 1).find().size()) ;
-
-		assertEquals(4, found.inlist("people").createQuery().ne("index", 1).find().size()) ;
-	}
-	
-	
-	public void testNotEqualFilter() throws Exception {
-		createNode() ;
-		Node found = session.createQuery().findOne() ;
+		InListNode listnode = session.createQuery().findOne().inlist("friend") ;
 		
-		assertEquals(4, found.inlist("people").createQuery().ne("index", 0).find().size()) ;
-	}
-	
-
-	public void testGreater() throws Exception {
-		createNode() ;
-		Node found = session.createQuery().findOne() ;
+		assertEquals(1, listnode.createQuery().addFilter(PropertyQuery.create().gte("age", 25)).find().size()) ;
+		assertEquals(1, listnode.createQuery().addFilter(PropertyQuery.create().gt("age", 20)).find().size()) ;
+		assertEquals(3, listnode.createQuery().addFilter(PropertyQuery.create().lte("age", 25)).find().size()) ;
+		assertEquals(2, listnode.createQuery().addFilter(PropertyQuery.create().lt("age", 25)).find().size()) ;
+		assertEquals(1, listnode.createQuery().addFilter(PropertyQuery.create().eq("age", 25)).find().size()) ;
+		assertEquals(1, listnode.createQuery().addFilter(PropertyQuery.create().in("age", new Object[]{25})).find().size()) ;
+		assertEquals(2, listnode.createQuery().addFilter(PropertyQuery.create().nin("age", new Object[]{25})).find().size()) ;
+		assertEquals(3, listnode.createQuery().addFilter(PropertyQuery.create().isExist("age")).find().size()) ;
+		assertEquals(0, listnode.createQuery().addFilter(PropertyQuery.create().isNotExist("age")).find().size()) ;
 		
-		assertEquals(1, found.inlist("people").createQuery().gt("index", 3).find().size()) ;
-		assertEquals(2, found.inlist("people").createQuery().gte("index", 3).find().size()) ;
 	}
-
-	
-	public void testLess() throws Exception {
-		createNode() ;
-		Node found = session.createQuery().findOne() ;
-		
-		assertEquals(2, found.inlist("people").createQuery().lt("index", 2).find().size()) ;
-		assertEquals(3, found.inlist("people").createQuery().lte("index", 2).find().size()) ;
-
-		assertEquals(2, found.inlist("people").createQuery().between("index", 2, 3).find().size()) ;
-	}
-
-
-	public void testIn() throws Exception {
-		createNode() ;
-		Node found = session.createQuery().findOne() ;
-		
-		assertEquals(2, found.inlist("people").createQuery().in("index", new Object[]{2,3}).find().size()) ;
-	}
-	
-
-	public void testExist() throws Exception {
-		createNode() ;
-		Node found = session.createQuery().findOne() ;
-		
-		assertEquals(5, found.inlist("people").createQuery().exist("index").find().size()) ;
-	}
-	
-
-	
 }

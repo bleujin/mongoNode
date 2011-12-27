@@ -54,6 +54,8 @@ public class InListQueryNode {
 		return update(query, cmap.toMap()) ;
 	}
 	public NodeResult update(PropertyQuery query, Map<String, Object> map) {
+		
+		
 		NodeResult result = this.pull(query);
 		if (result.getRowCount() == 0) {
 			return NodeResult.NULL;

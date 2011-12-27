@@ -8,10 +8,10 @@ public class TestMergeNode extends TestBaseRepository{
 	
 	public void testMergeNode() throws Exception {
 		session.mergeNode(MergeQuery.createByAradon("emp", "bleujin")).put("name", "bleujin") ;
-		int count = session.commit() ; // not saved ;
-		assertEquals(1, count) ;
+		int count = session.commit() ; // not applied count...  ;
 		
 		assertEquals("bleujin", session.createQuery().findOne().getString("name")) ;
+		assertEquals(1, count) ;
 	}
 
 	public void testMetaGet() throws Exception {
@@ -129,6 +129,7 @@ public class TestMergeNode extends TestBaseRepository{
 		assertEquals("jin", found.get("fname")) ;
 		assertEquals("dev", found.get("#dept.dname")) ;
 	}
+
 	
 	
 }

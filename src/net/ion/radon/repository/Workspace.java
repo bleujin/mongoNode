@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
+import net.ion.framework.util.RandomUtil;
 import net.ion.framework.util.StringUtil;
 
 import org.apache.commons.collections.map.LRUMap;
@@ -21,10 +22,12 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MapReduceCommand;
 import com.mongodb.MapReduceOutput;
+import com.mongodb.MongoException;
 import com.mongodb.QueryOperators;
 import com.mongodb.WriteResult;
 import com.mongodb.MapReduceCommand.OutputType;
@@ -37,65 +40,64 @@ public class Workspace {
 	protected Workspace() {
 	}
 
-	static Workspace load(DBCollection collection){
-		String key = collection.getFullName();
+	static Workspace load(DB db, String _wname, WorkspaceOption option) {
+		String wName = _wname.toLowerCase();
 
+		String key = db.getName() + "." + wName;
 		if (!wss.containsKey(key)) {
-			final Workspace workspace = createWorkspace(collection);
-		    wss.put(key, workspace);
-			
+			final Workspace workspace = createWorkspace(db, wName, option);
+			wss.put(key, workspace);
+
 			return workspace;
 		} else {
+
 			return wss.get(key);
 		}
 	}
 
-	private static PropertyFamily ARADON_INDEX = PropertyFamily.create(ARADON_GROUP, 1).put(ARADON_UID, -1);
-	private static PropertyFamily PATH_INDEX = PropertyFamily.create(NodeConstants.PATH, 1);
+	private static Workspace createWorkspace(DB db, String wname, WorkspaceOption option) {
+		if (!db.collectionExists(wname)) {
+			db.createCollection(wname, option.getDBObject());
+		}
 
-
-	private static Workspace createWorkspace(DBCollection collection) {
-		Workspace result = new Workspace() ;
-		result.collection = collection ;
-		if (result.getName() == null || result.getName().startsWith("_")) return result ;
-
-//		collection.ensureIndex(ARADON_INDEX.getDBObject(), PropertyFamily.create().put("name", "_aradon_id").put("unique", Boolean.TRUE).getDBObject());
-//		collection.ensureIndex(PATH_INDEX.getDBObject(), PropertyFamily.create().put("name", "_path_id").put("unique", Boolean.TRUE).getDBObject());
-		if (collection.getName().startsWith("system.")) return result ;
-		
-		collection.ensureIndex(ARADON_INDEX.getDBObject());
-		// collection.ensureIndex(new BasicDBObject("__aradon.group", 1)) ;
-		collection.ensureIndex(PATH_INDEX.getDBObject(), PropertyFamily.create().put("name", "_path_id").put("unique", Boolean.FALSE).getDBObject());
-		
+		Workspace result = new Workspace();
+		DBCollection col = db.getCollection(wname);
+		if (wname == null || wname.startsWith("_") || wname.startsWith("system.")) {
+			result.collection = col;
+			return result;
+		}
+		option.initWorkspace(col) ;
+		result.collection = col;
 		return result;
 	}
 
-	
-	public long count(){
-		return getCollection().count() ;
+	public long count() {
+		return getCollection().count();
 	}
-	
+
 	public String getName() {
 		return getCollection().getName();
 	}
-	
+
 	public void drop() {
 		wss.remove(getCollection().getFullName());
 		getCollection().drop();
 	}
-	
+
 	public void makeIndex(IPropertyFamily props, String indexName, boolean unique) {
-		BasicDBObject options = new BasicDBObject() ;
-		options.put("name", indexName) ;
-		options.put("unique", Boolean.TRUE) ;
-		
-		getCollection().ensureIndex(props.getDBObject(), options) ;
+		try {
+			BasicDBObject options = new BasicDBObject();
+			options.put("name", indexName);
+			options.put("unique", unique);
+
+			getCollection().ensureIndex(props.getDBObject(), options);
+		} catch (MongoException me) {
+			
+			throw me ;
+		}
 	}
-	
 
 	public int mergeNodes(Session session, Map<String, Node> modified) {
-		int index = modified.size();
-
 		Node[] targets = modified.values().toArray(new Node[0]);
 
 		List<Node> forInsert = ListUtil.newList();
@@ -107,40 +109,41 @@ public class Workspace {
 				forUpdate.add(node);
 			}
 		}
-		
+
+		int affectedRows = 0;
 		for (Node updateNode : forUpdate) {
-			session.getWorkspace(updateNode.getWorkspaceName()).save(session, updateNode);
+			NodeResult nr = session.getWorkspace(updateNode.getWorkspaceName()).save(session, updateNode);
+			// affectedRows += nr.getRow Count() ;
 		}
 
 		for (Node insertNode : forInsert) {
-			session.getWorkspace(insertNode.getWorkspaceName()).append(session, insertNode);
+			NodeResult nr = session.getWorkspace(insertNode.getWorkspaceName()).append(session, insertNode);
+			// affectedRows += nr.getRowCount() ;
 		}
-		
-		return index ;
+
+		return modified.size();
 	}
 
-	
 	public NodeCursor find(Session session, PropertyQuery iquery, Columns columns) {
 		NodeCursorImpl result = NodeCursorImpl.create(session, iquery, this.getName(), getCollection().find(iquery.getDBObject(), columns.getDBOjbect()));
-		session.setAttribute(Explain.class.getCanonicalName(), result.explain()) ;
+		session.setAttribute(Explain.class.getCanonicalName(), result.explain());
 		return result;
-	}
-	
-	public NodeResult remove(Session session, PropertyQuery query) {
-		NodeResult result = NodeResult.create(session, query, getCollection().remove(query.getDBObject())) ;
-		return result;
-	}
-	
-	public Node findOne(Session session, PropertyQuery iquery, Columns column) {
-		NodeCursor nc = find(session, iquery, column);
-		Explain explain = nc.explain() ;
-		
-		Node result = (nc.hasNext()) ? nc.next() : null;
-		session.setAttribute(Explain.class.getCanonicalName(), explain) ;
-		
-		return result ;
 	}
 
+	public NodeResult remove(Session session, PropertyQuery query) {
+		NodeResult result = NodeResult.create(session, query, getCollection().remove(query.getDBObject()));
+		return result;
+	}
+
+	public Node findOne(Session session, PropertyQuery iquery, Columns column) {
+		NodeCursor nc = find(session, iquery, column);
+		Explain explain = nc.explain();
+
+		Node result = (nc.hasNext()) ? nc.next() : null;
+		session.setAttribute(Explain.class.getCanonicalName(), explain);
+
+		return result;
+	}
 
 	void makeUniqueIndex(IPropertyFamily props, String indexName) {
 		makeIndex(props, indexName, true);
@@ -155,144 +158,144 @@ public class Workspace {
 		return newNode(session, name, PropertyFamily.create());
 	}
 
-
 	NodeCursor mapreduce(Session session, String mapFunction, String reduceFunction, String finalFunction, CommandOption options, PropertyQuery condition) {
-		if (StringUtil.isNotBlank(options.getOutputCollection()) && session.getWorkspace(options.getOutputCollection()).count() <= 0) {
+		if (StringUtil.isNotBlank(options.getOutputCollection()) && session.getWorkspace(options.getOutputCollection(), WorkspaceOption.NONE).count() <= 0) {
 			if (options.getOutputType() == OutputType.MERGE || options.getOutputType() == OutputType.REDUCE) {
-				options.setOutputType(OutputType.REPLACE) ;
+				options.setOutputType(OutputType.REPLACE);
 			}
 		}
-		
-		MapReduceCommand command = new MapReduceCommand(getCollection(), mapFunction, reduceFunction, options.getOutputCollection(), options.getOutputType(), condition.getDBObject());
-		if (StringUtil.isNotBlank(finalFunction)) command.setFinalize(finalFunction) ;
-		options.apply(command) ;
 
-		MapReduceOutput out = getCollection().mapReduce(command) ;
-		return ApplyCursor.create(session,  condition, out) ;
+		MapReduceCommand command = new MapReduceCommand(getCollection(), mapFunction, reduceFunction, options.getOutputCollection(), options.getOutputType(), condition.getDBObject());
+		if (StringUtil.isNotBlank(finalFunction))
+			command.setFinalize(finalFunction);
+		options.apply(command);
+
+		MapReduceOutput out = getCollection().mapReduce(command);
+		return ApplyCursor.create(session, condition, out);
 	}
-	
+
 	Object applyMapReduce(Session session, String mapFunction, String reduceFunction, String finalFunction, CommandOption options, PropertyQuery condition, ApplyHander handler) {
 		// MapReduceOutput out = collection.mapReduce(mapFunction, reduceFunction, null, MapReduceCommand.OutputType.INLINE, condition.getDBObject()) ;
-		NodeCursor nc = mapreduce(session, mapFunction, reduceFunction, finalFunction, options, condition) ;
-		
+		NodeCursor nc = mapreduce(session, mapFunction, reduceFunction, finalFunction, options, condition);
+
 		Object result = handler.handle(nc);
-		return result ;
+		return result;
 	}
-	
-	
+
 	List<Node> group(Session session, IPropertyFamily keys, PropertyQuery condition, IPropertyFamily initial, String reduce) {
-		BasicDBList list = (BasicDBList) getCollection().group(keys.getDBObject(), condition.getDBObject(), initial.getDBObject(), reduce) ;
+		BasicDBList list = (BasicDBList) getCollection().group(keys.getDBObject(), condition.getDBObject(), initial.getDBObject(), reduce);
 		List<Node> nodes = ListUtil.newList();
-		for(Object obj : list){
+		for (Object obj : list) {
 			nodes.add(NodeImpl.load(session, condition, getName(), (DBObject) obj));
 		}
-		return nodes ;
+		return nodes;
 
 	}
 
 	/* update start */
 
-	NodeResult merge(Session session, MergeQuery query, TempNode tnode) {
-		Map<String, Serializable> map = MapUtil.newMap() ;
-		map.putAll(tnode.toMap()) ;
+	public NodeResult merge(Session session, MergeQuery query, TempNode tnode) {
+		Map<String, Serializable> map = MapUtil.newMap();
+		map.putAll(tnode.toMap());
 
-		Node found = findOne(session, PropertyQuery.load(query), Columns.append().add(NodeConstants.ID)) ;
-		if (found != null){
-			tnode.putProperty(PropertyId.reserved(NodeConstants.ID), found.getId()) ;
+		Node found = findOne(session, PropertyQuery.load(query), Columns.append().add(NodeConstants.ID));
+		if (found != null) {
+			tnode.putProperty(PropertyId.reserved(NodeConstants.ID), found.getId());
 		} else { // if newNode
-			Map queryMap = query.getDBObject().toMap();
+			Map queryMap = query.data();
 			for (Object key : queryMap.keySet()) {
-				Object value = queryMap.get(key) ;
-				if (value instanceof DBObject){
-					continue ;
+				Object value = queryMap.get(key);
+				if (value instanceof DBObject) {
+					continue;
 				}
-				map.put(key.toString(), (Serializable)value) ;
+				map.put(key.toString(), (Serializable) value);
 			}
 		}
-		
-		DBObject mod = new BasicDBObject() ;
-		mod.put("$set", appendLastModified(map)) ;
-		
-		return updateNode(session, PropertyQuery.load(query), mod, true, true) ;
+
+		DBObject mod = new BasicDBObject();
+		mod.put("$set", appendLastModified(map));
+
+		return updateNode(session, PropertyQuery.load(query), mod, true, true);
 	}
-	
+
 	NodeResult findAndOverwrite(Session session, PropertyQuery query, Map<String, ?> props) {
 		DBObject find = getCollection().findOne(query.getDBObject());
-		if (find == null) return NodeResult.NULL;
-		
+		if (find == null)
+			return NodeResult.NULL;
+
 		NodeImpl findNode = NodeImpl.load(session, query, getCollection().getName(), find);
 		findNode.clearProp(false);
-		
+
 		for (Entry<String, ?> entry : props.entrySet()) {
 			find.put(entry.getKey(), entry.getValue());
 		}
-		
+
 		// collection.findAndModify(query.getDBObject(), NodeObject.load(props).getDBObject()) ;
-		
+
 		return NodeResult.create(session, query, getCollection().save(find));
 	}
 
 	NodeResult findAndUpdate(Session session, PropertyQuery query, Map<String, ?> props) {
-		DBObject mod = new BasicDBObject() ;
-		mod.put("$set", appendLastModified(props)) ;
-		
-		return updateNode(session, query, mod, false, true) ;
+		DBObject mod = new BasicDBObject();
+		mod.put("$set", appendLastModified(props));
+
+		return updateNode(session, query, mod, false, true);
 	}
-	
-	NodeResult inc(Session session, PropertyQuery query, String propId, long value){
-		DBObject mod = new BasicDBObject("$inc", new BasicDBObject(propId, value)) ;
-		return updateNode(session, query, mod, true, true) ;
+
+	NodeResult inc(Session session, PropertyQuery query, String propId, long value) {
+		DBObject mod = new BasicDBObject("$inc", new BasicDBObject(propId, value));
+		return updateNode(session, query, mod, true, true);
 	}
 
 	NodeResult update(Session session, PropertyQuery query, Map<String, ?> values, boolean upset) {
-		DBObject mod = new BasicDBObject() ;
-		mod.put("$set", appendLastModified(values)) ;
-		
-		return updateNode(session, query, mod, upset, true) ;
+		DBObject mod = new BasicDBObject();
+		mod.put("$set", appendLastModified(values));
+
+		return updateNode(session, query, mod, upset, true);
 	}
-	
-	NodeResult updateInner(Session session, PropertyQuery query, DBObject values, boolean upset){
+
+	NodeResult updateInner(Session session, PropertyQuery query, DBObject values, boolean upset) {
 		WriteResult wr = getCollection().update(query.getDBObject(), values, upset, true);
 		return NodeResult.create(session, query, wr);
-	
 	}
-	
+
 	NodeResult unset(Session session, PropertyQuery query, BasicDBObject value) {
-		DBObject mod = new BasicDBObject() ;
-		mod.put("$unset", value) ;
-		
-		return updateNode(session, query, mod, false, true) ;
+		DBObject mod = new BasicDBObject();
+		mod.put("$unset", value);
+
+		return updateNode(session, query, mod, false, true);
 	}
 
 	NodeResult pull(Session session, PropertyQuery query, Map<String, ?> values) {
-		DBObject mod = new BasicDBObject() ;
-		mod.put("$pull", NodeObject.load(values).getDBObject()) ;
-		
-		return updateNode(session, query, mod, false, true) ;
+		DBObject mod = new BasicDBObject();
+		mod.put("$pull", NodeObject.load(values).getDBObject());
+
+		return updateNode(session, query, mod, false, true);
 	}
 
 	NodeResult push(Session session, PropertyQuery query, Map<String, ?> values) {
-		DBObject mod = new BasicDBObject() ;
-		mod.put("$push", NodeObject.load(values).getDBObject()) ;
-		return updateNode(session, query, mod, false, true) ;
+		DBObject mod = new BasicDBObject();
+		mod.put("$push", NodeObject.load(values).getDBObject());
+		return updateNode(session, query, mod, false, true);
 	}
-	
 
-	List<DBObject> getIndexInfo() {
-		return getCollection().getIndexInfo();
+	public List<NodeObject> getIndexInfo() {
+		List<NodeObject> result = ListUtil.newList();
+		for (DBObject index : getCollection().getIndexInfo()) {
+			result.add(NodeObject.load(index));
+		}
+		return result;
 	}
-	
 
-
-	private NodeResult updateNode(Session session, PropertyQuery query, DBObject values, boolean upset, boolean multi){
+	private NodeResult updateNode(Session session, PropertyQuery query, DBObject values, boolean upset, boolean multi) {
 		WriteResult wr = getCollection().update(query.getDBObject(), values, upset, multi);
 		NodeResult result = NodeResult.create(session, query, wr);
-		return result ;
+		return result;
 	}
 
 	/* update end */
-	private DBCollection getCollection(){
-		return collection ;
+	private DBCollection getCollection() {
+		return collection;
 	}
 
 	private Node newNode(Session session, String name, PropertyFamily props) {
@@ -301,34 +304,34 @@ public class Workspace {
 
 	private NodeResult save(Session session, Node node) {
 		DBObject inmod = node.getDBObject();
-		inmod.put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis()) ;
-//		DBObject mod = new BasicDBObject("$set", inmod) ;
-// 		return NodeResult.create(collection.save(inmod)) ;
-		
-		return updateNode(session, PropertyQuery.createById(node.getIdentifier()), inmod, true, false) ;
+		inmod.put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis());
+		// DBObject mod = new BasicDBObject("$set", inmod) ;
+		// return NodeResult.create(collection.save(inmod)) ;
+
+		return updateNode(session, PropertyQuery.createById(node.getIdentifier()), inmod, true, false);
 	}
 
-	private NodeResult append(Session session, Node node){
+	private NodeResult append(Session session, Node node) {
 		DBObject inmod = node.getDBObject();
-		inmod.put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis()) ;
-		
+		inmod.put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis());
+
 		WriteResult wr = getCollection().insert(inmod);
 		NodeResult result = NodeResult.create(session, node.getQuery(), wr);
-		return result ;
+		return result;
 	}
 
 	private DBObject appendLastModified(Map<String, ?> values) {
 		DBObject inmod = NodeObject.load(values).getDBObject();
-		inmod.put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis()) ;
+		inmod.put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis());
 		return inmod;
 	}
 
-	public String toString(){
-		return getCollection().getFullName() ;
+	public String toString() {
+		return getCollection().getFullName();
 	}
-	
-	DBCollection innerCollection(){
-		return collection ;
+
+	DBCollection innerCollection() {
+		return collection;
 	}
 
 }

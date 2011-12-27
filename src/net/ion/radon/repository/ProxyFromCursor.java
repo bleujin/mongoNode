@@ -5,7 +5,7 @@ import java.util.Map;
 
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
-import net.ion.radon.repository.orm.AbstractORM;
+import net.ion.radon.repository.orm.NodeORM;
 import net.ion.radon.repository.relation.IRelation;
 
 import org.apache.commons.collections.Closure;
@@ -118,7 +118,7 @@ public class ProxyFromCursor implements NodeCursor{
 		return createReal().toList(page, comparator);
 	}
 
-	public <T> List<T> toList(PageBean page, Class<? extends AbstractORM> clz) {
+	public <T> List<T> toList(PageBean page, Class<? extends NodeORM> clz) {
 		return createReal().toList(page, clz);
 	}
 

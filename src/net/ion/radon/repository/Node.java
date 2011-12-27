@@ -27,7 +27,7 @@ public interface Node extends IPropertyFamily, INode {
 		
 	public String getIdentifier() ;
 
-	// public NodeResult save() ;
+	// public NodeResult merge(AradonId aid) ;
 	// public Node merge(IPropertyFamily query) ;
 
 	public Object getId() ;
@@ -84,6 +84,10 @@ public interface Node extends IPropertyFamily, INode {
 	public PropertyQuery getQuery();
 
 	public NodeRef selfRef();
+
+	public TempNode toTemp();
+	
+//	public int remove() ;
 
 }
 
@@ -248,6 +252,14 @@ class RootNode implements Node {
 
 	public NodeRef selfRef() {
 		return NodeRef.create(this);
+	}
+
+	public NodeResult merge(AradonId aid) {
+		return NodeResult.NULL;
+	}
+
+	public TempNode toTemp() {
+		return session.tempNode();
 	}
 
 }

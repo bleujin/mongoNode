@@ -24,19 +24,27 @@ public class TestGroup extends TestBaseRepository {
 		
 	}
 	
+	public void testGroupCount() throws Exception {
+		createSample() ;
+		
+		PropertyFamily initial = PropertyFamily.create().put("count", 0);
+		String reduce = "function(doc, out){ out.count++; }";
+		NodeCursor nc = session.createQuery().group(PropertyFamily.create("address", true), initial, reduce) ;
+		nc.debugPrint(PageBean.ALL) ;
+	}
 	
 	
 	private void createSample() {
 		session.newNode().put("name", "bleujin").put("address", "seoul").inlist("friend")
-		.push(MapUtil.chainMap().put("name", "novision").put("age", 20)) 
-		.push(MapUtil.chainMap().put("name", "iihi").put("age", 25))
-		.push(MapUtil.chainMap().put("name", "pm1200").put("age", 30)) ;
+		.push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20)) 
+		.push(MapUtil.chainKeyMap().put("name", "iihi").put("age", 25))
+		.push(MapUtil.chainKeyMap().put("name", "pm1200").put("age", 30)) ;
 		
 		session.newNode().put("name", "hero").put("address", "seoul").inlist("friend")
-		.push(MapUtil.chainMap().put("name", "baegi").put("age", 20)) 
-		.push(MapUtil.chainMap().put("name", "minato").put("age", 25))
-		.push(MapUtil.chainMap().put("name", "air").put("age", 30)) ;
-		
+		.push(MapUtil.chainKeyMap().put("name", "baegi").put("age", 20)) 
+		.push(MapUtil.chainKeyMap().put("name", "minato").put("age", 25))
+		.push(MapUtil.chainKeyMap().put("name", "air").put("age", 30)) ;
+
 		session.commit() ;
 	}
 }

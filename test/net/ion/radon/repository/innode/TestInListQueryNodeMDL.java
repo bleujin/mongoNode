@@ -3,6 +3,8 @@ package net.ion.radon.repository.innode;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.InListNode;
+import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeResult;
 import net.ion.radon.repository.PropertyQuery;
@@ -72,9 +74,16 @@ public class TestInListQueryNodeMDL extends TestBaseInListQuery{
 		
 		session.commit() ;
 		
-		NodeResult result = session.createQuery().eq("name", "bleujin").inlist("hobby").update(PropertyQuery.create("name", "navy"), MapUtil.chainMap().put("name", "navy promodel").put("type", "navy")) ;
+		NodeResult result = session.createQuery().eq("name", "bleujin").inlist("hobby").update(PropertyQuery.create("name", "navy"), MapUtil.chainMap().put("model", "navy promodel").put("type", "navy")) ;
 		assertEquals(1, result.getRowCount()) ;
 		assertEquals(2, session.createQuery().findOne().inlist("hobby").createQuery().find().size()) ;
+		
+		
+		InListNode listnode = session.createQuery().findOne().inlist("hobby") ;
+		assertEquals("promodel", ((InNode)listnode.get(0)).getString("name")) ;
+		assertEquals("navy", ((InNode)listnode.get(1)).getString("type")) ;
+		assertEquals("navy promodel", ((InNode)listnode.get(1)).getString("model")) ;
+//		assertEquals("navy", ((InNode)listnode.get(1)).getString("name")) ;
 		
 		session.createQuery().find().debugPrint(PageBean.ALL) ;
 	}

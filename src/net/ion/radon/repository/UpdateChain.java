@@ -1,22 +1,40 @@
 package net.ion.radon.repository;
 
+import static net.ion.radon.repository.NodeConstants.CREATED;
+import static net.ion.radon.repository.NodeConstants.ID;
+import static net.ion.radon.repository.NodeConstants.OWNER;
+import static net.ion.radon.repository.NodeConstants.TIMEZONE;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.bson.types.ObjectId;
+
+import com.mongodb.DBObject;
+
+import net.ion.bleujin.config.study.MakeConfig;
 import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.RandomUtil;
 import net.ion.radon.repository.innode.InListNodeImpl;
+import net.ion.radon.repository.innode.InNodeFilter;
 
 public class UpdateChain {
 
-	private NodeObject no ;
+	private NodeObject values ;
 	
 	private Session session;
-	private String targetWName;
+	private String targetWorkspace;
 	private PropertyQuery query;
 	
-	UpdateChain(Session session, String targetWName, PropertyQuery query){
+	UpdateChain(Session session, String targetWorkspace, PropertyQuery query){
 		this.session = session ;
-		this.targetWName = targetWName ;
+		this.targetWorkspace = targetWorkspace ;
 		this.query = query ;
-		this.no = NodeObject.create();
+		this.values = NodeObject.create();
 	}
 	
 	public UpdateChain put(String key, Object val) {
@@ -24,15 +42,25 @@ public class UpdateChain {
 		
 		return this;
 	}
+
+	private UpdateChain put(PropertyId key, Object val) {
+		getInner("$set").put(key, val) ;
+		
+		return this;
+	}
 	
+
 	public UpdateChain inc(String key, int val) {
 		getInner("$inc").put(key, val) ;
 		return this;
 	}
 
 	public UpdateChain inlist(String key, ChainMap<String, Object> values) {
-		InListNode inlist = getInner("$pushAll").inlist(key);
-		inlist.push(values.toMap()) ;
+		return inlist(key, values.toMap());
+	}
+	
+	public UpdateChain inlist(String key, Map<String, Object> map) {
+		getInner("$pushAll").inlist(key).push(map) ;
 		return this;
 	}
 	
@@ -42,22 +70,45 @@ public class UpdateChain {
 	}
 	
 	public NodeResult update() {
-		return session.getWorkspace(targetWName).updateInner(session, query, no.getDBObject(), false) ;
+		put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis());
+		return session.getWorkspace(targetWorkspace).updateInner(session, query, values.getDBObject(), false) ;
 	}
 	
 	private InNode getInner(String cmd){
-		return no.inner(cmd, session.getRoot()) ;
+		return values.inner(cmd, session.getRoot()) ;
 	}
 
-	public UpdateChain removeInlist(String key, PropertyQuery query) {
-		// @Todo : add interface ?
-		((InListNodeImpl)getInner("$pull").inlist(key)).pull(query.toMap()) ;
+	public UpdateChain removeInlist(String inlistKey, PropertyQuery inlistQuery) {
+		getInner("$pull").inlist(inlistKey).pull(inlistQuery.toMap()) ;
 		return this;
 	}
 
+	
 	public NodeResult merge() {
-		return session.getWorkspace(targetWName).updateInner(session, query, no.getDBObject(), true) ;
+		ObjectId oid = new ObjectId() ;
+		if (!query.getDBObject().containsField(NodeConstants.ARADON_GROUP)){
+			put(PropertyId.reserved(NodeConstants.ARADON_UID), MergeQuery.EMPTY_GROUP) ;
+		} 
+		if (!query.getDBObject().containsField(NodeConstants.ARADON_UID)){
+			put(PropertyId.reserved(NodeConstants.ARADON_UID), oid.toString()) ;
+		}
+		if (!query.getDBObject().containsField(NodeConstants.PATH)){
+			put(NodeConstants.PATH, "/" + oid) ;
+		}
+
+		if (query.getDBObject().get(CREATED) == null) {
+			Calendar c = GregorianCalendar.getInstance();
+			put(PropertyId.reserved(CREATED), c.getTimeInMillis());
+			put(PropertyId.reserved(TIMEZONE), TimeZone.getDefault().toString());
+		}
+
+		if (query.getDBObject().get(OWNER) == null) {
+			put(PropertyId.reserved(OWNER), "_unknown");
+		}
+		put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis());
+		return session.getWorkspace(targetWorkspace).updateInner(session, query, values.getDBObject(), true) ;
 	}
+
 
 }
 

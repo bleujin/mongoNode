@@ -2,6 +2,7 @@ package net.ion.radon.repository;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.StringUtil;
 
 public class TestWorkspace extends TestBaseRepository{
 	
@@ -42,16 +43,16 @@ public class TestWorkspace extends TestBaseRepository{
 	
 	public void testConplict() throws Exception {
 		
-		session.newNode("bleujin").put("name", "bleujin");
+		session.newNode("bleujin").setAradonId("name", "bleujin");
 		session.commit();
 		
-		try{
-			session.newNode("bleujin").put("name", "hero") ;
-			int count = session.commit() ;
-			
-			fail();
-		}catch(RepositoryException e){
-		}
+		session.newNode("bleujin").setAradonId("name", "bleujin") ;
+		session.commit() ;
+		
+		NodeResult nr = session.getAttribute(NodeResult.class.getCanonicalName(), NodeResult.class) ;
+		assertEquals(0, nr.getRowCount()) ;
+		assertEquals(true, StringUtil.isNotBlank(nr.getErrorMessage())) ;
+		assertEquals(1, session.createQuery().find().count()) ;
 	}
 	
 	public void testWorkspace() throws Exception {

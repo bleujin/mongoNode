@@ -53,8 +53,8 @@ public class TestInListQueryNode extends TestBaseRepository{
 	
 	private void createSample() {
 		Node bleujin = session.newNode().put("name", "bleujin") ;
-		bleujin.inlist("friend").push(MapUtil.chainMap().put("name", "novision").put("age", 20)) ;
-		bleujin.inlist("friend").push(MapUtil.chainMap().put("name", "iihi").put("age", 30)) ;
+		bleujin.inlist("friend").push(MapUtil.chainKeyMap().put("name", "novision").put("age", 20)) ;
+		bleujin.inlist("friend").push(MapUtil.chainKeyMap().put("name", "iihi").put("age", 30)) ;
 		
 		Node hero = session.newNode().put("name", "hero") ;
 		hero.inlist("friend").push(MapUtil.chainMap().put("name", "pm1200").put("age", 40)) ;

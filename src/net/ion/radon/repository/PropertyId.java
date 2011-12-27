@@ -25,8 +25,8 @@ public class PropertyId {
 			// if (StringUtil.isBlank(pkey)) {
 			throw new IllegalArgumentException("illegal property id :" + pkey);
 		}
-		if (CharUtils.isAsciiNumeric(pkey.charAt(0)))
-			throw new IllegalArgumentException("illegal property id :" + pkey);
+//		if (CharUtils.isAsciiNumeric(pkey.charAt(0)))
+//			throw new IllegalArgumentException("illegal property id :" + pkey);
 	}
 
 	public String getKeyString() {

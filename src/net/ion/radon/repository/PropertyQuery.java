@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryOperators;
 
 public class PropertyQuery implements IPropertyFamily {
 
@@ -62,6 +63,12 @@ public class PropertyQuery implements IPropertyFamily {
 
 	
 	public PropertyQuery aradonId(String groupId, Object uId){
+//		BasicDBObject bdb = new BasicDBObject() ;
+//		bdb.put("group", groupId) ;
+//		bdb.put("uid", uId) ;
+		
+//		put(NodeConstants.ARADON, bdb) ;
+		
 		put(ARADON_GROUP, groupId);
 		put(ARADON_UID, uId);
 		// put(ARADON_GHASH, HashFunction.hashGeneral(groupId));
@@ -70,7 +77,10 @@ public class PropertyQuery implements IPropertyFamily {
 	}
 	
 	public PropertyQuery aradonGroup(String groupId){
-		put(ARADON_GROUP, groupId);
+//		BasicDBObject bdb = new BasicDBObject() ;
+//		bdb.put("group", groupId) ;
+
+		put(NodeConstants.ARADON_GROUP, groupId);
 		return this ;
 	}
 	
@@ -132,7 +142,7 @@ public class PropertyQuery implements IPropertyFamily {
 			list.add(obj);
 		}
 
-		nobject.put(key, PropertyQuery.create("$in", list).getDBObject());
+		nobject.put(key, PropertyQuery.create(QueryOperators.IN, list).getDBObject());
 		return this;
 	}
 
@@ -141,12 +151,12 @@ public class PropertyQuery implements IPropertyFamily {
 		for (Object obj : objects) {
 			list.add(obj);
 		}
-		nobject.put(key, PropertyQuery.create("$nin", list).getDBObject());
+		nobject.put(key, PropertyQuery.create(QueryOperators.NIN, list).getDBObject());
 		return this;
 	}
 
 	public PropertyQuery ne(String key, Object value) {
-		nobject.put(key, new BasicDBObject("$ne", value));
+		nobject.put(key, new BasicDBObject(QueryOperators.NE, value));
 		return this;
 	}
 
@@ -156,27 +166,27 @@ public class PropertyQuery implements IPropertyFamily {
 	}
 
 	public PropertyQuery gt(String key, Object value) { // key > val
-		nobject.put(key, new BasicDBObject("$gt", value));
+		nobject.put(key, new BasicDBObject(QueryOperators.GT, value));
 		return this;
 	}
 
 	public PropertyQuery gte(String key, Object value) { // key >= val
-		nobject.put(key, new BasicDBObject("$gte", value));
+		nobject.put(key, new BasicDBObject(QueryOperators.GTE, value));
 		return this;
 	}
 
 	public PropertyQuery lt(String key, Object value) { // key < val
-		nobject.put(key, new BasicDBObject("$lt", value));
+		nobject.put(key, new BasicDBObject(QueryOperators.LT, value));
 		return this;
 	}
 
 	public PropertyQuery lte(String key, Object value) { // key <= val
-		nobject.put(key, new BasicDBObject("$lte", value));
+		nobject.put(key, new BasicDBObject(QueryOperators.LTE, value));
 		return this;
 	}
 
 	public PropertyQuery between(String key, Object openValue, Object closeValue) {
-		BasicDBObject dbo = new BasicDBObject("$gte", openValue);
+		BasicDBObject dbo = new BasicDBObject(QueryOperators.GTE, openValue);
 		dbo.put("$lte", closeValue);
 		nobject.put(key, dbo);
 		return this;
@@ -188,17 +198,17 @@ public class PropertyQuery implements IPropertyFamily {
 	}
 
 	public PropertyQuery isExist(String key) {
-		nobject.put(key, new BasicDBObject("$exists", true));
+		nobject.put(key, new BasicDBObject(QueryOperators.EXISTS, true));
 		return this;
 	}
 
 	public PropertyQuery isNotExist(String key) {
-		nobject.put(key, new BasicDBObject("$exists", false));
+		nobject.put(key, new BasicDBObject(QueryOperators.EXISTS, false));
 		return this;
 	}
 
 	public PropertyQuery where(String where) {
-		nobject.put("$where", where);
+		nobject.put(QueryOperators.WHERE, where);
 		return this;
 	}
 

@@ -59,7 +59,7 @@ public abstract class InNodeImpl implements InNode {
 
 	public InNode append(String key, Object val) {
 		nobject.appendProperty(NodeObject.createPropId(key), val);
-		parent.notify(NodeEvent.UPDATE);
+		notify(NodeEvent.UPDATE);
 		return this;
 	}
 

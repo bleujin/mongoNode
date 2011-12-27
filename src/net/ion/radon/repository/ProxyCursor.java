@@ -12,7 +12,7 @@ import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
 import net.ion.radon.repository.mr.ReduceFormat;
-import net.ion.radon.repository.orm.AbstractORM;
+import net.ion.radon.repository.orm.NodeORM;
 
 import org.apache.commons.beanutils.ConstructorUtils;
 import org.apache.commons.collections.Closure;
@@ -144,7 +144,7 @@ public class ProxyCursor implements NodeCursor{
 		return createReal().toList(page, comparator);
 	}
 
-	public <T> List<T> toList(PageBean page, Class<? extends AbstractORM> clz) {
+	public <T> List<T> toList(PageBean page, Class<? extends NodeORM> clz) {
 		return createReal().toList(page, clz);
 	}
 
@@ -287,11 +287,11 @@ class NodeListCursor implements NodeCursor{
 		return nodes;
 	}
 
-	public <T> List<T> toList(PageBean page, Class<? extends AbstractORM> clz) {
+	public <T> List<T> toList(PageBean page, Class<? extends NodeORM> clz) {
 		try {
 			List<T> result = ListUtil.newList();
 			for (Node node : toList(page)) {
-				AbstractORM obj = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
+				NodeORM obj = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
 				result.add((T) obj.load(node));
 			}
 

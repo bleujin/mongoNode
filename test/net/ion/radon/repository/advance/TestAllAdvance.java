@@ -7,7 +7,7 @@ import net.ion.radon.repository.TestNodeListCursor;
 import net.ion.radon.repository.TestNodeRows;
 import net.ion.radon.repository.TestNodeSerialize;
 import net.ion.radon.repository.TestSequence;
-import net.ion.radon.repository.TestSession;
+import net.ion.radon.repository.orm.TestPeople;
 
 public class TestAllAdvance extends TestCase {
 

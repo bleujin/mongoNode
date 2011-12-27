@@ -36,6 +36,10 @@ public class RepositoryCentral {
 		this.pwd = pwd;
 	}	
 
+	public RepositoryCentral(String url) throws UnknownHostException, MongoException{
+		this(url, null, null);
+	}
+	
 	public RepositoryCentral(String url, String user, String pwd) throws UnknownHostException, MongoException{
 		String[] urls = StringUtil.split(url, ":");
 		
@@ -56,11 +60,11 @@ public class RepositoryCentral {
 	}
 
 	public static RepositoryCentral testCreate() throws UnknownHostException, MongoException {
-		return create("127.0.0.1", 27017);
+		return testCreate("test");
 	}
 
 	public static RepositoryCentral testCreate(String dbName) throws UnknownHostException, MongoException {
-		return create("127.0.0.1", 27017).changeDB(dbName);
+		return create("61.250.201.78", 27017).changeDB(dbName);
 	}
 	
 	public static RepositoryCentral create(String host, int port) throws UnknownHostException, MongoException {
@@ -90,24 +94,23 @@ public class RepositoryCentral {
 	}
 
 	public Session login(String dbName, String defaultWorkspace, ICredential credential) {
-		return LocalSession.create(RepositoryImpl.create(mongo.getDB(dbName)), defaultWorkspace);
+		return LocalSession.create(LocalRepository.create(mongo.getDB(dbName)), defaultWorkspace);
 	}
 	
-	public Session login(String dbName, String defaultWorkspace) {
-		if(this.user == null) new Exception("User is null");
-		if(this.pwd == null) new Exception("Password is null");
+	public Session login(String dbName, String defaultWorkspace) throws IllegalArgumentException {
 
 		DB db = mongo.getDB(dbName);
-		if(!db.isAuthenticated()){
+
+		if(!db.isAuthenticated() && this.user != null && this.pwd != null){
 			boolean isLogin = db.authenticate(user, pwd.toCharArray());
-			if(!isLogin) throw new IllegalArgumentException("Authenticate is false");	
+			if(!isLogin) throw new IllegalArgumentException("Authenticate is false");
 		}
 
-		final Repository repository = RepositoryImpl.create(db);
+		final Repository repository = LocalRepository.create(db);
 		return LocalSession.create(repository, defaultWorkspace);
 	}
 	
-	public Session login(String defaultWorkspace) {
+	public Session login(String defaultWorkspace) throws IllegalArgumentException {
 		return login(currentDBName, defaultWorkspace);
 	}
 

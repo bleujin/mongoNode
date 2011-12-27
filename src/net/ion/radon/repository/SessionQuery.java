@@ -26,6 +26,7 @@ public class SessionQuery implements Serializable{
 	private String targetWName ;
 	private PropertyQuery inner ;
 	private PropertyFamily sort = PropertyFamily.create() ;
+	private WorkspaceOption option = WorkspaceOption.EMPTY ;
 
 	private SessionQuery(Session session, String targetWName, PropertyQuery inner){
 		this.session = session ;
@@ -43,6 +44,12 @@ public class SessionQuery implements Serializable{
 	
 	public static SessionQuery create(Session session, String wname) {
 		return new SessionQuery(session, wname, PropertyQuery.create()); 
+	}
+
+	public static SessionQuery create(Session session, String wname, WorkspaceOption option) {
+		SessionQuery result = new SessionQuery(session, wname, PropertyQuery.create());
+		result.option = option ;
+		return result; 
 	}
 
 	
@@ -308,7 +315,7 @@ public class SessionQuery implements Serializable{
 	}
 
 	private Workspace getWorkspace(){
-		return session.getWorkspace(targetWName);
+		return session.getWorkspace(targetWName, option);
 	}
 
 	public UpdateChain updateChain() {

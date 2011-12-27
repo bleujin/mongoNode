@@ -4,7 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.util.CycleDetectionStrategy;
 
 import org.apache.commons.collections.Closure;
 
@@ -75,5 +80,14 @@ public class TestNodeCursor extends TestBaseRepository{
 		}
 		session.commit() ;
 	}
-
+	
+	public void testScreenToListMap() throws Exception {
+		NodeScreen ns = session.createQuery().find().screen(PageBean.create(4, 1)) ;
+		
+		List<Map<String, ?>> mapList = ns.getPageMap() ;
+		JsonConfig jconfig = new JsonConfig();
+		jconfig.setCycleDetectionStrategy(CycleDetectionStrategy.LENIENT) ;
+		Debug.line(JSONArray.fromObject(mapList, jconfig)) ;
+		
+	}
 }

@@ -37,7 +37,7 @@ public class NodeScreen {
 	public List<Map<String, ? extends Object>> getPageMap() {
 		List<Map<String, ?>> result = new ArrayList<Map<String, ?>>() ;
 		for (Node node : getPageNode()) {
-			result.add(node.toMap()) ;
+			result.add(node.toPropertyMap()) ;
 		}
 		return result;
 	}

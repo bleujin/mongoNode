@@ -7,7 +7,6 @@ import net.ion.radon.repository.NodeObject;
 public interface ORMObject extends Serializable{
 
 	public void put(String key, Object value) ;
-	public NodeObject getNodeObject() ;
 }
 
 

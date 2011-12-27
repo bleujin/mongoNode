@@ -1,9 +1,11 @@
 package net.ion.radon.repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 
 public class LocalSession implements Session {
@@ -67,7 +69,6 @@ public class LocalSession implements Session {
 	}
 
 	public Node newNode() {
-
 		return getCurrentWorkspace().newNode(this);
 	}
 
@@ -109,7 +110,7 @@ public class LocalSession implements Session {
 	public NodeResult remove(Node node) {
 		if (node == getRoot())
 			return NodeResult.NULL;
-		return getWorkspace(node.getWorkspaceName()).remove(this, PropertyQuery.createById(node.getIdentifier()));
+		return getWorkspace(node.getWorkspaceName()).remove(this, PropertyQuery.createByAradon(node.getAradonId().getGroup(), node.getAradonId().getUid()));
 	}
 
 	public Node createChild(Node parent, String name) {
@@ -147,6 +148,10 @@ public class LocalSession implements Session {
 		return SessionQuery.create(this, wname);
 	}
 	
+	public SessionQuery createQuery(String wname, WorkspaceOption option) {
+		return SessionQuery.create(this, wname, option);
+	}
+	
 
 
 	public NodeResult merge(String idOrPath, TempNode tnode) {
@@ -181,10 +186,13 @@ public class LocalSession implements Session {
 		return repository.getWorkspace(wname, option);
 	}
 
+	public Workspace getWorkspace(String wname, WorkspaceOption myoptions) {
+		return repository.getWorkspace(wname, myoptions);
+	}
+
 	public String[] getWorkspaceNames() {
 		return repository.getWorkspaceNames().toArray(new String[0]) ;
 	}
-
 	
 	
 }

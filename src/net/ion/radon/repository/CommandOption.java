@@ -20,7 +20,7 @@ public class CommandOption {
 	
 	private CommandOption(OutputType outputType, String outputCollction) {
 		this.outputType = outputType ;
-		this.outputCollection = outputCollction ;
+		this.outputCollection = (outputCollction  != null) ? outputCollction.toLowerCase() : null;
 	}
 
 	public static CommandOption create() {

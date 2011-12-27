@@ -78,11 +78,4 @@ public class TestSessionQuery extends TestBaseRepository{
 		assertEquals(5, found.get("viewcount")) ;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
 }

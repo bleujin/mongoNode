@@ -1,5 +1,8 @@
 package net.ion.radon.repository;
 
+import net.ion.framework.util.Debug;
+import net.ion.framework.util.StringUtil;
+
 import com.mongodb.WriteResult;
 
 public class NodeResult {
@@ -26,6 +29,8 @@ public class NodeResult {
 	}
 
 	public int getRowCount(){
+//		int result = wr.getN() ;
+//		if (result == 0 && StringUtil.isBlank(wr.getError())) return 1 ;  
 		return wr.getN() ;
 	}
 

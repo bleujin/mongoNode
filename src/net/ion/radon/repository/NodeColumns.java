@@ -134,6 +134,7 @@ public class NodeColumns {
 			meta.setColumnName(i, column.getLabel());
 			meta.setColumnLabel(i, column.getLabel());
 			meta.setColumnType(i, Types.OTHER);
+			meta.setColumnTypeName(i, "other");
 		}
 		
 		return meta;

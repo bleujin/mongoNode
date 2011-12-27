@@ -3,6 +3,9 @@ package net.ion.radon.repository;
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.db.Rows;
 import net.ion.framework.db.procedure.Queryable;
+import net.ion.framework.util.Debug;
+import net.ion.framework.util.StringUtil;
+import net.ion.radon.core.PageBean;
 
 public class TestAdvanceRelation extends TestBaseRepository {
 	
@@ -16,19 +19,6 @@ public class TestAdvanceRelation extends TestBaseRepository {
 		Rows rows = NodeRows.createByNode(Queryable.Fake, bleujin, NodeColumns.create("id", "#dept.deptno"));
 		
 		assertEquals(20, rows.firstRow().getInt("deptno"));
-	}
-	
-	
-	public void testAradonDuplicate() throws Exception {
-		session.newNode().setAradonId("dept", "dev").put("deptno", 20);
-		session.commit() ;
-		
-		Node dupNode = session.newNode() ;
-		try {
-			dupNode.setAradonId("dept", "dev");
-			fail() ;
-		} catch(RepositoryException ignore){
-		}
 	}
 	
 	public void testDifferentWorksapce() throws Exception {

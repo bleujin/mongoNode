@@ -2,6 +2,10 @@ package net.ion.radon.repository;
 
 import java.util.Date;
 
+import net.ion.framework.util.MapUtil;
+import net.ion.framework.util.StringUtil;
+import net.ion.radon.core.PageBean;
+
 import junit.framework.TestCase;
 
 public class TestCreate extends TestCase{
@@ -138,4 +142,15 @@ public class TestCreate extends TestCase{
 	}
 
 
+	public void xtestDuplicateAradonId() throws Exception {
+		session.newNode().setAradonId("dept", "dev").put("deptno", 20);
+		session.commit() ;
+		
+		Node dupNode = session.newNode().setAradonId("dept", "dev").put("deptno", 30);
+		session.commit() ;
+		
+		NodeResult nr = session.getAttribute(NodeResult.class.getCanonicalName(), NodeResult.class) ;
+		assertEquals(true, StringUtil.isNotBlank(nr.getErrorMessage())) ;
+	}
+	
 }
