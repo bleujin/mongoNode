@@ -41,6 +41,7 @@ public class AradonId implements IPropertyFamily{
 
 	public String getGroup() {
 		BasicDBList ilist = (BasicDBList)inner.get(GROUP);
+		if (ilist == null) return null ;
 		return ilist.get(ilist.size() - 1).toString() ;
 	}
 	
@@ -58,7 +59,8 @@ public class AradonId implements IPropertyFamily{
 			newList.add(group) ;
 			glist = newList ;
 		} else {
-			glist = (BasicDBList) ((INode)dbo.get(GROUP)).getDBObject() ;
+			INode groupList = (INode)dbo.get(GROUP);
+			if (groupList != null) glist = (BasicDBList) groupList.getDBObject() ;
 		}
 		Object uid = dbo.get(UID) ;
 		Object ghash = dbo.get(GHASH) ;

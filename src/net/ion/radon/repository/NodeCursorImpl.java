@@ -1,6 +1,5 @@
 package net.ion.radon.repository;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
@@ -18,6 +18,7 @@ import org.apache.commons.beanutils.ConstructorUtils;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MapReduceOutput;
@@ -50,6 +51,11 @@ public class NodeCursorImpl implements NodeCursor {
 
 	public int count() {
 		return cursor.count();
+	}
+	
+	public NodeCursor batchSize(int n){
+		cursor.batchSize(n) ;
+		return this ;
 	}
 
 	public NodeCursor skip(int n) {
@@ -178,6 +184,14 @@ public class NodeCursorImpl implements NodeCursor {
 			throw RepositoryException.throwIt(e);
 		}
 	}
+	
+	public <T> List<T> toList(Class<T> clz, PageBean page) {
+		List<T> result = ListUtil.newList();
+		for (Node node : toList(page)) {
+			result.add(JsonParser.fromMap(node.toPropertyMap()).getAsObject(clz));
+		}
+		return result;
+	}
 
 	protected String getWorkspaceName() {
 		return workspaceName;
@@ -186,26 +200,29 @@ public class NodeCursorImpl implements NodeCursor {
 	protected DBObject nextIternal() {
 		return cursor.next();
 	}
+
 }
 
 class ApplyCursor implements NodeCursor {
 
 	private Session session;
 	private String workspaceName;
+	private MapReduceOutput output ;
 	private Iterator<DBObject> iterator;
 	private final PropertyQuery iquery;
 
-	protected ApplyCursor(Session session, PropertyQuery iquery, String workspaceName, Iterator<DBObject> iterator) {
+	protected ApplyCursor(Session session, PropertyQuery iquery, String workspaceName, MapReduceOutput output) {
 		this.session = session;
 		this.workspaceName = workspaceName;
-		this.iterator = iterator;
+		this.output = output ;
+		this.iterator = output.results().iterator();
 		this.iquery = iquery;
 	}
 
 	static ApplyCursor create(Session session, PropertyQuery iquery, MapReduceOutput out) {
 		String workspaceName = out.getOutputCollection() == null ? null : out.getOutputCollection().getName();
 
-		return new ApplyCursor(session, iquery, workspaceName, out.results().iterator());
+		return new ApplyCursor(session, iquery, workspaceName, out);
 	}
 
 	public Node next() {
@@ -234,8 +251,12 @@ class ApplyCursor implements NodeCursor {
 	}
 
 	public Explain explain() {
-		// TODO Auto-generated method stub
-		return null;
+		DBObject dbo = new BasicDBObject() ;
+		dbo.put("timeMillis", output.getRaw().get("timeMillis")) ;
+		dbo.put("timing", output.getRaw().get("timing")) ;
+		dbo.put("counts", output.getRaw().get("counts")) ;
+		
+		return Explain.load(dbo);
 	}
 
 	public PropertyQuery getQuery() {
@@ -312,7 +333,7 @@ class ApplyCursor implements NodeCursor {
 			throw RepositoryException.throwIt(e);
 		}
 	}
-
+	
 	public List<Map<String, ? extends Object>> toMapList(PageBean page) {
 		List<Node> list = toList(page);
 
@@ -334,4 +355,12 @@ class ApplyCursor implements NodeCursor {
 		return result;
 	}
 
+	public <T> List<T> toList(Class<T> clz, PageBean page) {
+		List<T> result = ListUtil.newList();
+		for (Node node : toList(page)) {
+			result.add(JsonParser.fromMap(node.toPropertyMap()).getAsObject(clz));
+		}
+		return result;
+	}
+	
 }

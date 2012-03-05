@@ -111,6 +111,7 @@ public class TestMRSpeed extends TestBaseRepository {
 				" emit(this._id, {post_list:sortedpost, postid:this.postid});}";
 
 		long start = System.nanoTime();
+		
 		NodeCursor nc = session.createQuery().mapreduce(map, "", "");
 		nc.debugPrint(PageBean.ALL);
 		Debug.line((System.nanoTime() - start) / 1000000);
@@ -165,7 +166,7 @@ public class TestMRSpeed extends TestBaseRepository {
 				.put("parentid", 0).put("content", (i + RandomUtil.nextRandomString(40)))
 				.put("sort1", System.nanoTime()).put("sort2", RandomUtil.nextInt(size)) ;
 			
-			dummy.inlist("post_list").push(jm.toJSON());
+			dummy.inlist("post_list").push(jm.toJSON().toMap());
 		}
 		session.commit();
 	}

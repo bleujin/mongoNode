@@ -3,6 +3,7 @@ package net.ion.radon.repository.innode;
 import java.util.Collections;
 import java.util.Map;
 
+import net.ion.framework.parse.gson.JsonString;
 import net.ion.framework.util.ChainMap;
 import net.ion.radon.repository.INode;
 import net.ion.radon.repository.InListNode;
@@ -10,17 +11,15 @@ import net.ion.radon.repository.InListQuery;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeObject;
 
-import org.bson.types.BasicBSONList;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 
 
-public class InListNodeImpl implements InListNode{
+public class InListNodeImpl implements InListNode, JsonString{
 	
 	private static final long serialVersionUID = 8183954909102079835L;
-	private BasicDBList list ;
 	private String field ;
+	private BasicDBList list ;
 	private INode parent ;
 	
 	private InListNodeImpl(BasicDBList list, String field, INode parent) {
@@ -85,6 +84,10 @@ public class InListNodeImpl implements InListNode{
 	
 	public int size(){
 		return list.size() ;
+	}
+
+	public String toJsonString() {
+		return list.toString();
 	}
 
 }

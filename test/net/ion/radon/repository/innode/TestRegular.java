@@ -20,4 +20,14 @@ public class TestRegular extends TestCase {
 			Debug.line(m.start(), StringUtil.substring(expr, 0, m.start()), StringUtil.substring(expr, m.start()+1));
 		}
 	}
+	
+	
+	public void testStartWith() throws Exception {
+		Pattern p = Pattern.compile("/aradon/.*");
+		assertEquals(true, p.matcher("/aradon/1234").find()) ;
+		assertEquals(true, p.matcher("/aradon/°¼³ª³ª´Ù¶ó").find()) ;
+		assertEquals(true, p.matcher("/aradon/123/123").find()) ;
+		assertEquals(true, p.matcher("/aradon/123/123?abc=123").find()) ;
+		assertEquals(true, p.matcher("/aradon/abc/def?abc=123").find()) ;
+	}
 }

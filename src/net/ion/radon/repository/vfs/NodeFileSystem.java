@@ -13,12 +13,14 @@ import net.ion.framework.util.IOUtil;
 import net.ion.radon.repository.RepositoryCentral;
 import net.ion.radon.repository.Session;
 
-import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileSystemOptions;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.apache.commons.vfs2.Capability;
+import org.apache.commons.vfs2.FileName;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemOptions;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.provider.AbstractFileName;
+import org.apache.commons.vfs2.provider.AbstractFileSystem;
 
 public class NodeFileSystem extends AbstractFileSystem implements Serializable {
 
@@ -32,11 +34,6 @@ public class NodeFileSystem extends AbstractFileSystem implements Serializable {
 		rc.changeDB(dbName) ;
 		this.wname = wname;
 
-	}
-
-	protected FileObject createFile(FileName name) throws Exception {
-		NodeFileObject file = new NodeFileObject((NodeFileName)name, this);
-		return file;
 	}
 
 	protected void addCapabilities(Collection caps) {
@@ -95,6 +92,12 @@ public class NodeFileSystem extends AbstractFileSystem implements Serializable {
 	@Override
 	public void setAttribute(String key, Object obj) {
 		Debug.debug(key, obj);
+	}
+
+	@Override
+	protected FileObject createFile(AbstractFileName name) throws Exception {
+		NodeFileObject file = new NodeFileObject((NodeFileName)name, this);
+		return file;
 	}
 	
 

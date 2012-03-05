@@ -97,6 +97,29 @@ public class TestSession extends TestCase{
 		Node found = session.createQuery().findOne() ;
 		assertEquals(true, found != null) ;
 	}
+	
+	public void testOtherNotEqual() throws Exception {
+		RepositoryCentral rc1 = RepositoryCentral.testCreate() ;
+		Session session1 = rc1.testLogin("bleujin1") ;
+		
+		RepositoryCentral rc2 = RepositoryCentral.testCreate() ;
+		Session session2 = rc2.testLogin("bleujin2") ;
+
+		assertEquals("test.bleujin1" , session1.getCurrentWorkspace().toString()) ;
+		assertEquals("test.bleujin2", session2.getCurrentWorkspace().toString()) ;
+	}
+	
+	public void testIfDroppedWorkspace() throws Exception {
+		RepositoryCentral rc = RepositoryCentral.testCreate() ;
+		Session jin = rc.testLogin("bleujin1") ;
+		jin.createQuery().aradonGroupId("group", "bleujin").updateChain().put("name", "bleujin").merge() ;
+		assertEquals(1, jin.createQuery().find().count()) ;
+		
+		Session dropper = rc.testLogin("bleujin1") ;
+		dropper.dropWorkspace() ;
+		assertEquals(0, jin.createQuery().find().count()) ;
+	}
+	
 }	
 
 

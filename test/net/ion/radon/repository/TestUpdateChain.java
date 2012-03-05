@@ -62,9 +62,14 @@ public class TestUpdateChain extends TestBaseRepository{
 		session.newNode().put("name", "bleujin").inner("address").put("city", "seoul").put("juso", "bun") ;
 		session.commit() ;
 		
-		session.createQuery().updateChain().put("address.city", "busan").update() ;
+		session.createQuery().updateChain().put("address.city", "busan").put("address.ne", "my").update() ;
 		Node found = session.createQuery().findOne() ;
 		assertEquals("busan", found.get("address.city")) ;
+		
+		assertEquals("busan", found.inner("address").getString("city")) ;
+		assertEquals("bun", found.inner("address").getString("juso")) ;
+		assertEquals("my", found.inner("address").getString("ne")) ;
+		
 	}
 	
 	

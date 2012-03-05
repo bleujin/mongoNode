@@ -1,7 +1,5 @@
 package net.ion.radon.repository;
 
-import static net.ion.radon.repository.NodeConstants.ARADON_GROUP;
-import static net.ion.radon.repository.NodeConstants.ARADON_UID;
 import static net.ion.radon.repository.NodeConstants.ID;
 
 import java.io.Serializable;
@@ -11,10 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
-import net.ion.framework.util.RandomUtil;
 import net.ion.framework.util.StringUtil;
 
 import org.apache.commons.collections.map.LRUMap;
@@ -28,7 +24,6 @@ import com.mongodb.DBObject;
 import com.mongodb.MapReduceCommand;
 import com.mongodb.MapReduceOutput;
 import com.mongodb.MongoException;
-import com.mongodb.QueryOperators;
 import com.mongodb.WriteResult;
 import com.mongodb.MapReduceCommand.OutputType;
 
@@ -56,8 +51,10 @@ public class Workspace {
 	}
 
 	private static Workspace createWorkspace(DB db, String wname, WorkspaceOption option) {
-		if (!db.collectionExists(wname)) {
-			db.createCollection(wname, option.getDBObject());
+		synchronized (Workspace.class) {
+			if (!db.collectionExists(wname)) {
+				db.createCollection(wname, option.getDBObject());
+			}
 		}
 
 		Workspace result = new Workspace();
@@ -136,12 +133,9 @@ public class Workspace {
 	}
 
 	public Node findOne(Session session, PropertyQuery iquery, Columns column) {
-		NodeCursor nc = find(session, iquery, column);
-		Explain explain = nc.explain();
+		NodeCursor nc = find(session, iquery, column).limit(1);
 
 		Node result = (nc.hasNext()) ? nc.next() : null;
-		session.setAttribute(Explain.class.getCanonicalName(), explain);
-
 		return result;
 	}
 

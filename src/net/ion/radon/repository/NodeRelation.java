@@ -22,7 +22,7 @@ public class NodeRelation implements IRelation {
 		if (relList.size() <= index)
 			return null ;
 
-		return parent.getQuery().corelateNode(parent.getSession(), getWsName(index), getQuery(), getRefQuery(index));
+		return parent.getQuery().corelateNode(parent.getSession(), getWsName(index), getRefQuery(index));
 	}
 
 	private PropertyQuery getRefQuery(int index) {
@@ -52,10 +52,13 @@ public class NodeRelation implements IRelation {
 		return parent.inner(NodeConstants.RELATION).inlist(relType).createQuery().remove() ;
 		// return parent.getSession().createQuery().id(parent.getIdentifier()).inlist(NodeConstants.RELATION + "." + relType).pull() ;
 	}
+	
+	public int remove(NodeRef selfRef) {
+		return parent.inner(NodeConstants.RELATION).inlist(relType).createQuery().remove(selfRef.toMap());
+	}
 
 	public NodeCursor froms() {
 		return parent.getSession().createQuery().eq(NodeConstants.RELATION + "." + relType, parent.selfRef()).find();
 	}
-
 
 }

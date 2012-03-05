@@ -1,5 +1,6 @@
 package net.ion.radon.repository.innode;
 
+import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
@@ -7,7 +8,6 @@ import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.TestBaseRepository;
-import net.sf.json.JSONObject;
 
 public class TestInListQueryNode extends TestBaseRepository{
 
@@ -15,7 +15,7 @@ public class TestInListQueryNode extends TestBaseRepository{
 	public void testDepth() throws Exception {
 		session.newNode().put("name", "bleujin") ;
 		session.commit() ;
-		session.createQuery().inlist("person").push(JSONObject.fromObject("{name:'bleujin',1:2, address:{city:'seoul',street:[1, 2, 3], col:{val:'A'}},color:['red','blue','white']}")) ;
+		session.createQuery().inlist("person").push(JsonParser.fromString("{name:'bleujin',1:2, address:{city:'seoul',street:[1, 2, 3], col:{val:'A'}},color:['red','blue','white']}").getAsJsonObject().toMap()) ;
 		
 		session.createQuery().find().debugPrint(PageBean.ALL) ;
 		Node node = session.createQuery().findOne() ;

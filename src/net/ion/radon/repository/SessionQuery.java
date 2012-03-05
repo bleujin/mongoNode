@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.StringUtil;
@@ -63,11 +64,17 @@ public class SessionQuery implements Serializable{
 	}
 
 	public Node findOne() throws RepositoryException {
-		return getWorkspace().findOne(session, inner, Columns.ALL);
+		NodeCursor nc = getWorkspace().find(session, inner, Columns.ALL).sort(sort).limit(1);
+		return nc.hasNext() ? nc.next() : null;
 	}
 
 	public Node findOne(Columns columns) {
-		return getWorkspace().findOne(session, inner, columns);
+		NodeCursor nc = getWorkspace().find(session, inner, columns).sort(sort).limit(1);
+		return nc.hasNext() ? nc.next() : null;
+	}
+	
+	public <T> T findOne(Class<T> clz) {
+		return findOne() != null ? JsonParser.fromMap(findOne().toPropertyMap()).getAsObject(clz) : null;
 	}
 
 	

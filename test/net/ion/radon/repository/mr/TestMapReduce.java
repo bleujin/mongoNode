@@ -3,6 +3,7 @@ package net.ion.radon.repository.mr;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.Explain;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.PropertyFamily;
@@ -35,6 +36,7 @@ public class TestMapReduce extends TestBaseRepository {
 
 	public void testOnlyMapFunction() throws Exception {
 		createSample();
+		session.setAttribute(Explain.class.getCanonicalName(), null) ;
 		
 		PropertyFamily initial = PropertyFamily.create().put("sortkey", "name").put("skip", 0).put("limit", 2).put("order", 1);
 		String params = "var _params = " + initial.toJSONString() + "; _params.comfn = function(f1, f2){ if (f1[_params.sortkey] > f2[_params.sortkey]) return 1 * _params.order ; else if(f1[_params.sortkey] < f2[_params.sortkey]) return -1 * _params.order; else return 0 }; " ;
@@ -44,6 +46,9 @@ public class TestMapReduce extends TestBaseRepository {
 				" emit(this._id, {friend:sorted, name:this.name, greeting:this.name + ' Hello', fcount:this.friend.length});}" ;
 
 		NodeCursor nc = session.createQuery().eq("address", "seoul").mapreduce(map, "", "") ;
+		
+		assertEquals(true, nc.explain() != null) ;
+		
 		
 		while(nc.hasNext()){
 			Node found = nc.next() ;

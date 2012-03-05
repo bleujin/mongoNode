@@ -3,11 +3,12 @@ package net.ion.radon.mongo;
 import java.util.List;
 
 import junit.framework.TestCase;
+import net.ion.framework.parse.gson.JsonObject;
+import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.RandomUtil;
-import net.sf.json.JSONObject;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -72,7 +73,7 @@ public class TestDBObject extends TestCase {
 	
 	public void testJSON() throws Exception {
 		BasicDBObject wrapper = new BasicDBObject() ;
-		JSONObject json = JSONObject.fromObject("{userid:'bleujin',num:23, address:{city:'seoul'}}") ;
+		JsonObject json = JsonParser.fromString("{userid:'bleujin',num:23, address:{city:'seoul'}}").getAsJsonObject() ;
 		wrapper.put("person", json) ;
 		col.save(wrapper);
 

@@ -4,6 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
+import java.util.Map;
+
+import net.ion.framework.parse.gson.JsonParser;
+import net.ion.framework.util.Debug;
+import net.ion.framework.util.ListUtil;
+import net.ion.radon.core.PageBean;
 
 public class TestNodeSerialize extends TestBaseRepository {
 
@@ -23,6 +30,15 @@ public class TestNodeSerialize extends TestBaseRepository {
 			fail();
 		} catch (IllegalStateException expect) {
 		}
+	}
+	
+	public void testJson() throws Exception {
+		Node node = session.newNode().put("name", "bleujin").append("name", "hero").put("city", "seoul").put("index", 10).setAradonId("test", "bleujin");
+		session.commit() ;
+		
+		List list = session.createQuery().find().toPropertiesList(PageBean.ALL) ;
+		
+		Debug.line(JsonParser.fromObject(list)) ;
 	}
 
 }

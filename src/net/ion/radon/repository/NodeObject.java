@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.ion.framework.parse.gson.JsonObject;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.innode.InListNodeImpl;
 import net.ion.radon.repository.innode.InNodeImpl;
 import net.ion.radon.repository.util.JSONUtil;
-import net.sf.json.JSONObject;
 
 import org.bson.types.BasicBSONList;
 
@@ -60,15 +60,15 @@ public class NodeObject implements Serializable, IPropertyFamily {
 
 	public NodeObject put(String key, Object value) {
 
-		String transKey = key.startsWith("$") ? key : key.toLowerCase() ;
+		String transKey = key.startsWith("$") ? key : key.toLowerCase();
 		if (value instanceof IPropertyFamily) {
 			inner.put(transKey, ((IPropertyFamily) value).getDBObject());
-		} else if (value instanceof JSONObject) {
-			inner.put(transKey, JSONUtil.toDBObject((JSONObject) value));
+		} else if (value instanceof JsonObject) {
+			inner.put(transKey, JSONUtil.toDBObject((JsonObject) value));
 		} else {
 			inner.put(transKey, value);
 		}
-		return this ;
+		return this;
 	}
 
 	public void put(String key, String[] values) {
@@ -84,15 +84,15 @@ public class NodeObject implements Serializable, IPropertyFamily {
 	}
 
 	public Object get(String key) {
-		if (key.startsWith("$")){
-			DBObject value = (DBObject) inner.get(key) ;
+		if (key.startsWith("$")) {
+			DBObject value = (DBObject) inner.get(key);
 			if (value == null) {
-				
-				inner.put(key, value) ;
+
+				inner.put(key, value);
 			}
-			return value ;
+			return value;
 		}
-		
+
 		String[] propIds = StringUtil.split(key, ".");
 
 		int i = 0;
@@ -108,69 +108,67 @@ public class NodeObject implements Serializable, IPropertyFamily {
 			} else
 				break;
 		}
-		 return result;
+		return result;
 	}
 
-	Serializable get(String propId, INode parent){
+	Serializable get(String propId, INode parent) {
 		Object result = get(propId);
 		if (result instanceof BasicDBList) {
 			return inlist(propId, result, parent);
-		} else if (result instanceof DBObject){
-			return inner(propId, result, parent) ;	
+		} else if (result instanceof DBObject) {
+			return inner(propId, result, parent);
 		}
 		return (Serializable) result;
-	} 
-	
+	}
+
 	public Serializable get(String propId, int index, INode parent) {
 		Object result = get(propId, parent);
-		if (result instanceof InListNode){
-			return (Serializable) ((InListNode)result).get(index) ;
-		} else if (index == 0){
-			return (Serializable) result ;
+		if (result instanceof InListNode) {
+			return (Serializable) ((InListNode) result).get(index);
+		} else if (index == 0) {
+			return (Serializable) result;
 		} else {
-			throw new IllegalArgumentException("element is not array") ;
+			throw new IllegalArgumentException("element is not array");
 		}
 	}
-	
-//	public void inner(String inname, NodeObject inner) {
-//		this.put(inname, inner.getDBObject()) ;
-//	}
+
+	// public void inner(String inname, NodeObject inner) {
+	// this.put(inname, inner.getDBObject()) ;
+	// }
 
 	public InNode inner(String name, INode parent) {
-		Object result = get(name) ;
+		Object result = get(name);
 		return inner(name, result, parent);
 	}
-	
-	
-	private InNode inner(String name, Object result, INode parent){
-		
-		if (! (result instanceof DBObject)) {
-			DBObject value = new BasicDBObject() ;
-			put(name, value) ;
-			return InNodeImpl.create(value, name, parent) ;
+
+	private InNode inner(String name, Object result, INode parent) {
+
+		if (!(result instanceof DBObject)) {
+			DBObject value = new BasicDBObject();
+			put(name, value);
+			return InNodeImpl.create(value, name, parent);
 		}
-		return InNodeImpl.create((DBObject)result, name, parent) ;
+		return InNodeImpl.create((DBObject) result, name, parent);
 	}
-	
+
 	public InListNode inlist(String name, INode parent) {
-		Object result = get(name) ;
-//		if (result == null) result = new BasicDBList();
-//		put(name, result) ;
-		return inlist(name, result, parent) ;
+		Object result = get(name);
+		// if (result == null) result = new BasicDBList();
+		// put(name, result) ;
+		return inlist(name, result, parent);
 	}
-	
-	
+
 	private InListNode inlist(String name, Object result, INode parent) {
-		if (! (result instanceof BasicDBList)) {
-			BasicDBList value = new BasicDBList() ;
-			put(name, value) ;
-			return InListNodeImpl.load(value, name, parent) ;
+		if (!(result instanceof BasicDBList)) {
+			BasicDBList value = new BasicDBList();
+			put(name, value);
+			return InListNodeImpl.load(value, name, parent);
 		}
-		return InListNodeImpl.load((BasicDBList)result, name, parent);
+		return InListNodeImpl.load((BasicDBList) result, name, parent);
 	}
-	
-	public String getString(String key) {
-		return StringUtil.toString(get(key));
+
+	public String getString(String path) {
+		return StringUtil.toString(get(path));
 	}
 
 	public synchronized void appendProperty(PropertyId pid, Object val) {
@@ -209,7 +207,7 @@ public class NodeObject implements Serializable, IPropertyFamily {
 	public Map<String, ? extends Object> toMap() {
 		return inner.toMap();
 	}
-	
+
 	public Map<String, Object> toMap(INode parent) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		for (String key : inner.keySet()) {
@@ -217,7 +215,7 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		}
 		return Collections.unmodifiableMap(result);
 	}
-	
+
 	public Map<String, ? extends Object> toPropertyMap(INode parent) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		for (String key : inner.keySet()) {
@@ -237,21 +235,20 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		}
 		return Collections.unmodifiableMap(result);
 	}
-	
-	public static PropertyId createPropId(String key){
-		return PropertyId.create(key) ;
-	}
-	
-	public int hashCode(){
-		return inner.hashCode() ;
-	}
-	
-	public boolean equals(Object obj){
-		if (! (obj instanceof NodeObject)) return false ;
-		NodeObject that = (NodeObject) obj ;
-		return inner.equals(that.inner) ;
+
+	public static PropertyId createPropId(String key) {
+		return PropertyId.create(key);
 	}
 
-	
+	public int hashCode() {
+		return inner.hashCode();
+	}
+
+	public boolean equals(Object obj) {
+		if (!(obj instanceof NodeObject))
+			return false;
+		NodeObject that = (NodeObject) obj;
+		return inner.equals(that.inner);
+	}
+
 }
-

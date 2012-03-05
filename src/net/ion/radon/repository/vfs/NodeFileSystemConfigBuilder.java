@@ -5,8 +5,8 @@ import java.net.UnknownHostException;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.RepositoryCentral;
 
-import org.apache.commons.vfs.FileSystemConfigBuilder;
-import org.apache.commons.vfs.FileSystemOptions;
+import org.apache.commons.vfs2.FileSystemConfigBuilder;
+import org.apache.commons.vfs2.FileSystemOptions;
 
 import com.mongodb.MongoException;
 

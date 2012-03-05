@@ -1,5 +1,6 @@
 package net.ion.radon.repository;
 
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
 
@@ -73,11 +74,11 @@ public class TestAdvanceNodeGet extends TestBaseRepository {
 		session.changeWorkspace("bleujin");
 		session.dropWorkspace();
 
-		session.newNode().setAradonId("emp", "bleujin").put("name", "bleujin").put("nation", "kr").put("lang", "kor").put("aid", "config:nation").put("wsname", nation.getWorkspaceName());
+		session.newNode().setAradonId("emp", "bleujin").put("name", "bleujin").put("nation", "kr").put("lang", "kor").put("gid", "config").put("aid", "nation").put("wsname", nation.getWorkspaceName());
 		session.commit();
 
 		Node found = session.createQuery().aradonGroupId("emp", "bleujin").findOne();
-		assertEquals("korea", found.get("${wsname}:{aid}.{nation}"));
+		assertEquals("korea", found.get("${wsname}:{gid}:{aid}.{nation}"));
 	}
 
 	public void testByAradonIdNumeric() throws Exception {
@@ -93,6 +94,23 @@ public class TestAdvanceNodeGet extends TestBaseRepository {
 		assertEquals("korea", found.get("${wsname}:{agroup}:{auid}.{nation}"));
 	}
 
+	public void testWhenNotExist() throws Exception {
+		session.newNode().put("name", "bleujin") ;
+		session.commit() ;
+		
+		Node found = session.createQuery().findOne() ;
+		assertEquals("bleujin", found.getString("name")) ;
+		assertEquals(0, found.getAsInt("ne")) ;
+		assertEquals(0, found.getAsInt("$number:num1.count")) ;
+
+		session.newNode().setAradonId("number", "num1").put("count", 2) ;
+		session.commit() ;
+
+		found = session.createQuery().eq("name", "bleujin").findOne() ;
+		assertEquals(2, found.getAsInt("$number:num1.count")) ;
+		
+	}
+	
 	public void testInListNodeExpression() throws Exception {
 
 		session.newNode().put("connnm", "MyOracle").setAradonId("dev_oracle", "dev_oracle");
@@ -118,6 +136,45 @@ public class TestAdvanceNodeGet extends TestBaseRepository {
 		Node name2 = session.createQuery().eq("name", "2").findOne();
 		assertEquals("MyOracle", name2.get("${groupid}:{groupid}_{aid}.connnm"));
 	}
+	
+	public void testNumericInt() throws Exception {
+		session.newNode().setAradonId("grp", 3).put("type", "int");
+		session.newNode().put("name", "finder").put("int", 3);
+		session.commit() ;
+		
+		Node finder = session.createQuery().eq("name", "finder").findOne();
+		assertEquals("int", finder.get("$grp:{int}.type"));
+	}
+	
+	public void testNumericLong() throws Exception {
+		session.newNode().setAradonId("grp", 3L).put("type", "long");
+		session.newNode().put("name", "finder").put("int", 3L);
+		session.commit() ;
+		
+		Node finder = session.createQuery().eq("name", "finder").findOne();
+		assertEquals("long", finder.get("$grp:{int}.type"));
+	}
+
+	public void testNumericConvert() throws Exception {
+		session.newNode().setAradonId("grp", 3L).put("type", "long");
+		session.newNode().put("name", "finder").put("int", 3);
+		session.commit() ;
+		
+		Node finder = session.createQuery().eq("name", "finder").findOne();
+		assertEquals("long", finder.get("$grp:{int}.type"));
+	}
+	
+	public void testNumericConvert2() throws Exception {
+		session.newNode().setAradonId("grp", 3).put("type", "int");
+		session.newNode().put("name", "finder").put("int", 3L);
+		session.commit() ;
+		
+		Node finder = session.createQuery().eq("name", "finder").findOne();
+		assertEquals("int", finder.get("$grp:{int}.type"));
+	}
+	
+
+	
 
 	public void testType() throws Exception {
 		session.newNode().put("int", Integer.MAX_VALUE).put("long", Long.MAX_VALUE).put("num", 1L * Integer.MAX_VALUE);

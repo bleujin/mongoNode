@@ -2,6 +2,7 @@ package net.ion.radon.repository;
 
 import java.util.List;
 
+import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
 
 public class TestSort extends TestBaseRepository{
@@ -39,4 +40,23 @@ public class TestSort extends TestBaseRepository{
 		
 		session.commit();
 	}
+	
+	public void testFindOne() throws Exception {
+		session.newNode().put("name", "bleujin").put("color", "red").put("age", 4);
+		session.newNode().put("name", "heeya").put("color", "black").put("age", 3);
+		session.newNode().put("name", "heeya").put("color", "white").put("age", 2);
+		session.newNode().put("name", "heeya").put("color", "white").put("age", 1);
+		session.newNode().put("name", "bleujin").put("color", "blue").put("age", 5);
+		
+		session.commit();
+		
+		
+		Node node = session.createQuery().ascending("age").find().limit(1).next() ;
+		assertEquals(1, node.getAsInt("age")) ; 
+
+		node = session.createQuery().ascending("age").findOne() ;
+		assertEquals(1, node.getAsInt("age")) ; 
+
+	}
+	
 }

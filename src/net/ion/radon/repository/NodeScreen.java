@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import net.ion.framework.parse.gson.JsonArray;
+import net.ion.framework.parse.gson.JsonObject;
+import net.ion.framework.parse.gson.JsonString;
+import net.ion.framework.parse.gson.JsonUtil;
 import net.ion.radon.core.PageBean;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
-public class NodeScreen {
+public class NodeScreen implements JsonString{
 
 	
 	private final int screenSize ;
@@ -42,24 +44,28 @@ public class NodeScreen {
 		return result;
 	}
 
-	public JSONObject getJSONObject() {
+	public JsonObject getJSONObject() {
 		List<Node> pageResult = getPageNode();
 		
-		JSONArray pageRows = new JSONArray() ;
+		JsonArray pageRows = new JsonArray() ;
 		for (Node row : pageResult) {
-			pageRows.add(row.toString()) ;
+			pageRows.add(JsonUtil.toProperElement(row.toString())) ;
 		}
 
-		JSONObject result = new JSONObject() ;
-		JSONObject request = new JSONObject() ;
+		JsonObject result = new JsonObject() ;
+		JsonObject request = new JsonObject() ;
 		request.accumulate("page", page.toString()) ;
-		JSONObject response = new JSONObject() ;
+		JsonObject response = new JsonObject() ;
 		response.accumulate("totalCount", getScreenSize()) ;
 		
-		result.accumulate("nodes", pageRows) ;
-		result.accumulate("request", request.toString()) ;
-		result.accumulate("response", response.toString()) ;
+		result.add("nodes", pageRows) ;
+		result.add("request", request) ;
+		result.add("response", response) ;
 		return result;
+	}
+
+	public String toJsonString() {
+		return getJSONObject().toString();
 	}
 	
 }

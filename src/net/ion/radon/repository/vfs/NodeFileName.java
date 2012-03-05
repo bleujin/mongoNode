@@ -2,9 +2,9 @@ package net.ion.radon.repository.vfs;
 
 import net.ion.framework.util.ObjectUtil;
 
-import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.provider.AbstractFileName;
+import org.apache.commons.vfs2.FileName;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.provider.AbstractFileName;
 
 public class NodeFileName extends AbstractFileName {
 
@@ -28,14 +28,6 @@ public class NodeFileName extends AbstractFileName {
 		return new NodeFileName(scheme, rootFile, path, ObjectUtil.coalesce(type, FileType.FILE_OR_FOLDER));
 	}
 
-
-	protected void appendRootUri(final StringBuffer buffer, boolean addPassword) {
-		buffer.append(getScheme());
-		buffer.append("://");
-		// buffer.append(getWorkspaceName());
-		buffer.append(rootFile);
-	}
-
 	
 	public String getNodePath(){
 		return isAsFile() ? super.getParent().getPath() : super.getPath() ;
@@ -51,6 +43,14 @@ public class NodeFileName extends AbstractFileName {
 
 	public boolean isRoot() {
 		return getDepth() == 0;
+	}
+
+	@Override
+	protected void appendRootUri(StringBuilder buffer, boolean flag) {
+		buffer.append(getScheme());
+		buffer.append("://");
+		// buffer.append(getWorkspaceName());
+		buffer.append(rootFile);
 	}
 
 	

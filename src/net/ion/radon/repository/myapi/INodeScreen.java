@@ -2,8 +2,8 @@ package net.ion.radon.repository.myapi;
 
 import java.util.List;
 
+import net.ion.framework.parse.gson.JsonObject;
 import net.ion.radon.repository.Node;
-import net.sf.json.JSONObject;
 
 public interface INodeScreen {
 
@@ -11,5 +11,5 @@ public interface INodeScreen {
 
 	public List<Node> getPageNode()  ;
 
-	public JSONObject getJSONObject() ;
+	public JsonObject getJSONObject() ;
 }

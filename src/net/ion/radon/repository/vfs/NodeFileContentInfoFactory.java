@@ -1,10 +1,10 @@
 package net.ion.radon.repository.vfs;
 
-import org.apache.commons.vfs.FileContent;
-import org.apache.commons.vfs.FileContentInfo;
-import org.apache.commons.vfs.FileContentInfoFactory;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.impl.DefaultFileContentInfo;
+import org.apache.commons.vfs2.FileContent;
+import org.apache.commons.vfs2.FileContentInfo;
+import org.apache.commons.vfs2.FileContentInfoFactory;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.impl.DefaultFileContentInfo;
 
 public class NodeFileContentInfoFactory implements FileContentInfoFactory{
 

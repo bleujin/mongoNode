@@ -3,11 +3,12 @@ package net.ion.radon.repository;
 import java.io.Serializable;
 import java.util.Map;
 
+import net.ion.framework.parse.gson.JsonString;
 import net.ion.framework.util.ChainMap;
 
 import com.mongodb.DBObject;
 
-public interface INode {
+public interface INode extends JsonString{
 
 	public InNode inner(String name) ;
 	

@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
 
+import net.ion.framework.parse.gson.JsonObject;
+import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.IOUtil;
 import net.ion.framework.util.ListUtil;
@@ -16,12 +18,11 @@ import net.ion.framework.vfs.VFile;
 import net.ion.framework.vfs.VFileContent;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.TestBaseRepository;
-import net.sf.json.JSONObject;
 
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.provider.ram.RamFileProvider;
-import org.apache.commons.vfs.provider.temp.TemporaryFileProvider;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.provider.ram.RamFileProvider;
+import org.apache.commons.vfs2.provider.temp.TemporaryFileProvider;
 
 public class TestNodeVfs extends TestBaseRepository {
 
@@ -131,8 +132,8 @@ public class TestNodeVfs extends TestBaseRepository {
 		assertEquals(true, deptNode.exists()) ;
 		Reader reader = new InputStreamReader(deptNode.getInputStream(), "UTF-8") ;
 		String result = IOUtil.toString(reader);
-		JSONObject jso = JSONObject.fromObject(result) ;
-		assertEquals(20, jso.get("year")) ;
+		JsonObject jso = JsonParser.fromString(result).getAsJsonObject() ;
+		assertEquals(20, jso.asInt("year")) ;
 		
 		VFile bigboy = entry.resolveFile("node://dept/dev");
 		assertEquals(FileType.FOLDER, bigboy.getType()) ;

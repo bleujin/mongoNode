@@ -45,4 +45,6 @@ public interface NodeCursor extends ICursor {
 
 	public <T> List<T> toList(PageBean page, Class<? extends NodeORM> clz) ;
 
+	public <T> List<T> toList(Class<T> clz, PageBean page);
+
 }

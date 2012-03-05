@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
@@ -163,7 +164,9 @@ public class ProxyCursor implements NodeCursor{
 		return real ;
 	}
 
-
+	public <T> List<T> toList(Class<T> clz, PageBean page) {
+		return createReal().toList(clz, page);
+	}
 
 
 }
@@ -325,6 +328,14 @@ class NodeListCursor implements NodeCursor{
 			result.add(node.toPropertyMap());
 		}
 
+		return result;
+	}
+
+	public <T> List<T> toList(Class<T> clz, PageBean page) {
+		List<T> result = ListUtil.newList();
+		for (Node node : toList(page)) {
+			result.add(JsonParser.fromMap(node.toPropertyMap()).getAsObject(clz));
+		}
 		return result;
 	}
 

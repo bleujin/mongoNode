@@ -6,8 +6,6 @@ import static net.ion.radon.repository.NodeConstants.ARADON_UID;
 import java.io.Serializable;
 import java.util.Map;
 
-import net.ion.radon.client.ISerialRequest;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;

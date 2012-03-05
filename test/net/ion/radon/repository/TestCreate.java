@@ -2,6 +2,8 @@ package net.ion.radon.repository;
 
 import java.util.Date;
 
+import net.ion.framework.parse.gson.JsonParser;
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.core.PageBean;
@@ -40,6 +42,8 @@ public class TestCreate extends TestCase{
 		node.put("date", new Date()) ;
 		session.commit() ;
 		
+		
+		Debug.line(JsonParser.fromObject(node)) ;
 		
 		
 		Node found = session.createQuery().findOne() ;

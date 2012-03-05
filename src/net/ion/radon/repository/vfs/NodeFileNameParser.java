@@ -1,9 +1,9 @@
 package net.ion.radon.repository.vfs;
 
-import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.provider.local.LocalFileNameParser;
+import org.apache.commons.vfs2.FileName;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.provider.local.LocalFileNameParser;
 
 public class NodeFileNameParser extends LocalFileNameParser {
 	private static final NodeFileNameParser INSTANCE = new NodeFileNameParser();
@@ -12,7 +12,7 @@ public class NodeFileNameParser extends LocalFileNameParser {
 		return INSTANCE;
 	}
 
-	protected String extractRootPrefix(final String uri, final StringBuffer name) throws FileSystemException {
+	@Override protected String extractRootPrefix(final String uri, final StringBuilder name) throws FileSystemException {
 		if (name.length() == 0 || name.charAt(0) != '/') {
 			throw new FileSystemException("vfs.provider.local/not-absolute-file-name.error", uri);
 		}

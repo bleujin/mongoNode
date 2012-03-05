@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 import net.ion.radon.repository.Session;
 
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileSystemException;
 
 /**
  * OutputStream to a RamFile.

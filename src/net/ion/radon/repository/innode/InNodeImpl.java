@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.parse.gson.JsonString;
 import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.INode;
@@ -24,7 +25,7 @@ import net.ion.radon.repository.util.MyNumberUtil;
 
 import com.mongodb.DBObject;
 
-public abstract class InNodeImpl implements InNode {
+public abstract class InNodeImpl implements InNode, JsonString {
 
 	private static final long serialVersionUID = 7569283280889592633L;
 	private NodeObject nobject;
@@ -186,13 +187,9 @@ public abstract class InNodeImpl implements InNode {
 	public int getIndex(){
 		return index ;
 	}
+
+	public String toJsonString() {
+		return nobject.toString();
+	}
+
 }
-
-
-
-
-
-
-
-
-

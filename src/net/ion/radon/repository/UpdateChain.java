@@ -1,26 +1,17 @@
 package net.ion.radon.repository;
 
 import static net.ion.radon.repository.NodeConstants.CREATED;
-import static net.ion.radon.repository.NodeConstants.ID;
 import static net.ion.radon.repository.NodeConstants.OWNER;
 import static net.ion.radon.repository.NodeConstants.TIMEZONE;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.bson.types.ObjectId;
-
-import com.mongodb.DBObject;
-
-import net.ion.bleujin.config.study.MakeConfig;
 import net.ion.framework.util.ChainMap;
-import net.ion.framework.util.Debug;
-import net.ion.framework.util.RandomUtil;
-import net.ion.radon.repository.innode.InListNodeImpl;
-import net.ion.radon.repository.innode.InNodeFilter;
+
+import org.bson.types.ObjectId;
 
 public class UpdateChain {
 
@@ -55,11 +46,11 @@ public class UpdateChain {
 		return this;
 	}
 
-	public UpdateChain inlist(String key, ChainMap<String, Object> values) {
+	public UpdateChain inlist(String key, ChainMap<String, ? extends Object> values) {
 		return inlist(key, values.toMap());
 	}
 	
-	public UpdateChain inlist(String key, Map<String, Object> map) {
+	public UpdateChain inlist(String key, Map<String, ? extends Object> map) {
 		getInner("$pushAll").inlist(key).push(map) ;
 		return this;
 	}

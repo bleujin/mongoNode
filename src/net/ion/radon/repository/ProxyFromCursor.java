@@ -142,4 +142,8 @@ public class ProxyFromCursor implements NodeCursor{
 		return real ;
 	}
 
+	public <T> List<T> toList(Class<T> clz, PageBean page) {
+		return createReal().toList(clz, page);
+	}
+
 }

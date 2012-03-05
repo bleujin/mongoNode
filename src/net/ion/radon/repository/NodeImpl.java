@@ -21,7 +21,10 @@ import java.util.regex.Pattern;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.db.procedure.IStringObject;
+import net.ion.framework.parse.gson.JsonParser;
+import net.ion.framework.parse.gson.JsonString;
 import net.ion.framework.util.ChainMap;
+import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.NumberUtil;
 import net.ion.framework.util.ObjectUtil;
 import net.ion.framework.util.StringUtil;
@@ -31,12 +34,13 @@ import net.ion.radon.repository.relation.IRelation;
 import net.ion.radon.repository.util.CipherUtil;
 import net.ion.radon.repository.util.MyNumberUtil;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 
-public class NodeImpl implements Node {
+public class NodeImpl implements Node, JsonString {
 
 	private static final long serialVersionUID = -9085850570829905483L;
 	private final transient Session session;
@@ -54,8 +58,8 @@ public class NodeImpl implements Node {
 
 	static NodeImpl create(Session currentSession, String workspaceName, NodeObject no, String parentPath, String name) {
 		if (!StringUtil.equals(name, no.getString("_id"))) {
-//			if (currentSession.createQuery().path(makePath(parentPath, name)).existNode())
-//				RepositoryException.throwIt("duplicate path : " + makePath(parentPath, name));
+			// if (currentSession.createQuery().path(makePath(parentPath, name)).existNode())
+			// RepositoryException.throwIt("duplicate path : " + makePath(parentPath, name));
 		}
 		if (!isSmallAlphaNumUnderBarComma(name))
 			throw new IllegalArgumentException(name + " must be smallAlphaNumUnderBarComma");
@@ -114,75 +118,147 @@ public class NodeImpl implements Node {
 
 	// prop has '.' or '#'
 	public Serializable get(String propId) {
+		if (StringUtil.isBlank(propId)){
+			return null ;
+		}else if (ArrayUtils.contains(new char[] { '$', '#', '!' }, propId.charAt(0))) {
+			return getTransValue(propId);
+		} else {
+			return nobject.get(propId, this);
+		}
 
-		String propExpr = transNumRegular(propId);
+	}
+
+	private Serializable getTransValue(String propId) {
+
 		if (propId.startsWith("$")) { // aid {
-			return getAradonIdExpression(propExpr);
+			return getAradonIdExpression(propId) ;
 		} else if (propId.startsWith("#")) { // relation
-			return getRelationExpression(propExpr);
+			String propExpr = transRegular(propId);
+			return getRelationExpression(propExpr) ;
 		} else if (propId.startsWith("!")) { // path
-			return getPathExpression(propExpr);
+			String propExpr = transRegular(propId);
+			return getPathExpression(propExpr) ;
 		}
-		return nobject.get(propExpr, this);
+		throw new IllegalArgumentException("not supported expression") ;
 	}
+	
+	
+	private Serializable getAradonIdExpression(String propId) {
+		
+		String[] svals = StringUtil.split(propId.substring(1), ":");
+		String wsNameExpr = (svals.length == 2) ? getWorkspaceName() : svals[0];
+		String groupExpr = svals[svals.length - 2];
+		String remainExpr = svals[svals.length - 1];
 
-	private Serializable getAradonIdExpression(String propExpr) {
+		String wsName = transRegular(wsNameExpr).toString();
+		String groupId = transRegular(groupExpr).toString();
+		RemainResult remain = transRemainExpr(remainExpr);
 
-		String aidExpr = StringUtil.substringBetween(propExpr, "$", ".");
-		String remain = StringUtil.substringAfter(propExpr, ".");
-
-		String wsName = getWorkspaceName();
-		if (StringUtil.countMatches(aidExpr, ":") == 2) {
-			wsName = StringUtil.substringBefore(aidExpr, ":");
-			aidExpr = StringUtil.substringAfter(aidExpr, ":");
-		}
-		String groupId = StringUtil.substringBefore(aidExpr, ":");
-		String uidExpr = StringUtil.substringAfter(aidExpr, ":");
-		Object uid = (uidExpr != null && uidExpr.startsWith("%")) ? Integer.parseInt(uidExpr.substring(1)) : uidExpr.replace("%", "") ;
-
-		Node targetNode = getQuery().corelateNode(getSession(), wsName, getQuery(), PropertyQuery.createByAradon(groupId, uid));
-		return targetNode == null ? null : targetNode.get(remain);
+		Node targetNode = getQuery().corelateNode(getSession(), wsName, PropertyQuery.createByAradon(groupId, remain.getUId()));
+		return targetNode == null ? null : targetNode.get(remain.getProps());
 	}
-
+	
 	private Serializable getPathExpression(String propExpr) {
-
+		
 		String path = StringUtil.substringBetween(propExpr, "!", ".");
 		String remain = StringUtil.substringAfter(propExpr, ".");
-
+		
 		String wsName = getWorkspaceName();
 		if (path.contains(":")) {
 			wsName = StringUtil.substringBefore(path, ":");
 			path = StringUtil.substringAfter(path, ":");
 		}
-		Node targetNode = getQuery().corelateNode(getSession(), wsName, getQuery(), PropertyQuery.createByPath(path));
+		Node targetNode = getQuery().corelateNode(getSession(), wsName, PropertyQuery.createByPath(path));
 		return targetNode == null ? null : targetNode.get(remain);
 	}
-
+	
 	private Serializable getRelationExpression(String propExpr) {
-
+		
 		String relType = StringUtil.substringBetween(propExpr, "#", ".");
 		String remain = StringUtil.substringAfter(propExpr, ".");
-
+		
 		Node targetNode = relation(relType).fetch(0);
 		return targetNode == null ? null : targetNode.get(remain);
 	}
 
-	private static Pattern p = Pattern.compile("\\{[a-zA-Z][a-zA-Z0-9_\\.]*\\}");
-	private String transNumRegular(String key) {
+	
+	private static Pattern remainPattern = Pattern.compile("(([^.{}]*(\\{[a-zA-Z0-9_\\.]*\\})?)*)\\.([\\S]*)");
+	private RemainResult transRemainExpr(String key) {
+		if (!key.contains("{"))
+			return new RemainResult(StringUtil.substringBefore(key, "."), StringUtil.substringAfter(key, "."));
+		
+		Matcher ma = remainPattern.matcher(key) ;
+		if (! ma.find()) {
+			throw new IllegalArgumentException("illegal expression : " + key) ;
+		}
+		
+		Serializable uid = transUIDExpr(ma.group(1)) ;
+		String propIds = transRegular(ma.group(ma.groupCount())) ;
+		
+		return new RemainResult(uid, propIds);
+	}
+	
+	private Serializable transUIDExpr(String key) {
+		Matcher m = EXPR_PATTERN.matcher(key);
+		StringBuffer sb = new StringBuffer();
+		
+		List<Serializable> foundValues = ListUtil.newList() ;
+		while (m.find()) {
+			Serializable value = get(StringUtil.substringBetween(m.group(), "{", "}"));
+			foundValues.add(value) ;
+			m.appendReplacement(sb, ObjectUtil.toString(value));
+		}
+		m.appendTail(sb);
+		
+		if (foundValues.size() == 0) {
+			return key ;
+		} else if (foundValues.size() == 1) {
+			return foundValues.get(0) ;
+		} else {
+			return sb.toString() ;
+		}
+	}
+	
+	private static Pattern EXPR_PATTERN = Pattern.compile("\\{[a-zA-Z0-9_\\.]*\\}");
+	private String transRegular(String key) {
 		if (!key.contains("{"))
 			return key;
 
-		Matcher m = p.matcher(key);
-
+		Matcher m = EXPR_PATTERN.matcher(key);
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
 			Serializable value = get(StringUtil.substringBetween(m.group(), "{", "}"));
-			m.appendReplacement(sb, ((value instanceof Integer) ? "%" : "") + ObjectUtil.toString(value));
+			m.appendReplacement(sb, ObjectUtil.toString(value));
 		}
 		m.appendTail(sb);
 		return sb.toString();
 	}
-
+	
+//	private RemainResult transRemainExpr(String key) {
+//		if (!key.contains("{"))
+//			return null;
+//		
+//		Matcher m = EXPR_PATTERN.matcher(key);
+//		StringBuffer sb = new StringBuffer();
+//		
+//		List<Serializable> foundValues = ListUtil.newList() ;
+//		while (m.find()) {
+//			Serializable value = get(StringUtil.substringBetween(m.group(), "{", "}"));
+//			foundValues.add(value) ;
+//			m.appendReplacement(sb, ObjectUtil.toString(value));
+//		}
+//		m.appendTail(sb);
+//		
+//		if (foundValues.size() == 1) {
+//			return new RemainResult(foundValues.get(0), StringUtil.substringAfter(sb.toString(), ".")) ;
+//		} else if (foundValues.size() > 1){
+//			return new RemainResult(StringUtil.substringBefore(sb.toString(), "."), StringUtil.substringAfter(sb.toString(), ".")) ;
+//		} else {
+//			throw new IllegalArgumentException("empty expr") ;
+//		}
+//	}
+	
+	
 	public Serializable get(String propId, int index) {
 		return nobject.get(propId, index, this);
 	}
@@ -262,7 +338,7 @@ public class NodeImpl implements Node {
 	}
 
 	public Node setAradonId(String groupid, Object uid) {
-//		if (existAradonId(groupid, uid)) throw RepositoryException.throwIt("duplicated groupId/uid : " + groupid + "/" + uid);
+		// if (existAradonId(groupid, uid)) throw RepositoryException.throwIt("duplicated groupId/uid : " + groupid + "/" + uid);
 
 		putProperty(PropertyId.reserved(ARADON), AradonId.create(groupid, uid).toNodeObject());
 		return this;
@@ -427,7 +503,30 @@ public class NodeImpl implements Node {
 		return TempNodeImpl.create(getSession(), NodeObject.load(nobject.toPropertyMap(this)));
 	}
 
+	public String toJsonString() {
+		return JsonParser.fromObject(getDBObject().toMap()).toString();
+	}
+
 	// public int remove(){
 	// return getSession().createQuery(getWorkspaceName()).id(getIdentifier()).remove();
 	// }
+}
+
+
+class RemainResult {
+	
+	private Serializable uid ;
+	private String remain ;
+	RemainResult(Serializable uid, String remain){
+		this.uid = uid ;
+		this.remain = remain ;
+	}
+	
+	public Serializable getUId(){
+		return uid ;
+	}
+	
+	public String getProps(){
+		return remain ;
+	}
 }

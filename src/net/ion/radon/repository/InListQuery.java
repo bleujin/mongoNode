@@ -175,9 +175,21 @@ public class InListQuery implements Serializable{
 		List<InNode> founds = find() ;
 		int count = 0 ;
 		for (InNode inode : founds) {
-			boolean result = list.remove(inode.getDBObject()) ;
-			if (result) count++ ;
+//			boolean result = list.remove(inode.getDBObject()) ;
+//			if (result) count++ ;
+			count += remove(inode.getDBObject().toMap());
 		}
+		parent.notify(NodeEvent.UPDATE);
+		return count ;
+	}
+	
+	public int remove(Map<String, ? extends Object> map) {
+		BasicBSONList list = (BasicBSONList)nobject.getDBObject() ;
+
+		int count = 0 ;
+		boolean result = list.remove(map) ;
+		if (result)
+			count++ ;
 		parent.notify(NodeEvent.UPDATE);
 		return count ;
 	}

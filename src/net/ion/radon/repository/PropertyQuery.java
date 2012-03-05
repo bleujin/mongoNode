@@ -228,8 +228,8 @@ public class PropertyQuery implements IPropertyFamily {
 		return nobject.equals(that.nobject);
 	}
 
-	Node corelateNode(Session session, String wsName, PropertyQuery parentQuery, PropertyQuery query) {
-		if (!cacheMap.containsKey(wsName, query) || parentQuery == EMPTY) {
+	Node corelateNode(Session session, String wsName, PropertyQuery query) {
+		if (!cacheMap.containsKey(wsName, query) || this == EMPTY) {
 			Node node = session.getWorkspace(wsName).findOne(session, query, Columns.ALL);
 			cacheMap.put(wsName, query, node);
 		}

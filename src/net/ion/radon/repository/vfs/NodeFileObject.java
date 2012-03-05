@@ -6,26 +6,27 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.Session;
-import net.sf.json.JSONObject;
 
-import org.apache.commons.vfs.AllFileSelector;
-import org.apache.commons.vfs.FileContent;
-import org.apache.commons.vfs.FileContentInfoFactory;
-import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSelector;
-import org.apache.commons.vfs.FileSystem;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.NameScope;
-import org.apache.commons.vfs.RandomAccessContent;
-import org.apache.commons.vfs.provider.AbstractFileObject;
-import org.apache.commons.vfs.util.RandomAccessMode;
+import org.apache.commons.vfs2.AllFileSelector;
+import org.apache.commons.vfs2.FileContent;
+import org.apache.commons.vfs2.FileContentInfoFactory;
+import org.apache.commons.vfs2.FileName;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSelector;
+import org.apache.commons.vfs2.FileSystem;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.NameScope;
+import org.apache.commons.vfs2.RandomAccessContent;
+import org.apache.commons.vfs2.provider.AbstractFileName;
+import org.apache.commons.vfs2.provider.AbstractFileObject;
+import org.apache.commons.vfs2.util.RandomAccessMode;
 
 public final class NodeFileObject extends AbstractFileObject {
 
@@ -35,7 +36,7 @@ public final class NodeFileObject extends AbstractFileObject {
 
 	private transient Node currentNode;
 	
-	protected NodeFileObject(FileName name, NodeFileSystem fs) throws FileSystemException {
+	protected NodeFileObject(AbstractFileName name, NodeFileSystem fs) throws FileSystemException {
 		super(name, fs);
 		this.nfs = fs;
 		this.currentNode = getSession().createQuery().path(getName().getNodePath()).findOne();
@@ -70,8 +71,8 @@ public final class NodeFileObject extends AbstractFileObject {
 		return result.toArray(new FileObject[0]);
 	}
 
-	private FileName resolveChildName(String childName) throws FileSystemException {
-		return getFileSystem().getFileSystemManager().resolveName(getName(), childName, NameScope.CHILD);
+	private AbstractFileName resolveChildName(String childName) throws FileSystemException {
+		return (AbstractFileName) getFileSystem().getFileSystemManager().resolveName(getName(), childName, NameScope.CHILD);
 	}
 
 	protected String[] doListChildren() throws Exception {
@@ -97,7 +98,7 @@ public final class NodeFileObject extends AbstractFileObject {
 	
 	
 	byte[] getDataBytes() throws UnsupportedEncodingException {
-		String jsonString = JSONObject.fromObject(currentNode.toPropertyMap()).toString();
+		String jsonString = JsonParser.fromMap(currentNode.toPropertyMap()).toString();
 		return jsonString.getBytes("UTF-8");
 	}
 	

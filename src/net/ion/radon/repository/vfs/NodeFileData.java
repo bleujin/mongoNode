@@ -2,11 +2,11 @@ package net.ion.radon.repository.vfs ;
 
 import java.io.Serializable;
 
+import net.ion.framework.parse.gson.JsonObject;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.Session;
-import net.sf.json.JSONObject;
 
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileSystemException;
 
 /**
  * RAM File Object Data.
@@ -61,9 +61,9 @@ class NodeFileData implements Serializable {
 	
 	void save(Session session) throws FileSystemException {
 
-		JSONObject jsonObject = NodeFileUtil.toJSONObject(getBuffer());
+		JsonObject jsonObject = NodeFileUtil.toJSONObject(getBuffer());
 		Node found = session.createQuery().path(name.getNodePath()).findOne();
-		found.putAll(jsonObject) ;  
+		found.putAll(jsonObject.toMap()) ;  
 		session.commit();
 		this.buffer = new byte[0] ;
 	}

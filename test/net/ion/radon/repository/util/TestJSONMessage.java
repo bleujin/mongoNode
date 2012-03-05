@@ -20,12 +20,13 @@ public class TestJSONMessage extends TestCase{
 	public void testToJSON() throws Exception {
 		JSONMessage mp = JSONMessage.create().put("name", "bleujin").inner("address").put("city", "seoul").toRoot().inner("phone").put("first", 1234).put("sec", "0") ;
 		
-		Map map = mp.toJSON() ;
+		Map map = mp.toJSON().toMap() ;
 
 		int index = 0 ;
 		for (Object _entry : map.entrySet()) {
 			Entry entry = (Entry)_entry ;
 			index++ ;
+			Debug.line(entry) ;
 		}
 		assertEquals(3, index) ;
 		
