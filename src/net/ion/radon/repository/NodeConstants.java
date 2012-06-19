@@ -29,5 +29,5 @@ public interface NodeConstants {
 	public static final String RELATION = RESERVED_PREFIX + "reference";
 
 	public static final String PARENT = RESERVED_PREFIX + "parent";
-
+	public static final String WSNAME = RESERVED_PREFIX + "workspace";
 }

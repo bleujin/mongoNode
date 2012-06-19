@@ -1,11 +1,11 @@
 package net.ion.framework.util;
 
 import java.sql.Date;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.sql.RowSetMetaData;
 
@@ -13,7 +13,6 @@ import net.ion.framework.db.Rows;
 import net.ion.framework.db.RowsImpl;
 import net.ion.framework.db.procedure.Queryable;
 import net.ion.framework.db.rowset.RowSetMetaDataImpl;
-import net.ion.radon.repository.IColumn;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeColumns;
 
@@ -34,7 +33,7 @@ public class MapListRows extends RowsImpl {
 
 		return result;
 	}
-	
+	private RowSetMetaDataImpl meta = new RowSetMetaDataImpl() ; 
 	private MapListRows(Queryable query) throws SQLException {
 		super(query);
 	}
@@ -47,8 +46,6 @@ public class MapListRows extends RowsImpl {
 	}
 
 	private RowSetMetaData setMetaData(List<Map<String, ? extends Object>> destList, String[] columns) throws SQLException {
-		RowSetMetaData meta = new RowSetMetaDataImpl();
-
 		meta.setColumnCount(columns.length);
 		int appendIndex = 0;
 		
@@ -60,9 +57,11 @@ public class MapListRows extends RowsImpl {
 			meta.setCaseSensitive(index, false) ;
 			if (firstRow == MapUtil.EMPTY) {
 				meta.setColumnType(index, Types.OTHER) ;
+				meta.setColumnTypeName(index, "other") ;
 			} else {
 				Object value = firstRow.get(columns[myidx]) ;
 				meta.setColumnType(index, value == null ? Types.OTHER : TypeMappingMap.get(value.getClass()));
+				meta.setColumnTypeName(index, "other") ;
 			}
 		}
 		super.setMetaData(meta) ;
@@ -88,6 +87,10 @@ public class MapListRows extends RowsImpl {
 
 		super.insertRow();
 		super.moveToCurrentRow();
+	}
+	
+	@Override public ResultSetMetaData getMetaData(){
+		return meta ;
 	}
 
 	private RowSetMetaData makeMetaData(Node node, NodeColumns columns) throws SQLException {

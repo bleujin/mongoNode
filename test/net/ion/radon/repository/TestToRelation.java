@@ -2,10 +2,10 @@ package net.ion.radon.repository;
 
 import net.ion.framework.db.Rows;
 import net.ion.framework.db.procedure.Queryable;
+import net.ion.framework.util.Closure;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.relation.IRelation;
 
-import org.apache.commons.collections.Closure;
 import org.apache.commons.lang.ArrayUtils;
 
 public class TestToRelation extends TestBaseRepository {
@@ -109,9 +109,8 @@ public class TestToRelation extends TestBaseRepository {
 		session.commit() ;
 
 		NodeCursor nc = session.createQuery().aradonGroup("emp").find() ;
-		nc.each(PageBean.ALL, new Closure() {
-			public void execute(Object _node) {
-				Node node = (Node) _node ;
+		nc.each(PageBean.ALL, new Closure<Node>() {
+			public void execute(Node node) {
 				assertEquals(true, ArrayUtils.contains(new String[]{"korean","english"}, node.get("#nation.ncode.{nation}"))) ;
 			}
 		}) ;
@@ -127,9 +126,8 @@ public class TestToRelation extends TestBaseRepository {
 		session.createQuery().aradonGroupId("config", "code").remove() ;
 
 		NodeCursor nc = session.createQuery().aradonGroup("emp").find() ;
-		nc.each(PageBean.ALL, new Closure() {
-			public void execute(Object _node) {
-				Node node = (Node) _node ;
+		nc.each(PageBean.ALL, new Closure<Node>() {
+			public void execute(Node node) {
 				assertEquals(true, node.get("#nation.ncode.{nation}") == null) ;
 			}
 		}) ;

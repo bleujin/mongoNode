@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
-import net.ion.framework.util.ChainMap;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
@@ -17,6 +16,7 @@ import net.ion.radon.repository.NodeResult;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.Session;
 import net.ion.radon.repository.SessionQuery;
+import net.ion.radon.repository.SessionQueryImpl;
 
 import org.apache.commons.beanutils.ConstructorUtils;
 
@@ -25,7 +25,7 @@ public class BeanQuery<T extends NodeORM> {
 	private GenericManager<T> gm ;
 	private final SessionQuery squery;
 	private BeanQuery(Session session, GenericManager<T> gm) {
-		this.squery = SessionQuery.create(session, gm.getIDMethod().workspaceName()).aradonGroup(gm.getIDMethod().groupId()) ;
+		this.squery = SessionQueryImpl.create(session, gm.getIDMethod().workspaceName()).aradonGroup(gm.getIDMethod().groupId()) ;
 		this.gm = gm ;
 	}
 

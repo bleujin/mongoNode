@@ -21,7 +21,6 @@ public class TestAllAdvance extends TestCase {
 		suite.addTestSuite(TestMapListRows.class) ;
 		suite.addTestSuite(TestNodeSerialize.class);
 		
-		suite.addTestSuite(TestSession.class) ;
 		suite.addTestSuite(TestNodeListCursor.class) ;
 		
 		return suite ;

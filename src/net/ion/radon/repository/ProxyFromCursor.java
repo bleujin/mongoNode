@@ -3,12 +3,11 @@ package net.ion.radon.repository;
 import java.util.List;
 import java.util.Map;
 
+import net.ion.framework.util.Closure;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.orm.NodeORM;
 import net.ion.radon.repository.relation.IRelation;
-
-import org.apache.commons.collections.Closure;
 
 public class ProxyFromCursor implements NodeCursor{
 

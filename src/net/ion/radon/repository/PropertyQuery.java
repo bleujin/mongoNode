@@ -107,12 +107,15 @@ public class PropertyQuery implements IPropertyFamily {
 		return nobject.toMap();
 	}
 
+	public boolean isEmpty(){
+		return toMap().size() <= 0 ;
+	}
+	
 	public String toString() {
 		return nobject.toString();
 	}
 
 	public PropertyQuery and(IPropertyFamily... conds) {
-		BasicDBList list = makeListCondition(conds);
 		for (IPropertyFamily cond : conds) {
 			for (Entry<String, ? extends Object> c : cond.toMap().entrySet()) {
 				nobject.put(c.getKey(), c.getValue());
@@ -187,7 +190,7 @@ public class PropertyQuery implements IPropertyFamily {
 
 	public PropertyQuery between(String key, Object openValue, Object closeValue) {
 		BasicDBObject dbo = new BasicDBObject(QueryOperators.GTE, openValue);
-		dbo.put("$lte", closeValue);
+		dbo.put(QueryOperators.LTE, closeValue);
 		nobject.put(key, dbo);
 		return this;
 	}

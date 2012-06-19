@@ -8,7 +8,7 @@ import net.ion.framework.util.ChainMap;
 
 import com.mongodb.DBObject;
 
-public interface INode extends JsonString{
+public interface INode extends JsonString, Serializable {
 
 	public InNode inner(String name) ;
 	

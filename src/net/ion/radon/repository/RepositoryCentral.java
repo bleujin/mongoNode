@@ -1,6 +1,6 @@
 package net.ion.radon.repository;
 
-import java.awt.geom.CubicCurve2D;
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,21 +8,19 @@ import java.util.Map.Entry;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.StringUtil;
+import net.ion.radon.repository.admin.DBStatus;
 import net.ion.radon.repository.myapi.ICredential;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
-import com.mongodb.MongoURI;
-import com.mongodb.WriteConcern;
 
-public class RepositoryCentral {
+public class RepositoryCentral implements RCentral {
 
 	private Mongo mongo;
 	private String currentDBName = "test";
-	private String userId;
-	private String pwd;
+	private ICredential credential = SimpleCredential.BLANK;
 
 	public RepositoryCentral(String host, int port) throws UnknownHostException, MongoException {
 		this(host, port, "test");
@@ -36,31 +34,30 @@ public class RepositoryCentral {
 		this(loadMongo(host, port), defaultDBName, userId, pwd);
 	}
 
-	private RepositoryCentral(Mongo mongo, String dbName, String userId, String pwd) {
+	protected RepositoryCentral(Mongo mongo, String dbName, String userId, String pwd) {
 		this.mongo = mongo;
 		this.currentDBName = dbName;
-		this.userId = userId;
-		this.pwd = pwd;
+		this.credential = BasicCredential.create(userId, pwd) ;
 	}
 
 	// Replica-Set
-	public final static RepositoryCentral createReliica(String uri, String dbName, String userId, String pwd) throws MongoException, UnknownHostException {
-		Mongo mongo = new Mongo(new MongoURI(uri));
-		mongo.setWriteConcern(WriteConcern.REPLICAS_SAFE);
-		return new RepositoryCentral(mongo, dbName, userId, pwd) ;
-	}
+	// use -> public static RepositoryCentral create(Mongo mongo, String dbName, String userId, String pwd) {
+//	public final static RepositoryCentral createReliica(String uri, String dbName, String userId, String pwd) throws MongoException, UnknownHostException {
+//		Mongo mongo = new Mongo(new MongoURI(uri));
+//		mongo.setWriteConcern(WriteConcern.REPLICAS_SAFE);
+//		return new RepositoryCentral(mongo, dbName, userId, pwd) ;
+//	}
 
 	public RepositoryCentral(String url) throws UnknownHostException, MongoException {
 		this(url, null, null);
 	}
 
-	public RepositoryCentral(String url, String user, String pwd) throws UnknownHostException, MongoException {
+	public RepositoryCentral(String url, String userId, String pwd) throws UnknownHostException, MongoException {
 		String[] urls = StringUtil.split(url, ":");
 
 		this.mongo = loadMongo(urls[0], Integer.parseInt(urls[1]));
 		this.currentDBName = urls[2];
-		this.userId = user;
-		this.pwd = pwd;
+		this.credential = BasicCredential.create(userId, pwd) ;
 	}
 
 	private static Map<String, Mongo> STORE = MapUtil.newMap();
@@ -74,11 +71,11 @@ public class RepositoryCentral {
 		return m;
 	}
 
-	public static RepositoryCentral testCreate() throws UnknownHostException, MongoException {
+	public static RepositoryCentral testCreate() throws UnknownHostException, IOException {
 		return testCreate("test");
 	}
 
-	public static RepositoryCentral testCreate(String dbName) throws UnknownHostException, MongoException {
+	public static RepositoryCentral testCreate(String dbName) throws UnknownHostException, IOException {
 		return create("61.250.201.78", 27017).changeDB(dbName);
 	}
 
@@ -110,25 +107,15 @@ public class RepositoryCentral {
 	}
 
 	public Session testLogin(String wname) {
-		return login(currentDBName, wname, new SimpleCredential());
+		return login(currentDBName, wname);
 	}
-
-	public Session login(String dbName, String defaultWorkspace, ICredential credential) {
-		return LocalSession.create(LocalRepository.create(mongo.getDB(dbName)), defaultWorkspace);
-	}
-
 	public Session login(String dbName, String defaultWorkspace) throws IllegalArgumentException {
 
 		DB db = mongo.getDB(dbName);
 
-		if (!db.isAuthenticated() && this.userId != null && this.pwd != null) {
-			boolean isLogin = db.authenticate(userId, pwd.toCharArray());
-			if (!isLogin)
-				throw new IllegalArgumentException("Authenticate is false");
-		}
+		if (!credential.isAuthenticated(db)) throw new IllegalArgumentException("Authenticate is false");
 
-		final Repository repository = LocalRepository.create(db);
-		return LocalSession.create(repository, defaultWorkspace);
+		return LocalSession.create(LocalRepository.create(db), defaultWorkspace);
 	}
 
 	public Session login(String defaultWorkspace) throws IllegalArgumentException {
@@ -157,15 +144,57 @@ public class RepositoryCentral {
 		}
 	}
 
+	public DBStatus getDBStatus(){
+		DB db = mongo.getDB(currentDBName) ;
+		return DBStatus.create(mongo.getDB("system"), db) ;
+	}
+	
 }
 
 class SimpleCredential implements ICredential {
 
-	SimpleCredential() {
+	static SimpleCredential BLANK = new SimpleCredential() ;
+	
+	private SimpleCredential() {
 	}
 
 	public String getUniqueId() {
 		return "my test simple";
 	}
 
+	public boolean isBlank() {
+		return true;
+	}
+
+	public boolean isAuthenticated(DB db) {
+		return true;
+	}
+}
+
+class BasicCredential implements ICredential {
+
+	private String userId ;
+	private String pwd ;
+	private BasicCredential(String userId, String pwd) {
+		this.userId = userId ;
+		this.pwd = pwd ;
+	}
+
+	final static ICredential create(String userId, String pwd){
+		if (StringUtil.isBlank(userId)) return SimpleCredential.BLANK ;
+		return new BasicCredential(userId, pwd) ;
+	}
+	
+	public String getUniqueId() {
+		return userId;
+	}
+
+	public boolean isBlank() {
+		return false;
+	}
+
+	public boolean isAuthenticated(DB db) {
+		return (!db.isAuthenticated()) || db.authenticate(userId, pwd.toCharArray());
+	}
+	
 }

@@ -3,11 +3,10 @@ package net.ion.radon.repository;
 import java.util.List;
 import java.util.Map;
 
+import net.ion.framework.util.Closure;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.myapi.ICursor;
 import net.ion.radon.repository.orm.NodeORM;
-
-import org.apache.commons.collections.Closure;
 
 public interface NodeCursor extends ICursor {
 
@@ -35,7 +34,7 @@ public interface NodeCursor extends ICursor {
 	
 	public void debugPrint(PageBean page) ;
 	
-	public void each(PageBean page, Closure closure) ;
+	public <T> void each(PageBean page, Closure<T> closure) ;
 
 	public Explain explain() ;
 

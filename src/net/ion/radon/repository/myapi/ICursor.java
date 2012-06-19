@@ -3,14 +3,13 @@ package net.ion.radon.repository.myapi;
 import java.util.List;
 import java.util.Map;
 
+import net.ion.framework.util.Closure;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeCursor;
 import net.ion.radon.repository.NodeScreen;
 import net.ion.radon.repository.PropertyComparator;
 import net.ion.radon.repository.PropertyFamily;
-
-import org.apache.commons.collections.Closure;
 
 public interface ICursor {
 
@@ -32,7 +31,7 @@ public interface ICursor {
 	
 	public void debugPrint(PageBean page) ;
 
-	public void each(PageBean page, Closure closure) ;
+	public <T> void each(PageBean page, Closure<T> closure) ;
 	
 	public List<Node> toList(PageBean page);
 

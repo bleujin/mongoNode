@@ -5,10 +5,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.ion.framework.parse.gson.JsonParser;
+import net.ion.framework.util.Closure;
 import net.ion.framework.util.Debug;
 import net.ion.radon.core.PageBean;
-
-import org.apache.commons.collections.Closure;
 
 public class TestNodeCursor extends TestBaseRepository{
 
@@ -44,9 +43,9 @@ public class TestNodeCursor extends TestBaseRepository{
 	public void testEach() throws Exception {
 		
 		final AtomicInteger sum = new AtomicInteger() ;
-		createQuery().eq("name", "bleujin").find().each(PageBean.ALL, new Closure() {
-			public void execute(Object node) {
-				sum.addAndGet(((Node)node).getAsInt("index")) ;
+		createQuery().eq("name", "bleujin").find().each(PageBean.ALL, new Closure<Node>() {
+			public void execute(Node node) {
+				sum.addAndGet(node.getAsInt("index")) ;
 			}
 		}) ;
 		
@@ -85,4 +84,22 @@ public class TestNodeCursor extends TestBaseRepository{
 		Debug.line(JsonParser.fromList(mapList)) ;
 		
 	}
+	
+	public void testPage() throws Exception {
+		List<Node> list =  session.createQuery().find().skip(2).limit(5).ascending("index").toList(PageBean.create(2, 1)) ;
+		assertEquals(2, list.get(0).getAsInt("index")) ;
+		assertEquals(3, list.get(1).getAsInt("index")) ;
+		
+		List<Node> allList = session.createQuery().find().ascending("index").toList(PageBean.ALL) ;
+		NodeCursor pcursor = ProxyCursor.create(session, session.createQuery().getQuery(), allList, null) ;
+
+		list = pcursor.skip(2).limit(5).toList(PageBean.create(2, 1)) ;
+		assertEquals(2, list.get(0).getAsInt("index")) ;
+		assertEquals(3, list.get(1).getAsInt("index")) ;
+	}
+	
+	
+	
+	
+	
 }

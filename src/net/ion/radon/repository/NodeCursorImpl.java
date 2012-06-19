@@ -9,14 +9,14 @@ import java.util.Map;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.parse.gson.JsonParser;
+import net.ion.framework.util.Closure;
+import net.ion.framework.util.CollectionUtil;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
 import net.ion.radon.repository.orm.NodeORM;
 
 import org.apache.commons.beanutils.ConstructorUtils;
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
@@ -29,6 +29,8 @@ public class NodeCursorImpl implements NodeCursor {
 	private String workspaceName;
 	private DBCursor cursor;
 	private final PropertyQuery iquery;
+	private int skip = 0 ;
+	private int limit = 1000000 ;
 
 	protected NodeCursorImpl(Session session, PropertyQuery iquery, String workspaceName, DBCursor cursor) {
 		this.session = session;
@@ -60,11 +62,13 @@ public class NodeCursorImpl implements NodeCursor {
 
 	public NodeCursor skip(int n) {
 		cursor.skip(n);
+		this.skip = n ;
 		return this;
 	}
 
 	public NodeCursor limit(int n) {
 		cursor.limit(n);
+		this.limit = n ;
 		return this;
 	}
 
@@ -94,7 +98,7 @@ public class NodeCursorImpl implements NodeCursor {
 	// }
 
 	public List<Node> toList(PageBean page) {
-		this.skip(page.getSkipScreenCount()).limit(page.getMaxScreenCount() + 1);
+		this.skip(this.skip + page.getSkipScreenCount()).limit( Math.min(page.getMaxScreenCount() + 1, this.limit) );
 		return toList(page.getPageIndexOnScreen() * page.getListNum(), page.getListNum());
 	}
 
@@ -103,11 +107,11 @@ public class NodeCursorImpl implements NodeCursor {
 			if (cursor.hasNext()) {
 				cursor.next();
 			} else {
-				return new ArrayList<Node>();
+				return ListUtil.EMPTY ;
 			}
 		}
 
-		List<Node> result = new ArrayList<Node>();
+		List<Node> result = ListUtil.newList() ;
 		while (limit-- > 0 && cursor.hasNext()) {
 			result.add(next());
 		}
@@ -118,7 +122,7 @@ public class NodeCursorImpl implements NodeCursor {
 	public List<Map<String, ? extends Object>> toMapList(PageBean page) {
 		List<Node> list = toList(page);
 
-		List<Map<String, ?>> result = new ArrayList<Map<String, ?>>();
+		List<Map<String, ?>> result = ListUtil.newList();
 		for (Node node : list) {
 			result.add(node.toMap());
 		}
@@ -128,7 +132,7 @@ public class NodeCursorImpl implements NodeCursor {
 	public List<Map<String, ? extends Object>> toPropertiesList(PageBean page) {
 		List<Node> list = toList(page);
 
-		List<Map<String, ?>> result = new ArrayList<Map<String, ?>>();
+		List<Map<String, ?>> result = ListUtil.newList();
 		for (Node node : list) {
 			result.add(node.toPropertyMap());
 		}
@@ -146,7 +150,7 @@ public class NodeCursorImpl implements NodeCursor {
 	}
 
 	public void each(PageBean page, Closure closure) {
-		CollectionUtils.forAllDo(toList(page), closure);
+		CollectionUtil.each(toList(page), closure);
 	}
 
 	public Explain explain() {
@@ -247,7 +251,7 @@ class ApplyCursor implements NodeCursor {
 	}
 
 	public void each(PageBean page, Closure closure) {
-		CollectionUtils.forAllDo(toList(page), closure);
+		CollectionUtil.each(toList(page), closure);
 	}
 
 	public Explain explain() {
@@ -297,7 +301,7 @@ class ApplyCursor implements NodeCursor {
 			if (iterator.hasNext()) {
 				next();
 			} else {
-				return new ArrayList<Node>();
+				return ListUtil.EMPTY ;
 			}
 		}
 
@@ -337,7 +341,7 @@ class ApplyCursor implements NodeCursor {
 	public List<Map<String, ? extends Object>> toMapList(PageBean page) {
 		List<Node> list = toList(page);
 
-		List<Map<String, ?>> result = new ArrayList<Map<String, ?>>();
+		List<Map<String, ?>> result = ListUtil.newList();
 		for (Node node : list) {
 			result.add(node.toMap());
 		}
@@ -347,7 +351,7 @@ class ApplyCursor implements NodeCursor {
 	public List<Map<String, ? extends Object>> toPropertiesList(PageBean page) {
 		List<Node> list = toList(page);
 
-		List<Map<String, ?>> result = new ArrayList<Map<String, ?>>();
+		List<Map<String, ?>> result = ListUtil.newList();
 		for (Node node : list) {
 			result.add(node.toPropertyMap());
 		}

@@ -2,6 +2,8 @@ package net.ion.radon.repository;
 
 import java.util.Collection;
 
+import net.ion.radon.repository.myapi.ICredential;
+
 import com.mongodb.DBCollection;
 
 public interface Session {
@@ -63,7 +65,6 @@ public interface Session {
 	public SessionQuery createQuery(String wname);
 	// public NodeResult merge(AradonId aid, Node node);
 
-	public SessionQuery createQuery(String string, WorkspaceOption option);
-
+	public SessionQuery createQuery(String wname, WorkspaceOption option);
 
 }

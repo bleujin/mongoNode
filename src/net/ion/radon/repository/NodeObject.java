@@ -216,8 +216,19 @@ public class NodeObject implements Serializable, IPropertyFamily {
 		return Collections.unmodifiableMap(result);
 	}
 
+	public Map<String, Object> toClone(INode parent) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		for (String key : inner.keySet()) {
+			if (NodeConstants.ID.equals(key)) continue ;
+			result.put(key, get(key, parent));
+		}
+		return Collections.unmodifiableMap(result);
+	}
+
+
 	public Map<String, ? extends Object> toPropertyMap(INode parent) {
 		Map<String, Object> result = new HashMap<String, Object>();
+		
 		for (String key : inner.keySet()) {
 			if (NodeUtil.isReservedProperty(key))
 				continue;

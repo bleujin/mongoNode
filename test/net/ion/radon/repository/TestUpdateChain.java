@@ -2,9 +2,9 @@ package net.ion.radon.repository;
 
 import java.util.List;
 
-import org.apache.commons.collections.Closure;
 
 import net.ion.framework.util.ChainMap;
+import net.ion.framework.util.Closure;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
@@ -21,9 +21,8 @@ public class TestUpdateChain extends TestBaseRepository{
 		assertEquals(2, nr.getRowCount()) ;
 		
 		NodeCursor nc = session.createQuery().find() ;
-		nc.each(PageBean.ALL, new Closure() {
-			public void execute(Object _node) {
-				Node node = (Node) _node ;
+		nc.each(PageBean.ALL, new Closure<Node>() {
+			public void execute(Node node) {
 				assertEquals("busan", node.get("address")) ;
 				assertEquals(20, node.get("age")) ;
 			}

@@ -1,7 +1,11 @@
 package net.ion.radon.repository;
 
+import java.util.List;
+
+import net.ion.framework.util.Closure;
 import net.ion.framework.util.DateUtil;
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 
 
@@ -66,6 +70,16 @@ public class TestQueryOperator extends TestBaseRepository {
 		NodeCursor nc =  createQuery().in("name", new Object[] { "bleu", "jin" }).find();
 
 		assertEquals(2, nc.count());
+	}
+	
+	public void testInIds() throws Exception {
+		final List<String> ids = ListUtil.newList() ;
+		createQuery().find().each(PageBean.ALL, new Closure<Node>(){
+			public void execute(Node node) {
+				ids.add(node.getIdentifier()) ;
+			}}) ;
+		
+		assertEquals(3, createQuery().idIn(ids.toArray(new String[0])).find().count()) ;
 	}
 
 

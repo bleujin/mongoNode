@@ -49,7 +49,7 @@
 	</target>
 	
 	
-	<target name="publish" depends="test_mongonode">
+	<target name="publish">
 		<delete file="publish/mongonode_${version.number}.${build.number}.jar"></delete>
 		<jar destfile="publish/mongonode_${version.number}.${build.number}.jar">
 			<manifest>
@@ -70,8 +70,23 @@
 	</target>
 	
 	<target name="copy" depends="publish">
+		<echo>Copy to ICSS5</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../ICSS6/icss/WEB-INF/lib/" />
+		<echo>Copy to ICS6</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../ICS6/ics/WEB-INF/lib/" />
+		<echo>Copy to ICS6Extend</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../ICS6Extend/lib/common/" />
+		<echo>Copy to AradonExtend</echo>
 		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../AradonExtend/lib/" />
+		<echo>Copy to Websocket</echo>
 		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../WebSocket/libs/" />
-	</target>	
+		<echo>Copy to MongoSearch</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../MongoSearch/lib/" />
+		<echo>Copy to ToonTalk</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../ToonServer/lib_source/aradon/" />
+		<echo>Copy to Fluffy</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../fluffy/trunk/fluffy/lib/common/" />
+	</target>
+	
 
 </project>

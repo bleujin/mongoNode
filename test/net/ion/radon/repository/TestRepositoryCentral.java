@@ -1,7 +1,10 @@
 package net.ion.radon.repository;
 
+import com.mongodb.Mongo;
+
 import junit.framework.TestCase;
 import net.ion.framework.util.Debug;
+import net.ion.radon.core.PageBean;
 
 public class TestRepositoryCentral extends TestCase{
 
@@ -26,6 +29,22 @@ public class TestRepositoryCentral extends TestCase{
 		
 		assertEquals(true, rc1.getMongo() == rc2.getMongo()) ;
 		
+	}
+	
+	
+	public void testOtherMongo() throws Exception {
+		Mongo m1 = new Mongo("61.250.201.78") ;
+		Mongo m2 = new Mongo("61.250.201.78") ;
+		
+		RepositoryCentral r1 = new RepositoryCentral(m1, "test", "", "") ;
+		RepositoryCentral r2 = new RepositoryCentral(m2, "test", "", "") ;
+		
+		Session s1 = r1.login("myshop") ;
+		s1.dropWorkspace() ;
+		s1.newNode().put("name", "bleujin").getSession().commit() ;
+		
+		Session s2 = r2.login("myshop") ;
+		s2.createQuery().find().debugPrint(PageBean.ALL) ;
 	}
 	
 	

@@ -8,7 +8,7 @@ import net.ion.framework.parse.gson.JsonObject;
 
 public class PageBean implements Serializable {
 
-	private static final long serialVersionUID = 1185739585588000730L;
+	private static final long serialVersionUID = -5665091035524221963L;
 	public final static PageBean TEN = new PageBean(Page.TEN) ;
 	public static final PageBean ALL = new PageBean(Page.ALL) ;
 	private Page page;

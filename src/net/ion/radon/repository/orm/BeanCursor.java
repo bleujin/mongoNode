@@ -4,10 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.apache.commons.beanutils.ConstructorUtils;
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
 
 import net.ion.framework.db.RepositoryException;
+import net.ion.framework.util.Closure;
+import net.ion.framework.util.CollectionUtil;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
@@ -83,7 +83,7 @@ public class BeanCursor<T extends NodeORM> {
 	}
 
 	public void each(PageBean page, Closure closure) {
-		CollectionUtils.forAllDo(toList(page), closure);
+		CollectionUtil.each(toList(page), closure);
 	}
 
 	public void debugPrint(PageBean page) {

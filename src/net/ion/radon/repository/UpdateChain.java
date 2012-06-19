@@ -40,6 +40,9 @@ public class UpdateChain {
 		return this;
 	}
 	
+	public String toString(){
+		return String.format("session:%s, targetwname:%s, query:%s, inner:%s", session, targetWorkspace, query, getInner("$set")) ;
+	}
 
 	public UpdateChain inc(String key, int val) {
 		getInner("$inc").put(key, val) ;
@@ -62,7 +65,8 @@ public class UpdateChain {
 	
 	public NodeResult update() {
 		put(NodeConstants.LASTMODIFIED, GregorianCalendar.getInstance().getTimeInMillis());
-		return session.getWorkspace(targetWorkspace).updateInner(session, query, values.getDBObject(), false) ;
+		Workspace workspace = session.getWorkspace(targetWorkspace);
+		return workspace.updateInner(session, query, values.getDBObject(), false) ;
 	}
 	
 	private InNode getInner(String cmd){

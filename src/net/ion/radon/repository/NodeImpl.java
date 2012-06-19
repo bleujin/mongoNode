@@ -233,31 +233,7 @@ public class NodeImpl implements Node, JsonString {
 		m.appendTail(sb);
 		return sb.toString();
 	}
-	
-//	private RemainResult transRemainExpr(String key) {
-//		if (!key.contains("{"))
-//			return null;
-//		
-//		Matcher m = EXPR_PATTERN.matcher(key);
-//		StringBuffer sb = new StringBuffer();
-//		
-//		List<Serializable> foundValues = ListUtil.newList() ;
-//		while (m.find()) {
-//			Serializable value = get(StringUtil.substringBetween(m.group(), "{", "}"));
-//			foundValues.add(value) ;
-//			m.appendReplacement(sb, ObjectUtil.toString(value));
-//		}
-//		m.appendTail(sb);
-//		
-//		if (foundValues.size() == 1) {
-//			return new RemainResult(foundValues.get(0), StringUtil.substringAfter(sb.toString(), ".")) ;
-//		} else if (foundValues.size() > 1){
-//			return new RemainResult(StringUtil.substringBefore(sb.toString(), "."), StringUtil.substringAfter(sb.toString(), ".")) ;
-//		} else {
-//			throw new IllegalArgumentException("empty expr") ;
-//		}
-//	}
-	
+
 	
 	public Serializable get(String propId, int index) {
 		return nobject.get(propId, index, this);
@@ -326,6 +302,7 @@ public class NodeImpl implements Node, JsonString {
 		if (_dbo.get(OWNER) == null) {
 			setOwner("_unknown");
 		}
+		if (! nobject.containsField(NodeConstants.LASTMODIFIED)) this.nobject.put(NodeConstants.LASTMODIFIED, 0L);
 	}
 
 	private void setCreated(Calendar c) {
@@ -499,8 +476,8 @@ public class NodeImpl implements Node, JsonString {
 		return getIdentifier().equals(that.getIdentifier());
 	}
 
-	public TempNode toTemp() {
-		return TempNodeImpl.create(getSession(), NodeObject.load(nobject.toPropertyMap(this)));
+	public TempNode toTemp(Session session) {
+		return TempNodeImpl.create(session, NodeObject.load(nobject.toClone(this)));
 	}
 
 	public String toJsonString() {

@@ -86,7 +86,7 @@ public interface Node extends IPropertyFamily, INode {
 
 	public NodeRef selfRef();
 
-	public TempNode toTemp();
+	public TempNode toTemp(Session session);
 	
 //	public int remove() ;
 
@@ -259,7 +259,7 @@ class RootNode implements Node {
 		return NodeResult.NULL;
 	}
 
-	public TempNode toTemp() {
+	public TempNode toTemp(Session s) {
 		return session.tempNode();
 	}
 

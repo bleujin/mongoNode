@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.parse.gson.JsonParser;
+import net.ion.framework.util.Closure;
+import net.ion.framework.util.CollectionUtil;
 import net.ion.framework.util.ListUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
@@ -16,8 +18,6 @@ import net.ion.radon.repository.mr.ReduceFormat;
 import net.ion.radon.repository.orm.NodeORM;
 
 import org.apache.commons.beanutils.ConstructorUtils;
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
 
 public class ProxyCursor implements NodeCursor{
 
@@ -89,9 +89,9 @@ public class ProxyCursor implements NodeCursor{
 		for (Object key : map.keySet()) {
 			Object value = map.get(key) ;
 			if (ONE.equals(value)){
-				options.ascending(key.toString()) ;
+				ascending(key.toString()) ;
 			} else {
-				options.descending(key.toString()) ;
+				descending(key.toString()) ;
 			}
 		}
 		
@@ -114,7 +114,7 @@ public class ProxyCursor implements NodeCursor{
 		createReal().debugPrint(page) ;
 	}
 
-	public void each(PageBean page, Closure closure) {
+	public <T> void each(PageBean page, Closure<T> closure) {
 		createReal().each(page, closure) ;
 	}
 
@@ -169,6 +169,10 @@ public class ProxyCursor implements NodeCursor{
 	}
 
 
+	public final static NodeCursor create(Session session, PropertyQuery query, List<Node> nodes, Explain explain){
+		session.setAttribute(Explain.class.getCanonicalName(), explain) ;
+		return NodeListCursor.create(session, query, nodes) ;
+	}
 }
 
 
@@ -238,7 +242,7 @@ class NodeListCursor implements NodeCursor{
 	}
 
 	public void each(PageBean page, Closure closure) {
-		CollectionUtils.forAllDo(toList(page), closure);
+		CollectionUtil.each(toList(page), closure);
 	}
 
 	

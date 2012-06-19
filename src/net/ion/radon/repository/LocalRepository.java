@@ -13,7 +13,7 @@ import com.mongodb.DB;
 public class LocalRepository implements Repository {
 
 	private DB db;
-	private static ConcurrentHashMap<String, Repository> rss = new ConcurrentHashMap<String, Repository>(new LRUMap(5));
+	private static ConcurrentHashMap<String, Repository> rss = new ConcurrentHashMap<String, Repository>(new LRUMap(15));
 
 	private LocalRepository(DB db) {
 		this.db = db;

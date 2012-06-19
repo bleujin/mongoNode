@@ -107,7 +107,7 @@ public abstract class NodeORM implements ORMObject {
 		if (loadNode == null)
 			return null;
 
-		this.node = loadNode.toTemp();
+		this.node = loadNode.toTemp(loadNode.getSession());
 		this.session = loadNode.getSession() ;
 		this.aid = loadNode.getAradonId() ;
 		this.idm = getClass().getAnnotation(IDMethod.class);

@@ -1,9 +1,13 @@
 package net.ion.radon.repository;
 
+import java.io.Serializable;
+
 import com.mongodb.MapReduceCommand;
 import com.mongodb.MapReduceCommand.OutputType;
 
-public class CommandOption {
+public class CommandOption implements Serializable{
+
+	private static final long serialVersionUID = -176567678281489432L;
 
 	public final static CommandOption BLANK = new CommandOption() ;
 	

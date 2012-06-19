@@ -1,11 +1,9 @@
 package net.ion.radon.repository;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 
 public class LocalSession implements Session {
@@ -22,12 +20,6 @@ public class LocalSession implements Session {
 		this.root = new RootNode(this);
 		this.currentWsName = wname;
 	}
-
-//	private static ThreadLocal<Session> CURRENT = new ThreadLocal<Session>();
-//
-//	private static ThreadLocal<Session> getThreadLocal() {
-//		return CURRENT;
-//	}
 
 	static synchronized Session create(Repository repository, String wname) {
 		return new LocalSession(repository, wname);
@@ -78,7 +70,7 @@ public class LocalSession implements Session {
 
 	public Node mergeNode(MergeQuery mergeQuery, String... props) {
 
-		Node found = SessionQuery.create(this, mergeQuery.getQuery()).findOne(Columns.append().add(Columns.MetaColumns).add(props));
+		Node found = SessionQueryImpl.create(this, mergeQuery.getQuery()).findOne(Columns.append().add(Columns.MetaColumns).add(props));
 		if (found == null) {
 			Node newNode = newNode();
 			Map<String, ? extends Object> queryMap = mergeQuery.data();
@@ -110,7 +102,7 @@ public class LocalSession implements Session {
 	public NodeResult remove(Node node) {
 		if (node == getRoot())
 			return NodeResult.NULL;
-		return getWorkspace(node.getWorkspaceName()).remove(this, PropertyQuery.createByAradon(node.getAradonId().getGroup(), node.getAradonId().getUid()));
+		return getWorkspace(node.getWorkspaceName()).remove(this, PropertyQuery.createById(node.getIdentifier()));
 	}
 
 	public Node createChild(Node parent, String name) {
@@ -141,15 +133,15 @@ public class LocalSession implements Session {
 	}
 
 	public SessionQuery createQuery(PropertyQuery definedQuery) {
-		return SessionQuery.create(this, definedQuery);
+		return SessionQueryImpl.create(this, definedQuery);
 	}
 	
 	public SessionQuery createQuery(String wname) {
-		return SessionQuery.create(this, wname);
+		return SessionQueryImpl.create(this, wname);
 	}
 	
 	public SessionQuery createQuery(String wname, WorkspaceOption option) {
-		return SessionQuery.create(this, wname, option);
+		return SessionQueryImpl.create(this, wname, option);
 	}
 	
 
@@ -164,7 +156,7 @@ public class LocalSession implements Session {
 	}
 	
 	public SessionQuery createQuery() {
-		return SessionQuery.create(this);
+		return SessionQueryImpl.create(this);
 	}
 
 	public void setAttribute(String key, Object value) {
