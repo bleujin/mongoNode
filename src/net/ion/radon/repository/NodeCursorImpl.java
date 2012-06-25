@@ -29,8 +29,8 @@ public class NodeCursorImpl implements NodeCursor {
 	private String workspaceName;
 	private DBCursor cursor;
 	private final PropertyQuery iquery;
-	private int skip = 0 ;
-	private int limit = 1000000 ;
+	private int skip = 0;
+	private int limit = 1000000;
 
 	protected NodeCursorImpl(Session session, PropertyQuery iquery, String workspaceName, DBCursor cursor) {
 		this.session = session;
@@ -54,21 +54,23 @@ public class NodeCursorImpl implements NodeCursor {
 	public int count() {
 		return cursor.count();
 	}
-	
-	public NodeCursor batchSize(int n){
-		cursor.batchSize(n) ;
-		return this ;
+
+	public NodeCursor batchSize(int n) {
+		cursor.batchSize(n);
+		return this;
 	}
 
 	public NodeCursor skip(int n) {
-		cursor.skip(n);
-		this.skip = n ;
+		if (n > 0) {
+			cursor.skip(n);
+			this.skip = n;
+		}
 		return this;
 	}
 
 	public NodeCursor limit(int n) {
 		cursor.limit(n);
-		this.limit = n ;
+		this.limit = n;
 		return this;
 	}
 
@@ -98,7 +100,7 @@ public class NodeCursorImpl implements NodeCursor {
 	// }
 
 	public List<Node> toList(PageBean page) {
-		this.skip(this.skip + page.getSkipScreenCount()).limit( Math.min(page.getMaxScreenCount() + 1, this.limit) );
+		this.skip(this.skip + page.getSkipScreenCount()).limit(Math.min(page.getMaxScreenCount() + 1, this.limit));
 		return toList(page.getPageIndexOnScreen() * page.getListNum(), page.getListNum());
 	}
 
@@ -107,11 +109,11 @@ public class NodeCursorImpl implements NodeCursor {
 			if (cursor.hasNext()) {
 				cursor.next();
 			} else {
-				return ListUtil.EMPTY ;
+				return ListUtil.EMPTY;
 			}
 		}
 
-		List<Node> result = ListUtil.newList() ;
+		List<Node> result = ListUtil.newList();
 		while (limit-- > 0 && cursor.hasNext()) {
 			result.add(next());
 		}
@@ -171,7 +173,7 @@ public class NodeCursorImpl implements NodeCursor {
 		try {
 
 			List<T> result = ListUtil.newList();
-			
+
 			for (Node node : toList(page)) {
 				NodeORM obj = clz.cast(ConstructorUtils.invokeConstructor(clz, new Object[0]));
 				result.add((T) obj.load(node));
@@ -188,7 +190,7 @@ public class NodeCursorImpl implements NodeCursor {
 			throw RepositoryException.throwIt(e);
 		}
 	}
-	
+
 	public <T> List<T> toList(Class<T> clz, PageBean page) {
 		List<T> result = ListUtil.newList();
 		for (Node node : toList(page)) {
@@ -211,14 +213,14 @@ class ApplyCursor implements NodeCursor {
 
 	private Session session;
 	private String workspaceName;
-	private MapReduceOutput output ;
+	private MapReduceOutput output;
 	private Iterator<DBObject> iterator;
 	private final PropertyQuery iquery;
 
 	protected ApplyCursor(Session session, PropertyQuery iquery, String workspaceName, MapReduceOutput output) {
 		this.session = session;
 		this.workspaceName = workspaceName;
-		this.output = output ;
+		this.output = output;
 		this.iterator = output.results().iterator();
 		this.iquery = iquery;
 	}
@@ -255,11 +257,11 @@ class ApplyCursor implements NodeCursor {
 	}
 
 	public Explain explain() {
-		DBObject dbo = new BasicDBObject() ;
-		dbo.put("timeMillis", output.getRaw().get("timeMillis")) ;
-		dbo.put("timing", output.getRaw().get("timing")) ;
-		dbo.put("counts", output.getRaw().get("counts")) ;
-		
+		DBObject dbo = new BasicDBObject();
+		dbo.put("timeMillis", output.getRaw().get("timeMillis"));
+		dbo.put("timing", output.getRaw().get("timing"));
+		dbo.put("counts", output.getRaw().get("counts"));
+
 		return Explain.load(dbo);
 	}
 
@@ -301,7 +303,7 @@ class ApplyCursor implements NodeCursor {
 			if (iterator.hasNext()) {
 				next();
 			} else {
-				return ListUtil.EMPTY ;
+				return ListUtil.EMPTY;
 			}
 		}
 
@@ -337,7 +339,7 @@ class ApplyCursor implements NodeCursor {
 			throw RepositoryException.throwIt(e);
 		}
 	}
-	
+
 	public List<Map<String, ? extends Object>> toMapList(PageBean page) {
 		List<Node> list = toList(page);
 
@@ -366,5 +368,5 @@ class ApplyCursor implements NodeCursor {
 		}
 		return result;
 	}
-	
+
 }

@@ -1,10 +1,17 @@
 package net.ion.radon.repository.innode;
 
+import java.util.Date;
+
+import javax.swing.plaf.ListUI;
+
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.radon.core.PageBean;
+import net.ion.radon.repository.InListNode;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
+import net.ion.radon.repository.NodeCursor;
 
 public class TestInListNode extends TestBaseInListQuery {
 
@@ -21,6 +28,18 @@ public class TestInListNode extends TestBaseInListQuery {
 		assertEquals(1, found.inlist("people").createQuery().eq("address.city", "seoul").eq("index", 1).find().size());
 
 		assertEquals(4, found.inlist("people").createQuery().ne("index", 1).find().size());
+	}
+	
+
+	public void testAppend() throws Exception {
+		Node newNode = session.newNode() ;
+		newNode.put("name", ListUtil.toList("name")).getSession().commit() ;
+		
+		Node found = session.createQuery().findOne() ;
+		NodeCursor nc = session.createQuery().find() ;
+		
+		nc.debugPrint(PageBean.ALL) ;
+		nc.debugPrint(PageBean.ALL) ;
 	}
 
 	public void testNotEqualFilter() throws Exception {
