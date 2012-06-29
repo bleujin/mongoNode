@@ -31,17 +31,6 @@ public class TestInListNode extends TestBaseInListQuery {
 	}
 	
 
-	public void testAppend() throws Exception {
-		Node newNode = session.newNode() ;
-		newNode.put("name", ListUtil.toList("name")).getSession().commit() ;
-		
-		Node found = session.createQuery().findOne() ;
-		NodeCursor nc = session.createQuery().find() ;
-		
-		nc.debugPrint(PageBean.ALL) ;
-		nc.debugPrint(PageBean.ALL) ;
-	}
-
 	public void testNotEqualFilter() throws Exception {
 		createNode();
 		Node found = session.createQuery().findOne();
