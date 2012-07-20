@@ -234,6 +234,13 @@ public class Workspace {
 		return NodeResult.create(session, query, getCollection().save(find));
 	}
 
+	
+	protected Node poll(Session session, PropertyQuery query){
+		DBObject dbo = getCollection().findAndModify(query.getDBObject(), null, new BasicDBObject("_id", 1), true, null, false, false) ;
+		return NodeImpl.load(session, query, getName(), dbo) ;
+	}
+	
+	
 	NodeResult findAndUpdate(Session session, PropertyQuery query, Map<String, ?> props) {
 		DBObject mod = new BasicDBObject();
 		mod.put("$set", appendLastModified(props));

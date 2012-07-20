@@ -6,7 +6,9 @@ import net.ion.radon.core.PageBean;
 import net.ion.radon.repository.InListNode;
 import net.ion.radon.repository.InNode;
 import net.ion.radon.repository.Node;
+import net.ion.radon.repository.NodeObject;
 import net.ion.radon.repository.NodeResult;
+import net.ion.radon.repository.PropertyFamily;
 import net.ion.radon.repository.PropertyQuery;
 
 public class TestInListQueryNodeMDL extends TestBaseInListQuery{
@@ -20,12 +22,18 @@ public class TestInListQueryNodeMDL extends TestBaseInListQuery{
 
 		assertEquals(2, session.createQuery().findOne().inlist("people").createQuery().find().size()) ;
 	}
+	
+	public void testUnset() throws Exception {
+		session.newNode().put("name", "bleujin").inner("people").put("idx", 1).put("age", 20).getParent().getSession().commit() ;
+		session.createQuery().updateChain().unset("people.idx").update() ;
+		session.createQuery().find().debugPrint(PageBean.ALL) ;
+	}
 
 	public void testPull() throws Exception {
 		createNodes() ;
 		assertEquals(2, session.createQuery().lte("oindex", 1).inlist("people").pull(PropertyQuery.create().eq("index", 0)).getRowCount());
 
-		session.createQuery().eq("oindex", 2).findOne() ;
+		Debug.line(session.createQuery().eq("oindex", 2).findOne()) ;
 	}
 	
 	

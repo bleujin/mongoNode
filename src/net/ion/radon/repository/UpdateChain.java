@@ -34,6 +34,13 @@ public class UpdateChain {
 		return this;
 	}
 
+	
+	public UpdateChain unset(String key) {
+		getInner("$unset").put(key, 1) ;
+		
+		return this;
+	}
+
 	private UpdateChain put(PropertyId key, Object val) {
 		getInner("$set").put(key, val) ;
 		

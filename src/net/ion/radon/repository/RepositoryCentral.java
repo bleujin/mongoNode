@@ -148,6 +148,10 @@ public class RepositoryCentral implements RCentral {
 		DB db = mongo.getDB(currentDBName) ;
 		return DBStatus.create(mongo.getDB("system"), db) ;
 	}
+
+	public WorkspaceQueue lookupQueue(String wsname) {
+		return WorkspaceQueue.create(login(wsname));
+	}
 	
 }
 

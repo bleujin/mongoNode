@@ -219,6 +219,7 @@ public class PropertyQuery implements IPropertyFamily {
 		nobject.put("$not", query.getDBObject());
 		return this;
 	}
+	
 
 	public int hashCode() {
 		return nobject.hashCode();
@@ -238,5 +239,6 @@ public class PropertyQuery implements IPropertyFamily {
 		}
 		return cacheMap.get(wsName, query);
 	}
+
 
 }

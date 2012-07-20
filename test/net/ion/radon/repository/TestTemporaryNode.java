@@ -1,6 +1,9 @@
 package net.ion.radon.repository;
 
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
+import net.ion.framework.util.ObjectId;
+import net.ion.radon.core.PageBean;
 
 public class TestTemporaryNode extends TestBaseRepository {
 
@@ -129,6 +132,15 @@ public class TestTemporaryNode extends TestBaseRepository {
 		InNode in = (InNode) found.inlist("child").get(0) ;
 		assertEquals("seoul", in.getString("address")) ;
 		
+	}
+	
+	public void testMulti() throws Exception {
+		
+		session.merge(MergeQuery.createByAradon("name", "bleujin"), session.tempNode().put("name", "bleujin").put("age", 20)) ;
+		session.merge(MergeQuery.createByAradon("name", "hero"), session.tempNode().put("name", "hero").put("age", 20)) ;
+		session.merge(MergeQuery.createByAradon("name", "jin"), session.tempNode().put("name", "jin").put("age", 20)) ;
+		
+		session.createQuery().find().debugPrint(PageBean.ALL) ;
 	}
 	
 	
