@@ -174,8 +174,6 @@ public class TestAdvanceNodeGet extends TestBaseRepository {
 	}
 	
 
-	
-
 	public void testType() throws Exception {
 		session.newNode().put("int", Integer.MAX_VALUE).put("long", Long.MAX_VALUE).put("num", 1L * Integer.MAX_VALUE);
 		session.commit();
@@ -186,4 +184,8 @@ public class TestAdvanceNodeGet extends TestBaseRepository {
 		assertEquals(true, session.createQuery().eq("num", 1L * Integer.MAX_VALUE).existNode());
 	}
 
+	
+	
+	
+	
 }
