@@ -26,6 +26,13 @@ public class NodeRows extends RowsImpl {
 		return rows;
 	}
 
+	public static NodeRows createByNode(Node node, NodeColumns columns) throws SQLException {
+		return createByNode(Queryable.Fake, node, columns);
+	}
+
+	public static NodeRows createByNode(Node node, String... columns) throws SQLException {
+		return createByNode(node, NodeColumns.create(columns));
+	}
 	
 	public static NodeRows createByNode(Queryable query, Node node, NodeColumns columns) throws SQLException {
 	if (node == null){
@@ -38,6 +45,13 @@ public class NodeRows extends RowsImpl {
 		return result;
 	}
 	
+	public static NodeRows createByScreen(NodeScreen nodeScreen, NodeColumns columns) throws SQLException {
+		return createByScreen(Queryable.Fake, nodeScreen, columns);
+	}
+
+	public static NodeRows createByScreen(NodeScreen nodeScreen, String... columns) throws SQLException {
+		return createByScreen(nodeScreen, NodeColumns.create(columns));
+	}
 
 	public static NodeRows createByScreen(Queryable query, NodeScreen nodeScreen, NodeColumns columns) throws SQLException {
 		final NodeRows result = new NodeRows(query);
@@ -46,13 +60,29 @@ public class NodeRows extends RowsImpl {
 		return result;
 	}
 
+	public static Rows createByCursor(ICursor cursor, NodeColumns columns) throws SQLException {
+		return createByCursor(Queryable.Fake, cursor, columns);
+	}
+
+	public static Rows createByCursor(ICursor cursor, String... columns) throws SQLException {
+		return createByCursor(cursor, NodeColumns.create(columns));
+	}
+	
 	public static Rows createByCursor(Queryable query, ICursor cursor, NodeColumns columns) throws SQLException {
 		final NodeRows result = new NodeRows(query);
 		result.populate(cursor, columns);
 		result.beforeFirst();
 		return result;
 	}
-	
+
+	public static Rows createByList(List<Node> nodes, NodeColumns columns) throws SQLException {
+		return createByList(Queryable.Fake, nodes, columns);
+	}
+
+	public static Rows createByList(List<Node> nodes, String... columns) throws SQLException {
+		return createByList(Queryable.Fake, nodes, NodeColumns.create(columns));
+	}
+		
 	public static Rows createByList(Queryable query, List<Node> nodes, NodeColumns columns) throws SQLException {
 		final NodeRows result = new NodeRows(query);
 		result.populate(nodes, columns);
@@ -127,7 +157,7 @@ public class NodeRows extends RowsImpl {
 		List<Node> sourceList = nodeScreen.getPageNode();
 //		List<Node> destList = new ArrayList<Node>(sourceList) ;
 //		Collections.reverse(destList) ;
-//		
+		
 		setMetaData(sourceList, columns) ;
 		for(Node node : sourceList) {
 			appendRow(columns, node, nodeScreen.getScreenSize());
