@@ -1,11 +1,9 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.StringUtil;
 
 public class TestWorkspace extends TestBaseRepository{
-	
 	
 	public void testWorkspace2() throws Exception {
 		
