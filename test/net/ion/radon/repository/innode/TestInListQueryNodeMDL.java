@@ -26,7 +26,12 @@ public class TestInListQueryNodeMDL extends TestBaseInListQuery{
 	public void testUnset() throws Exception {
 		session.newNode().put("name", "bleujin").inner("people").put("idx", 1).put("age", 20).getParent().getSession().commit() ;
 		session.createQuery().updateChain().unset("people.idx").update() ;
-		session.createQuery().find().debugPrint(PageBean.ALL) ;
+		assertEquals(true, session.createQuery().findOne().get("people.idx") == null) ;
+		
+		
+		session.createQuery().updateChain().unset("people.age").put("people.idx", 2).update() ;
+		assertEquals(true, session.createQuery().findOne().get("people.age") == null) ;
+		assertEquals(true, session.createQuery().findOne().get("people.idx") != null) ;
 	}
 
 	public void testPull() throws Exception {
