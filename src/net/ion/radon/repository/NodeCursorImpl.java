@@ -156,7 +156,7 @@ public class NodeCursorImpl implements NodeCursor {
 	}
 
 	public Explain explain() {
-		return Explain.load(cursor.explain());
+		return Explain.load(cursor.limit(1).explain());
 	}
 
 	public PropertyQuery getQuery() {

@@ -134,6 +134,7 @@ public class Workspace {
 	public NodeCursor find(Session session, PropertyQuery iquery, Columns columns) {
 		NodeCursorImpl result = NodeCursorImpl.create(session, iquery, this.getName(), getCollection().find(iquery.getDBObject(), columns.getDBOjbect()));
 		session.setAttribute(Explain.class.getCanonicalName(), result.explain());
+		
 		return result;
 	}
 	
