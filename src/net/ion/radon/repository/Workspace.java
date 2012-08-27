@@ -130,11 +130,14 @@ public class Workspace {
 		return result;
 	}
 
+	NodeCursor findInner(Session session, PropertyQuery iquery, Columns columns) {
+		return NodeCursorImpl.create(session, iquery, this.getName(), getCollection().find(iquery.getDBObject(), columns.getDBOjbect()));
+	}
+
 
 	public NodeCursor find(Session session, PropertyQuery iquery, Columns columns) {
-		NodeCursorImpl result = NodeCursorImpl.create(session, iquery, this.getName(), getCollection().find(iquery.getDBObject(), columns.getDBOjbect()));
-		session.setAttribute(Explain.class.getCanonicalName(), result.explain());
-		
+		NodeCursor result = findInner(session, iquery, columns) ;
+		session.setAttribute(Explain.class.getCanonicalName(), FakeExplain.load(session, iquery, columns));
 		return result;
 	}
 	

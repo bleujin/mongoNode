@@ -10,7 +10,7 @@ public class Explain implements Serializable{
 
 	private static final long serialVersionUID = 342391910395943395L;
 	private DBObject dbo ;
-	private Explain(DBObject dbo) {
+	protected Explain(DBObject dbo) {
 		this.dbo = dbo ;
 	}
 

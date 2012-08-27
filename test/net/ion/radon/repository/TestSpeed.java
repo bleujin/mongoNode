@@ -3,7 +3,9 @@ package net.ion.radon.repository;
 
 import junit.framework.TestCase;
 import net.ion.framework.util.Debug;
+import net.ion.radon.core.PageBean;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -21,22 +23,38 @@ public class TestSpeed extends TestCase  {
 		String pDate = "20120827-102042";
 		Session s = rc.login("ics_article");
 		SessionQuery query = s.createQuery().eq("catidpath", "siya_root");
-		query = query.eq("useflg", "T");
-		query = query.lte("operday", pDate).gte("expireday", pDate);
+//		query = query.eq("useflg", "T");
+//		query = query.lte("operday", pDate).gte("expireday", pDate);
 		
 		long start = System.nanoTime();
+		
+		NodeCursor nc =  query.find().limit(50);
+		System.out.println("actual time(ms) : " + (int) ((System.nanoTime() - start) / 1000000));
 
-		//Debug.line(query.find().limit(50).explain()) ;
+//		PropertyFamily initial = PropertyFamily.create().put("count", 0);
+//		String reduce = "function(doc, out){ out.count++; }";
+//		NodeCursor nc2 = query.group(PropertyFamily.create(), initial, reduce) ;
+//		nc2.debugPrint(PageBean.TEN) ;
+//		
+//		System.out.println("actual time(ms) : " + (int) ((System.nanoTime() - start) / 1000000));
+
+//		Debug.line(query.count());
+//		
+//		System.out.println("actual time(ms) : " + (int) ((System.nanoTime() - start) / 1000000));
 		
-		NodeCursor nc =  query.find();
+		Debug.line(nc.count());
 		
+		System.out.println("actual time(ms) : " + (int) ((System.nanoTime() - start) / 1000000));
 		
-		long actual_time = (System.nanoTime() - start);
-		System.out.println(query);
-		System.out.println("actual time(ms) : " + (int) (actual_time / 1000000));
+//		while(nc.hasNext()){
+//			Debug.line(nc.next().getAradonId()) ;
+//		}
 		
-		Debug.line(nc.explain()) ;
-		//Debug.line(nc.explain());
+//		System.out.println(query);
+//		System.out.println("actual time(ms) : " + (int) ((System.nanoTime() - start) / 1000000));
+		
+		//Debug.line(s.getAttribute(Explain.class.getCanonicalName(), Explain.class)) ;
+//		Debug.line(nc.explain());
 		//nc.debugPrint(PageBean.TEN);
 	}
 	
@@ -54,15 +72,30 @@ public class TestSpeed extends TestCase  {
 
 		long start = System.nanoTime();
 
-		DBCursor cu = collection.find(ref).limit(50);
+		DBCursor cu = collection.find(ref).limit(10);
+		System.out.println("actual time(ms) : " + (int) ( (System.nanoTime() - start) / 1000000));
+//		Debug.line(cu.count()) ;
+//		System.out.println("actual time(ms) : " + (int) ( (System.nanoTime() - start) / 1000000));
+//		while(cu.hasNext()){
+//			Debug.line(cu.next()) ;
+//		}
 		
-		while(cu.hasNext()){
-			Debug.line(cu.next()) ;
-		}
-
-		long actual_time = (System.nanoTime() - start);
-		System.out.println(ref);
-		System.out.println("actual time(ms) : " + (int) (actual_time / 1000000));
+		Debug.line(collection.count(ref));
+		
+		System.out.println("actual time(ms) : " + (int) ( (System.nanoTime() - start) / 1000000));
+		
+//		PropertyFamily initial = PropertyFamily.create().put("count", 0);
+//		String reduce = "function(doc, out){ out.count++; }";
+//		
+//		BasicDBList list = (BasicDBList) collection.group(PropertyFamily.create().getDBObject(), ref, initial.getDBObject(), reduce);
+//		for (Object obj : list) {
+//			Debug.line(obj) ;
+//
+//		}
+//		System.out.println("actual time(ms) : " + (int) ( (System.nanoTime() - start) / 1000000));
+//
+//		//System.out.println(ref);
+//		System.out.println("actual time(ms) : " + (int) ( (System.nanoTime() - start) / 1000000));
 	}
 	
 	
