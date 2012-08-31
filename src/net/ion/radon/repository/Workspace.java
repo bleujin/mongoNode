@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.StringUtil;
@@ -62,7 +63,12 @@ public class Workspace {
 		if (wname == null || wname.startsWith("_") || wname.startsWith("system.")) {
 			result.collection = col;
 			return result;
+		} else if (StringUtil.contains(wname, '.')) {
+			result.collection = col;
+			return result;
 		}
+		
+		
 		option.initWorkspace(col) ;
 		result.collection = col;
 		return result;

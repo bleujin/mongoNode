@@ -34,7 +34,7 @@ public class TestAdvanceRelation extends TestBaseRepository {
 		Node bleujin = session.newNode().setAradonId("employee", "bleujin").put("id", "bleujin").put("name", "bleu").put("age", 20);
 		bleujin.toRelation("dept", dev.selfRef()) ;
 		session.commit() ;
-		
+
 		Node found = session.createQuery().aradonGroupId("employee", "bleujin").findOneInDB() ;
 
 		assertEquals("dev", found.get("#dept.dname")) ;
