@@ -16,6 +16,8 @@ public interface NodeCursor extends ICursor {
 
 	public int count()  ;
 
+	public NodeCursor hint(String indexName) ;
+
 	public NodeCursor skip(int n)  ;
 
 	public NodeCursor limit(int n)  ;

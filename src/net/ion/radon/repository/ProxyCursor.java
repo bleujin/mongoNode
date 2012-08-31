@@ -97,19 +97,16 @@ public class ProxyCursor implements NodeCursor{
 		
 		return this;
 	}
-
-	
-	
-	
-	
-	
-	
-	
 	
 	public int count() {
 		return createReal().count();
 	}
 
+	public NodeCursor hint(String indexName) {
+		; // 
+		return this;
+	}
+	
 	public void debugPrint(PageBean page) {
 		createReal().debugPrint(page) ;
 	}
@@ -226,6 +223,10 @@ class NodeListCursor implements NodeCursor{
 		return subList(PageBean.ALL).size();
 	}
 
+	public NodeCursor hint(String indexName) {
+		return this;
+	}
+	
 	public NodeCursor skip(int skip) {
 		this.fromindex = skip ;
 		this.current = skip ;
