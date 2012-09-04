@@ -63,6 +63,13 @@ public class NodeCursorImpl implements NodeCursor {
 		return this;
 	}
 	
+	public NodeCursor hint(IPropertyFamily props) {
+		if(props != null){
+			cursor.hint(props.getDBObject());
+		}
+		return this;
+	}
+	
 	public NodeCursor batchSize(int n) {
 		cursor.batchSize(n);
 		return this;
@@ -252,6 +259,10 @@ class ApplyCursor implements NodeCursor {
 		return this;
 	}
 
+	public NodeCursor hint(IPropertyFamily props) {
+		return this;
+	}
+	
 	public void debugPrint(PageBean page) {
 		each(page, new DebugPrinter());
 	}

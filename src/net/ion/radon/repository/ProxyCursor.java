@@ -103,7 +103,10 @@ public class ProxyCursor implements NodeCursor{
 	}
 
 	public NodeCursor hint(String indexName) {
-		; // 
+		return this;
+	}
+	
+	public NodeCursor hint(IPropertyFamily props) {
 		return this;
 	}
 	
@@ -224,6 +227,10 @@ class NodeListCursor implements NodeCursor{
 	}
 
 	public NodeCursor hint(String indexName) {
+		return this;
+	}
+	
+	public NodeCursor hint(IPropertyFamily props) {
 		return this;
 	}
 	

@@ -78,6 +78,10 @@ public class ProxyFromCursor implements NodeCursor{
 		return this;
 	}
 	
+	public NodeCursor hint(IPropertyFamily props) {
+		return this;
+	}
+	
 	public void debugPrint(PageBean page) {
 		createReal().debugPrint(page) ;
 	}
