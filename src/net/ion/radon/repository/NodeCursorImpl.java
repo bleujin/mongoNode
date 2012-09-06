@@ -12,6 +12,7 @@ import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.Closure;
 import net.ion.framework.util.CollectionUtil;
 import net.ion.framework.util.ListUtil;
+import net.ion.framework.util.StringUtil;
 import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
 import net.ion.radon.repository.orm.NodeORM;
@@ -55,6 +56,20 @@ public class NodeCursorImpl implements NodeCursor {
 		return cursor.count();
 	}
 
+	public NodeCursor hint(String indexName) {
+		if(StringUtil.isNotBlank(indexName)){
+			cursor.hint(indexName);
+		}
+		return this;
+	}
+	
+	public NodeCursor hint(IPropertyFamily props) {
+		if(props != null){
+			cursor.hint(props.getDBObject());
+		}
+		return this;
+	}
+	
 	public NodeCursor batchSize(int n) {
 		cursor.batchSize(n);
 		return this;
@@ -240,6 +255,14 @@ class ApplyCursor implements NodeCursor {
 		return -1;
 	}
 
+	public NodeCursor hint(String indexName) {
+		return this;
+	}
+
+	public NodeCursor hint(IPropertyFamily props) {
+		return this;
+	}
+	
 	public void debugPrint(PageBean page) {
 		each(page, new DebugPrinter());
 	}
