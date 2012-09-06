@@ -1,5 +1,7 @@
 package net.ion.radon.repository;
 
+import net.ion.radon.core.PageBean;
+
 
 public class TestInnerNode extends TestBaseRepository {
 
@@ -47,6 +49,8 @@ public class TestInnerNode extends TestBaseRepository {
 		Node node = session.newNode().put("name", "bleujin") ;
 		node.inner("c1").put("name", "c1").inner("c2").put("name", "c2").inner("c3").put("name", "c3") ;
 		session.commit() ;
+		
+		// session.createQuery().find(Columns.append().add("c1.c2.c3")).debugPrint(PageBean.ALL) ;
 		
 		Node found = session.createQuery().findOne() ;
 		assertEquals("bleujin", found.get("name")) ;
