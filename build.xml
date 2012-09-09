@@ -81,6 +81,8 @@
 		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../AradonExtend/lib/" />
 		<echo>Copy to Websocket</echo>
 		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../WebSocketPlug/libs/" />
+		<echo>Copy to ToonStory</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../../workspace/ToonServer/lib_source/aradon/" />
 
 	</target>
 
