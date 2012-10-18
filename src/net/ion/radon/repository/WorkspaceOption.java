@@ -52,7 +52,7 @@ public class WorkspaceOption implements IPropertyFamily, Serializable{
 			
 			BasicDBObject path_options = new BasicDBObject();
 			path_options.put("name", "_path_id");
-			path_options.put("unique", Boolean.TRUE);
+			path_options.put("unique", Boolean.FALSE);
 			
 			dc.ensureIndex(PATH_INDEX.getDBObject(), path_options);
 		}

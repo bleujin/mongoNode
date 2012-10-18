@@ -72,8 +72,6 @@
 	<target name="copy" depends="publish">
 		<echo>Copy to Fluffy</echo>
 		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../../workspace/fluffy/trunk/fluffy/lib/common/" />
-		<echo>Copy to ToonTalk</echo>
-		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../../workspace/ToonServer/lib_source/aradon/" />
 	
 		<echo>Copy to MongoSearch</echo>
 		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../MongoSearch/lib/" />
@@ -82,7 +80,10 @@
 		<echo>Copy to Websocket</echo>
 		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../WebSocketPlug/libs/" />
 		<echo>Copy to ToonStory</echo>
-		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../../workspace/ToonServer/lib_source/aradon/" />
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../../workspace/ToonServer/alone/lib/" />
+
+		<echo>Copy to Craken</echo>
+		<copy file="publish/mongonode_${version.number}.${build.number}.jar" todir="../craken/lib/mongodb/" />
 
 	</target>
 

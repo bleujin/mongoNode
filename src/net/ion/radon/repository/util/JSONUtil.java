@@ -23,23 +23,23 @@ public class JSONUtil {
 		BasicDBObject result = new BasicDBObject() ;
 		
 		for (Entry<String, JsonElement> entry : json.entrySet()) {
-			result.put(entry.getKey(), toDBObject(entry.getValue())) ;
+			result.put(entry.getKey(), toPreferObject(entry.getValue())) ;
 		}
 		return result;
 	}
 
-	private static Object toDBObject(JsonElement jsonElement) {
+	public static Object toPreferObject(JsonElement jsonElement) {
 		if (jsonElement.isJsonArray()) {
 			JsonElement[] jeles = jsonElement.getAsJsonArray().toArray();
 			BasicDBList list = new BasicDBList() ;
 			for (JsonElement jele : jeles) {
-				list.add(toDBObject(jele));
+				list.add(toPreferObject(jele));
 			}
 			return list;
 		} else if (jsonElement.isJsonObject()) {
 			BasicDBObject newDBO = new BasicDBObject() ;
 			for (Entry<String, JsonElement> entry : jsonElement.getAsJsonObject().entrySet()) {
-				newDBO.put(entry.getKey(), toDBObject(entry.getValue())) ;
+				newDBO.put(entry.getKey(), toPreferObject(entry.getValue())) ;
 			}
 			return newDBO;
 		} else if (jsonElement.isJsonPrimitive()) {

@@ -9,6 +9,7 @@ import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.StringUtil;
 import net.ion.radon.repository.admin.DBStatus;
+import net.ion.radon.repository.collection.CollectionFactory;
 import net.ion.radon.repository.myapi.ICredential;
 
 import com.mongodb.BasicDBObject;
@@ -152,6 +153,10 @@ public class RepositoryCentral implements RCentral {
 	public WorkspaceQueue lookupQueue(String wsname) {
 		return WorkspaceQueue.create(login(wsname));
 	}
+
+	public CollectionFactory colFactory(String wsName) {
+		return new CollectionFactory(mongo.getDB(currentDBName).getCollection(wsName));
+	}
 	
 }
 
@@ -198,7 +203,7 @@ class BasicCredential implements ICredential {
 	}
 
 	public boolean isAuthenticated(DB db) {
-		return (!db.isAuthenticated()) || db.authenticate(userId, pwd.toCharArray());
+		return ( (!db.isAuthenticated())) || db.authenticate(userId, pwd.toCharArray());
 	}
 	
 }
