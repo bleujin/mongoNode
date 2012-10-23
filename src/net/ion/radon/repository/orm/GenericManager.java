@@ -5,16 +5,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.HashFunction;
-import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeConstants;
-import net.ion.radon.repository.NodeImpl;
-import net.ion.radon.repository.NodeResult;
 import net.ion.radon.repository.PropertyQuery;
 import net.ion.radon.repository.Session;
-import net.ion.radon.repository.Workspace;
-import net.ion.radon.repository.orm.bean.Employee;
 
 public class GenericManager<T extends NodeORM> {
 

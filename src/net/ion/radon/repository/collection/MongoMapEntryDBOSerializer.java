@@ -11,21 +11,28 @@ public class MongoMapEntryDBOSerializer<K, V> implements DBOSerializer<Entry<K, 
 	private DBOSerializer<K> keySerializer;
 	private DBOSerializer<V> valueSerializer;
 
-	public MongoMapEntryDBOSerializer(final DBCollection collection, final DBOSerializer<K> keySerializer, final DBOSerializer<V> valueSerializer) {
+	MongoMapEntryDBOSerializer(final DBCollection collection, final DBOSerializer<K> keySerializer, final DBOSerializer<V> valueSerializer) {
 		this.collection = collection;
 		this.keySerializer = keySerializer;
 		this.valueSerializer = valueSerializer;
 	}
 
-	public DBObject toDBObject(final Entry<K, V> element, final boolean equalFunctions, final boolean negate) {
-		DBObject obj = keySerializer.toDBObject(element.getKey(), equalFunctions, negate);
-		obj.putAll(valueSerializer.toDBObject(element.getValue(), equalFunctions, negate));
+	public DBObject toDBObject(final Entry<K, V> element) {
+		DBObject obj = keySerializer.toDBObject(element.getKey());
+		obj.putAll(valueSerializer.toDBObject(element.getValue()));
 
 		return obj;
 	}
 
 	public MongoMapEntry<K, V> toElement(final DBObject dbObject) {
 		return new MongoMapEntry<K, V>(keySerializer.toElement(dbObject), collection, dbObject, valueSerializer);
+	}
+
+	public DBObject groupQuery(){
+		return valueSerializer.groupQuery() ;
+	}
+	public String groupId(){
+		return valueSerializer.groupId() ;
 	}
 
 }

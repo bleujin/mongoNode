@@ -4,8 +4,11 @@ import com.mongodb.DBObject;
 
 public interface DBOSerializer<E> {
 
-	DBObject toDBObject(E element, boolean equalFunctions, boolean negate);
+	DBObject toDBObject(E element);
 
 	E toElement(DBObject dbObject);
 
+	public DBObject groupQuery() ;
+
+	String groupId();
 }

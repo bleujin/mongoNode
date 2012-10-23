@@ -7,10 +7,10 @@ import com.mongodb.DBObject;
 
 public class MongoMapEntry<K, V> implements Entry<K, V> {
 
-	DBCollection collection;
-	DBObject document;
-	K key;
-	DBOSerializer<V> serializer;
+	private DBCollection collection;
+	private DBObject document;
+	private K key;
+	private DBOSerializer<V> serializer;
 
 	public MongoMapEntry(final K key, final DBCollection collection, final DBObject document, final DBOSerializer<V> serializer) {
 		this.document = document;
@@ -29,7 +29,7 @@ public class MongoMapEntry<K, V> implements Entry<K, V> {
 
 	public V setValue(final V value) {
 		V old = getValue();
-		document.putAll(serializer.toDBObject(value, false, false));
+		document.putAll(serializer.toDBObject(value));
 		collection.save(document);
 		return old;
 	}

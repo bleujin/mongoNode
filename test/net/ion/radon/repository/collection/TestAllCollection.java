@@ -10,6 +10,7 @@ public class TestAllCollection extends TestCase {
 		
 		result.addTestSuite(TestCollectionFactory.class) ;
 		result.addTestSuite(TestMongoMap.class) ;
+		result.addTestSuite(TestMongoQueue.class) ;
 		
 		return result ;
 	}

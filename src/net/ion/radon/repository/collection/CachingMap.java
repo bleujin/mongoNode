@@ -1,6 +1,7 @@
 package net.ion.radon.repository.collection;
 
 import java.util.Map;
+import java.util.Set;
 
 public class CachingMap<K, V> implements Map<K, V> {
 
@@ -31,7 +32,7 @@ public class CachingMap<K, V> implements Map<K, V> {
 		return true;
 	}
 
-	public MongoSet<Entry<K, V>> entrySet() {
+	public Set<Entry<K, V>> entrySet() {
 		return backstore.entrySet();
 	}
 
@@ -49,7 +50,7 @@ public class CachingMap<K, V> implements Map<K, V> {
 		return cache.isEmpty() ? backstore.isEmpty() : false;
 	}
 
-	public MongoSet<K> keySet() {
+	public Set<K> keySet() {
 		return backstore.keySet();
 	}
 

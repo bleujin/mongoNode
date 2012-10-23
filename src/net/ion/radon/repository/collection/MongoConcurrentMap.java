@@ -1,6 +1,7 @@
 package net.ion.radon.repository.collection;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import com.mongodb.BasicDBObject;
@@ -14,14 +15,14 @@ public class MongoConcurrentMap<K, V> implements ConcurrentMap<K, V> {
 	private DBOSerializer<K> keySerializer;
 	private DBOSerializer<V> valueSerializer;
 
-	public MongoConcurrentMap(final DBCollection collection, final DBOSerializer<K> keySerializer, final DBOSerializer<V> valueSerializer) {
+	MongoConcurrentMap(final DBCollection collection, final DBOSerializer<K> keySerializer, final DBOSerializer<V> valueSerializer) {
 		this.collection = collection;
 		this.keySerializer = keySerializer;
 		this.valueSerializer = valueSerializer;
 	}
 
 	public int size() {
-		return (int) collection.count();
+		return (int) collection.count(keySerializer.groupQuery());
 	}
 
 	public boolean isEmpty() {
@@ -30,33 +31,33 @@ public class MongoConcurrentMap<K, V> implements ConcurrentMap<K, V> {
 
 	@SuppressWarnings("unchecked")
 	public boolean containsKey(final Object key) {
-		return collection.count(keySerializer.toDBObject((K) key, true, false)) > 0;
+		return collection.count(keySerializer.toDBObject((K) key)) > 0;
 	}
 
 	@SuppressWarnings("unchecked")
 	public boolean containsValue(final Object value) {
-		return collection.count(valueSerializer.toDBObject((V) value, true, false)) > 0;
+		return  collection.count(valueSerializer.groupQuery()) > 0 && collection.count(valueSerializer.toDBObject((V) value)) > 0;
 	}
 
 	public void clear() {
-		collection.remove(EMPTY_BASICDBOBJECT);
+		collection.remove(keySerializer.groupQuery());
 	}
 
-	public MongoSet<K> keySet() {
-		return new MongoSet<K>(collection, keySerializer);
+	public KeyMongoCollection<K> keySet() {
+		return new KeyMongoCollection<K>(collection, keySerializer);
 	}
 
 	public MongoCollection<V> values() {
-		return new MongoCollection<V>(collection, valueSerializer);
+		return new EntryMongoCollection<V>(collection, valueSerializer);
 	}
 
-	public MongoSet<Map.Entry<K, V>> entrySet() {
-		return new MongoSet<Entry<K, V>>(collection, new MongoMapEntryDBOSerializer<K, V>(collection, keySerializer, valueSerializer));
+	public Set<Map.Entry<K, V>> entrySet() {
+		return new EntryMongoCollection<Entry<K, V>>(collection, new MongoMapEntryDBOSerializer<K, V>(collection, keySerializer, valueSerializer));
 	}
 
 	@SuppressWarnings("unchecked")
 	public V get(final Object key) {
-		DBObject result = collection.findOne(keySerializer.toDBObject((K) key, true, false));
+		DBObject result = collection.findOne(keySerializer.toDBObject((K) key));
 		return result != null ? valueSerializer.toElement(result) : null;
 	}
 
@@ -79,15 +80,15 @@ public class MongoConcurrentMap<K, V> implements ConcurrentMap<K, V> {
 	}
 
 	public V put(final K key, final V value, boolean insertIfAbsent, boolean returnNew) {
-		DBObject dbObject;
-		DBObject queryObject;
-		V old = null;
 
-		queryObject = keySerializer.toDBObject(key, true, false);
-		dbObject = keySerializer.toDBObject(key, false, false);
-		dbObject.putAll(valueSerializer.toDBObject(value, false, false));
+		DBObject queryObject = keySerializer.toDBObject(key);
+		
+		DBObject dbObject = keySerializer.toDBObject(key);
+		dbObject.putAll(valueSerializer.toDBObject(value));
 
+		
 		dbObject = collection.findAndModify(queryObject, null, null, false, dbObject, returnNew, insertIfAbsent);
+		V old = null;
 		if (dbObject != null) {
 			old = valueSerializer.toElement(dbObject);
 		}
@@ -97,7 +98,7 @@ public class MongoConcurrentMap<K, V> implements ConcurrentMap<K, V> {
 
 	@SuppressWarnings("unchecked")
 	public V remove(final Object key) {
-		DBObject queryObject = keySerializer.toDBObject((K) key, true, false);
+		DBObject queryObject = keySerializer.toDBObject((K) key);
 		DBObject result;
 		V old = null;
 
@@ -111,24 +112,54 @@ public class MongoConcurrentMap<K, V> implements ConcurrentMap<K, V> {
 
 	@SuppressWarnings("unchecked")
 	public boolean remove(final Object key, final Object value) {
-		DBObject queryObject = keySerializer.toDBObject((K) key, true, false);
-		queryObject.putAll(valueSerializer.toDBObject((V) value, true, false));
+		DBObject queryObject = keySerializer.toDBObject((K) key);
+		queryObject.putAll(valueSerializer.toDBObject((V) value));
 
 		return collection.remove(queryObject).getN() > 0;
 	}
 
 	public boolean replace(final K key, final V oldValue, final V newValue) {
-		DBObject queryObject = keySerializer.toDBObject(key, true, false);
-		DBObject dbObject = keySerializer.toDBObject(key, false, false);
+		DBObject queryObject = keySerializer.toDBObject(key);
+		DBObject dbObject = keySerializer.toDBObject(key);
 
-		queryObject.putAll(valueSerializer.toDBObject(oldValue, true, false));
-		dbObject.putAll(valueSerializer.toDBObject(newValue, false, false));
+		queryObject.putAll(valueSerializer.toDBObject(oldValue));
+		dbObject.putAll(valueSerializer.toDBObject(newValue));
 
 		return collection.update(queryObject, dbObject).getN() > 0;
 	}
 
 	public V replace(final K key, final V value) {
 		return put(key, value, false, false);
+	}
+
+}
+
+
+class EntryMongoCollection<T> extends MongoCollection<T> implements Set<T> {
+
+	EntryMongoCollection(DBCollection collection, DBOSerializer<T> serializer) {
+		super(collection, serializer);
+	}
+
+	@Override
+	public boolean add(T e) {
+		return super.add(e) ;
+	}
+}
+
+class KeyMongoCollection<T> extends MongoCollection<T> implements Set<T> {
+	
+
+	public KeyMongoCollection(DBCollection collection, DBOSerializer<T> keyserializer) {
+		super(collection, keyserializer);
+	}
+
+	@Override
+	public boolean add(T e) {
+		if (!contains(e)) {
+			return super.add(e);
+		}
+		return false;
 	}
 
 }

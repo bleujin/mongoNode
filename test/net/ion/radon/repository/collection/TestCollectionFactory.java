@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import junit.framework.TestCase;
 import net.ion.radon.repository.RepositoryCentral;
 import net.ion.radon.repository.Session;
@@ -15,11 +17,11 @@ public class TestCollectionFactory extends TestCase {
 	public void testCreate() throws Exception {
 		RepositoryCentral rc = RepositoryCentral.testCreate();
 		
-		CollectionFactory cf = rc.colFactory("collection");
+		CollectionFactory cf = rc.login("collection").newCollectionFactory("map");
 		
 		Map<String, ? extends TestBean> map = cf.newConcurrentMap(String.class, TestBean.class) ;
-		Set<TestBean> set = cf.newSet(TestBean.class) ;
 		Queue<TestBean> queue = cf.newQueue(TestBean.class) ;
+		Queue<TestBean> stack = cf.newStack(TestBean.class) ;
 		
 		MongoConcurrentMap<String, TestBean> backer = cf.newConcurrentMap(String.class, TestBean.class);
 		CachingConcurrentMap<String, TestBean> cmap = cf.newCacheConcurrentMap(backer);
@@ -32,12 +34,23 @@ public class TestCollectionFactory extends TestCase {
 
 class Person {
 	
+	public static Person bleujin = Person.create(7789, "bleujin", 20, Address.create("seoul"));
 	private long empno ;
 	private int age ;
 	private String name ;
 	private Address address ;
 	
-	
+	@Override
+	public int hashCode(){
+		return (int)empno ;
+	}
+
+	@Override
+	public boolean equals(Object _that){
+		if (! (_that instanceof Person)) return false ;
+		Person that = (Person) _that ;
+		return this.empno == that.empno ;
+	}
 	
 	public long getEmpno() {
 		return empno;
@@ -63,6 +76,11 @@ class Person {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
+	
+	public String toString(){
+		return ToStringBuilder.reflectionToString(this) ;
+	}
+	
 	public static Person create(long empno, String name, int age, Address address) {
 		Person newPerson = new Person();
 		newPerson.setEmpno(empno) ;

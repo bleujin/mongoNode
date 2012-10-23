@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.ion.framework.util.MapUtil;
+import net.ion.radon.repository.collection.CollectionFactory;
 
 public class LocalSession implements Session {
 
@@ -184,6 +185,10 @@ public class LocalSession implements Session {
 
 	public String[] getWorkspaceNames() {
 		return repository.getWorkspaceNames().toArray(new String[0]) ;
+	}
+
+	public CollectionFactory newCollectionFactory(String groupId) {
+		return new CollectionFactory(this.getCurrentWorkspace().getCollection(), groupId);
 	}
 	
 	

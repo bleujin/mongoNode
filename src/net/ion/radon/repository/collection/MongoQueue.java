@@ -13,22 +13,22 @@ public class MongoQueue<E> extends MongoCollection<E> implements Queue<E> {
 	private static final BasicDBObject ORDER_BY_ASC = new BasicDBObject("_id", 1);
 	private static final BasicDBObject ORDER_BY_DESC = new BasicDBObject("_id", -1);
 
-	private boolean asc;
+	private BasicDBObject order;
 
 	public MongoQueue(final DBCollection collection, final DBOSerializer<E> serializer) {
 		super(collection, serializer);
-		asc = true;
+		order = ORDER_BY_ASC;
 	}
 
 	public MongoQueue(final DBCollection collection, final DBOSerializer<E> serializer, final boolean asc) {
 		super(collection, serializer);
-		this.asc = asc;
+		this.order = asc ? ORDER_BY_ASC : ORDER_BY_DESC;
 	}
 
 	public CloseableIterator<E> iterator() {
 		return new CloseableIterator<E>() {
 
-			DBCursor cursor = getCollection().find().sort(asc ? ORDER_BY_ASC : ORDER_BY_DESC);
+			DBCursor cursor = getCollection().find(getSerializer().groupQuery()).sort(order);
 
 			public boolean hasNext() {
 				boolean next = cursor.hasNext();
@@ -65,13 +65,11 @@ public class MongoQueue<E> extends MongoCollection<E> implements Queue<E> {
 	}
 
 	public E poll() {
-		DBObject dbObject;
-
 		if (isEmpty()) {
 			return null;
 		}
 
-		dbObject = getCollection().findAndModify(null, null, asc ? ORDER_BY_ASC : ORDER_BY_DESC, true, null, false, false);
+		DBObject dbObject = getCollection().findAndModify(getSerializer().groupQuery(), null, order, true, null, false, false);
 		return getSerializer().toElement(dbObject);
 	}
 
@@ -83,13 +81,11 @@ public class MongoQueue<E> extends MongoCollection<E> implements Queue<E> {
 	}
 
 	public E peek() {
-		DBCursor cursor;
-
 		if (isEmpty()) {
 			return null;
 		}
 
-		cursor = getCollection().find().sort(asc ? ORDER_BY_ASC : ORDER_BY_DESC);
+		DBCursor cursor = getCollection().find(getSerializer().groupQuery()).sort(order);
 		try {
 			if (cursor.hasNext()) {
 				return getSerializer().toElement(cursor.next());

@@ -1,13 +1,10 @@
 package net.ion.radon.repository.collection;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import net.ion.framework.parse.gson.JsonElement;
 import net.ion.framework.parse.gson.JsonObject;
 import net.ion.framework.parse.gson.JsonParser;
-import net.ion.framework.util.ArrayUtil;
-import net.ion.framework.util.ListUtil;
+import net.ion.radon.repository.AradonId;
+import net.ion.radon.repository.NodeConstants;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -15,30 +12,30 @@ import com.mongodb.DBObject;
 
 public class DefaultDBOSerializer<E> implements DBOSerializer<E> {
 
+	private String groupId ;
 	private String field;
 	private Class<? extends E> type;
 
-	public DefaultDBOSerializer(final String field, final Class<? extends E> value) {
+	public DefaultDBOSerializer(String groupId, final String field, final Class<? extends E> value) {
+		this.groupId = groupId ;
 		this.field = field;
 		this.type = value;
 	}
 
-	public DBObject toDBObject(final E element, final boolean equalFunctions, final boolean negate) {
-		if (equalFunctions && negate) {
-			return new BasicDBObject(field, new BasicDBObject("$ne", JsonObject.fromObject(element).toMap()));
-		}
-		JsonElement jsonElement = JsonParser.fromObject(element) ;
-		if (jsonElement.isJsonPrimitive()) return new BasicDBObject(field, element) ;
-		if (jsonElement.isJsonArray()) {
-			Object[] array = jsonElement.getAsJsonArray().toObjectArray() ;
-			BasicDBList list = new BasicDBList() ;
+	public DBObject toDBObject(final E element) {
+		JsonElement jsonElement = JsonParser.fromObject(element);
+		if (jsonElement.isJsonPrimitive()) {
+			return new BasicDBObject(field, element);
+		} else if (jsonElement.isJsonArray()) {
+			Object[] array = jsonElement.getAsJsonArray().toObjectArray();
+			BasicDBList list = new BasicDBList();
 			for (Object obj : array) {
-				list.add(obj) ;
+				list.add(obj);
 			}
-			return new BasicDBObject(field, list) ;
+			return new BasicDBObject(field, list);
+		} else {
+			return new BasicDBObject(field, JsonObject.fromObject(element).toMap());
 		}
-		
-		return new BasicDBObject(field, JsonObject.fromObject(element).toMap());
 	}
 
 	public E toElement(final DBObject dbObject) {
@@ -49,6 +46,60 @@ public class DefaultDBOSerializer<E> implements DBOSerializer<E> {
 		}
 
 		return null;
+	}
+
+	public DBObject groupQuery() {
+		return new BasicDBObject(NodeConstants.ARADON_GROUP, groupId);
+	}
+
+	public String groupId(){
+		return groupId ;
+	}
+	
+}
+
+class AradonIdSerializer<E> implements DBOSerializer<E> {
+
+	private String groupId ;
+	private String field;
+	private Class<? extends E> type;
+
+	AradonIdSerializer(String groupId, final String field, final Class<? extends E> value) {
+		this.groupId = groupId ;
+		this.field = field;
+		this.type = value;
+	}
+
+	public DBObject toDBObject(final E element) {
+		JsonElement jsonElement = JsonParser.fromObject(element);
+		if (jsonElement.isJsonPrimitive()) {
+			return new BasicDBObject(field, element);
+		} else if (jsonElement.isJsonArray()) {
+			Object[] array = jsonElement.getAsJsonArray().toObjectArray();
+			BasicDBList list = new BasicDBList();
+			for (Object obj : array) {
+				list.add(obj);
+			}
+			return new BasicDBObject(field, list);
+		} else {
+			return new BasicDBObject(field, JsonObject.fromObject(element).toMap());
+		}
+	}
+
+	public E toElement(final DBObject dbObject) {
+		Object _aradonId = dbObject.get("__aradon");
+		if (_aradonId == null || (! (_aradonId instanceof DBObject))) return null ;
+
+		DBObject uId = (DBObject)AradonId.load((DBObject)_aradonId).getUid() ;
+		return JsonObject.fromObject(uId.get(field)).getAsObject(type);
+	}
+
+	public DBObject groupQuery() {
+		return new BasicDBObject(NodeConstants.ARADON_GROUP, groupId);
+	}
+
+	public String groupId(){
+		return groupId ;
 	}
 
 }

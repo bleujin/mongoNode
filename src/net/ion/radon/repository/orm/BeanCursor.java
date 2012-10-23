@@ -3,8 +3,6 @@ package net.ion.radon.repository.orm;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.apache.commons.beanutils.ConstructorUtils;
-
 import net.ion.framework.db.RepositoryException;
 import net.ion.framework.util.Closure;
 import net.ion.framework.util.CollectionUtil;
@@ -13,6 +11,8 @@ import net.ion.radon.core.PageBean;
 import net.ion.radon.impl.util.DebugPrinter;
 import net.ion.radon.repository.Node;
 import net.ion.radon.repository.NodeCursor;
+
+import org.apache.commons.beanutils.ConstructorUtils;
 
 public class BeanCursor<T extends NodeORM> {
 

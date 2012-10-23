@@ -2,8 +2,6 @@ package net.ion.radon.repository;
 
 import net.ion.framework.util.StringUtil;
 
-import org.apache.commons.lang.CharUtils;
-
 public class PropertyId {
 
 	private String innerKey;

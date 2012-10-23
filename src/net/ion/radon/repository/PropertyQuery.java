@@ -4,7 +4,6 @@ import static net.ion.radon.repository.NodeConstants.ARADON_GROUP;
 import static net.ion.radon.repository.NodeConstants.ARADON_UID;
 import static net.ion.radon.repository.NodeConstants.ID;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 

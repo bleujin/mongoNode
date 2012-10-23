@@ -1,8 +1,5 @@
 package net.ion.radon.repository;
 
-import net.ion.framework.util.StringUtil;
-
-import com.mongodb.DBObject;
 
 public class FakeExplain extends Explain{
 

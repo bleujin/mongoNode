@@ -13,7 +13,6 @@ import net.ion.framework.util.IOUtil;
 import net.ion.radon.repository.RepositoryCentral;
 import net.ion.radon.repository.Session;
 
-import org.apache.commons.vfs2.Capability;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;

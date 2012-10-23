@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.StringUtil;
@@ -76,6 +75,10 @@ public class Workspace {
 
 	public long count() {
 		return getCollection().count();
+	}
+	
+	public long count(PropertyQuery query){
+		return getCollection().count(query.getDBObject()) ;
 	}
 
 	public String getName() {
