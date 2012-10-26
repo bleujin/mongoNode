@@ -1,4 +1,4 @@
-package net.ion.radon.repository;
+package net.ion.radon.repository.perf;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -15,6 +15,9 @@ import net.ion.framework.db.procedure.IUserCommand;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.RandomUtil;
+import net.ion.radon.repository.Node;
+import net.ion.radon.repository.RepositoryCentral;
+import net.ion.radon.repository.Session;
 
 public class TestNodeCreateSpeed extends TestCase {
 
@@ -94,7 +97,7 @@ public class TestNodeCreateSpeed extends TestCase {
 		final Session session = rc.testLogin("speed");
 		session.dropWorkspace();
 		
-		for (int i : ListUtil.rangeNum(2000)) {
+		for (int i : ListUtil.rangeNum(20000)) {
 			Node node = session.newNode() ;
 			node.put( "a" + RandomUtil.nextRandomString(100), RandomUtil.nextRandomString(900));
 			if (i % 100 == 0) {
