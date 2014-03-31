@@ -12,7 +12,7 @@
 	<property name="manifest.main.class" value="" />
 	<property name="manifest.classpath" value="./" />
 	<property name="version.number" value="0"/>
-	<property name="build.number" value="3"/>
+	<property name="build.number" value="5"/>
 	
 	<target name="test_mongonode">
 		<property name="test.reports" value="./resource/report" /> 
