@@ -15,7 +15,7 @@ import net.ion.repository.mongo.PropertyId.PType;
 import net.ion.repository.mongo.PropertyValue;
 import net.ion.repository.mongo.ReadSession;
 import net.ion.repository.mongo.Workspace;
-import net.ion.repository.mongo.util.ReadJobs;
+import net.ion.repository.mongo.util.ReadChildrenEachs;
 import net.ion.repository.mongo.util.Transformers;
 
 import com.google.common.base.Function;
@@ -25,25 +25,17 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 
 	private final ReadSession session;
 	private final Fqn fqn;
-	private final DBObject found;
 	
 	private ReadNode(ReadSession session, Fqn fqn, DBObject found) {
+		super(found) ;
 		this.session = session ;
 		this.fqn = fqn ;
-		this.found = found ;
 	}
 
 	public static ReadNode create(ReadSession session, Fqn fqn, DBObject found) {
 		return new ReadNode(session, fqn, found);
 	}
 
-	public PropertyValue property(String name) {
-		return propertyId(PropertyId.fromString(name));
-	}
-	
-	public PropertyValue propertyId(PropertyId pid) {
-		return PropertyValue.create(found.get(pid.idString()));
-	}
 
 
 	public Fqn fqn() {
@@ -69,7 +61,7 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 
 	@Override
 	public int dataSize() {
-		return found.keySet().size();
+		return found().keySet().size();
 	}
 
 	@Override
@@ -79,19 +71,10 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 
 
 	@Override
-	public Object id() {
-		return fqn;
-	}
-
-	@Override
 	public boolean hasChild(String childPath) {
-		return workspace().exists(session, Fqn.fromRelativeFqn(fqn, Fqn.fromString(childPath)) );
+		return workspace().exists(session, fqn.relativeFqn(childPath) );
 	}
 
-	@Override
-	public boolean hasProperty(PropertyId pid) {
-		return found.containsField(pid.idString());
-	}
 
 	@Override
 	public ReadNode root() {
@@ -103,27 +86,20 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 	
 	@Override
 	public ReadNode child(String childFqn) {
-		return workspace().pathBy(session, Fqn.fromRelativeFqn(fqn, Fqn.fromString(childFqn)));
+		return workspace().pathBy(session, fqn.relativeFqn(childFqn));
 	}
 
 	@Override
 	public Set<String> childrenNames() {
-		return children().find(ReadJobs.CHILDREN_NAME);
-	}
-
-	@Override
-	public Set<PropertyId> keys() {
-		Set<PropertyId> result = SetUtil.newSet() ;
-		for (String key : found.keySet()){
-			result.add(PropertyId.fromString(key)) ;
-		} 
-		return result;
+		return children().eachNode(ReadChildrenEachs.CHILDREN_NAME);
 	}
 
 	@Override
 	public Set<PropertyId> normalKeys() {
 		Set<PropertyId> result = SetUtil.newSet() ;
-		for (String key : found.keySet()){
+		for (String key : found().keySet()){
+			if (key.startsWith("_") || key.startsWith("@")) continue ;
+			
 			PropertyId pid = PropertyId.fromString(key);
 			if (pid.type() == PType.NORMAL) result.add(pid) ;
 		} 
@@ -133,7 +109,7 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 
 	@Override
 	public Map<PropertyId, PropertyValue> toMap() {
-		return transformer(Transformers.TOMAP);
+		return transformer(Transformers.READ_TOMAP);
 	}
 
 	@Override
@@ -145,7 +121,7 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 
 	@Override
 	public boolean hasRef(String refName) {
-		return found.containsField(PropertyId.refer(refName).idString());
+		return found().containsField(PropertyId.refer(refName).idString());
 	}
 
 	@Override
@@ -197,12 +173,24 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 	}
 
 	
-	public String toString(){
-		return transformer(Transformers.TOSTRING) ;
+	@Override
+	public boolean equals(Object _obj){
+		if (ReadNode.class.isInstance(_obj)){
+			ReadNode that = (ReadNode) _obj ;
+			return this.fqn.equals(that.fqn) ;
+		} return false ;
 	}
 	
+	
 	@Override
-	public PropertyValue extendProperty(String propPath) {
-		return ExtendPropertyId.create(propPath).propValue(this) ;
+	public int hashCode(){
+		return fqn.hashCode() ;
 	}
+	
+	
+	@Override
+	public String toString(){
+		return transformer(Transformers.READ_TOSTRING) ;
+	}
+
 }

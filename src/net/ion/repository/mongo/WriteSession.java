@@ -11,10 +11,11 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import net.ion.framework.util.ListUtil;
+import net.ion.repository.mongo.node.ReadNode;
 import net.ion.repository.mongo.node.WriteNode;
 import net.ion.repository.mongo.node.WriteNode.Touch;
 
-public class WriteSession {
+public class WriteSession implements ISession<WriteNode>{
 
 	private ReadSession rsession;
 	private Workspace workspace;
@@ -79,6 +80,26 @@ public class WriteSession {
 
 	}
 
+	public WriteNode root() {
+		return pathBy("/");
+	}
+	
+	public boolean exists(String fqn) {
+		return workspace.exists(rsession, fqn);
+	}
+	
+	public boolean exists(Fqn fqn) {
+		return workspace.exists(rsession, fqn);
+	}
+
+	public Credential credential() {
+		return rsession.credential();
+	}
+	
+	
+	
+	
+	
 	static class LogRow {
 
 		private WriteNode source;
@@ -125,5 +146,24 @@ public class WriteSession {
 			return target + ", " + touch;
 		}
 	}
+
+
+
+
+
+	@Override
+	public Workspace workspace() {
+		return workspace;
+	}
+
+	public ReadSession readSession() {
+		return rsession;
+	}
+
+
+
+
+
+
 
 }

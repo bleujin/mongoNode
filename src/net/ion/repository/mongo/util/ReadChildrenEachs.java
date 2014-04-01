@@ -6,15 +6,15 @@ import java.util.Set;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.SetUtil;
-import net.ion.repository.mongo.ReadJob;
-import net.ion.repository.mongo.node.ChildrenIterator;
+import net.ion.repository.mongo.node.ReadChildrenEach;
+import net.ion.repository.mongo.node.ReadChildrenIterator;
 import net.ion.repository.mongo.node.ReadNode;
 
-public class ReadJobs {
+public class ReadChildrenEachs {
 
-	public static final ReadJob<List<ReadNode>> LIST = new ReadJob<List<ReadNode>>() {
+	public static final ReadChildrenEach<List<ReadNode>> LIST = new ReadChildrenEach<List<ReadNode>>() {
 		@Override
-		public List<ReadNode> handle(ChildrenIterator citer) {
+		public List<ReadNode> handle(ReadChildrenIterator citer) {
 			List<ReadNode> result = ListUtil.newList() ;
 			while(citer.hasNext()){
 				result.add(citer.next()) ;
@@ -22,18 +22,18 @@ public class ReadJobs {
 			return result;
 		}
 	};
-	public static final ReadJob<Void> DEBUG = new ReadJob<Void>(){
+	public static final ReadChildrenEach<Void> DEBUG = new ReadChildrenEach<Void>(){
 		@Override
-		public Void handle(ChildrenIterator citer) {
+		public Void handle(ReadChildrenIterator citer) {
 			while(citer.hasNext()){
 				Debug.debug(citer.next()) ;
 			}
 			return null;
 		}
 	};
-	public static final ReadJob<Set<String>> CHILDREN_NAME = new ReadJob<Set<String>>(){
+	public static final ReadChildrenEach<Set<String>> CHILDREN_NAME = new ReadChildrenEach<Set<String>>(){
 		@Override
-		public Set<String> handle(ChildrenIterator citer) {
+		public Set<String> handle(ReadChildrenIterator citer) {
 			Set result = SetUtil.newSet() ;
 			while(citer.hasNext()){
 				result.add(citer.next().fqn().name()) ;

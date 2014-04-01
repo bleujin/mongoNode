@@ -1,5 +1,9 @@
 package net.ion.repository.mongo;
 
+import java.util.Map;
+
+import net.ion.framework.util.MapUtil;
+import net.ion.repository.mongo.node.NodeResult;
 import net.ion.repository.mongo.node.ReadNode;
 
 public class ReadSession implements ISession<ReadNode> {
@@ -7,6 +11,7 @@ public class ReadSession implements ISession<ReadNode> {
 	private final Workspace workspace;
 	private final Credential credential;
 	private final String colName;
+	private Map<String, Object> attrs = MapUtil.newMap() ;
 	
 	ReadSession(Workspace workspace, Credential credential, String colName) {
 		this.workspace = workspace ;
@@ -57,8 +62,16 @@ public class ReadSession implements ISession<ReadNode> {
 	}
 
 	public ReadNode root() {
-		return pathBy("/");
+		return pathBy(Fqn.ROOT);
 	}
 
+	public <T> T attribute(String name, Class<T> clz) {
+		return clz.cast(attrs.get(name));
+	}
+	
+	public ReadSession attribute(String name, Object value){
+		attrs.put(name, value) ;
+		return this ;
+	}
 
 }

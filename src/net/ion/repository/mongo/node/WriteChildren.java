@@ -4,45 +4,45 @@ import java.util.List;
 
 import net.ion.framework.util.IOUtil;
 import net.ion.repository.mongo.Fqn;
-import net.ion.repository.mongo.ReadSession;
-import net.ion.repository.mongo.util.ReadChildrenEachs;
+import net.ion.repository.mongo.WriteSession;
+import net.ion.repository.mongo.util.WriteChildrenEachs;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
+public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 
 	private int skip = 0;
 	private int offset = 1000;
 	private DBObject orderBy = new BasicDBObject();
 
-	private final ReadSession session;
+	private final WriteSession session;
 	private final DBCollection collection;
 
-	public ReadChildren(ReadSession session, DBCollection collection, Fqn parent) {
+	public WriteChildren(WriteSession session, DBCollection collection, Fqn parent) {
 		super(parent);
 		this.session = session;
 		this.collection = collection;
 	}
 
-	public ReadChildren skip(int skip) {
+	public WriteChildren skip(int skip) {
 		this.skip = skip;
 		return this;
 	}
 
-	public ReadChildren offset(int offset) {
+	public WriteChildren offset(int offset) {
 		this.offset = offset;
 		return this;
 	}
 
-	public ReadChildren ascending(String propId) {
+	public WriteChildren ascending(String propId) {
 		orderBy.put(propId, 1);
 		return this;
 	}
 
-	public ReadChildren descending(String propId) {
+	public WriteChildren descending(String propId) {
 		orderBy.put(propId, -1);
 		return this;
 	}
@@ -77,11 +77,11 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 	// return hasNext() ? next() : null;
 	// }
 
-	public <T> T eachNode(ReadChildrenEach<T> readJob) {
+	public <T> T eachNode(WriteChildrenEach<T> readJob) {
 		DBCursor cursor = null;
 		try {
 			cursor = collection.find(filters(), fields(), skip, offset).sort(orderBy).limit(offset);
-			ReadChildrenIterator citer = ReadChildrenIterator.create(session, cursor);
+			WriteChildrenIterator citer = WriteChildrenIterator.create(session, cursor);
 			T result = readJob.handle(citer);
 			return result;
 		} finally {
@@ -89,12 +89,11 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 		}
 	}
 
-	public List<ReadNode> toList() {
-		return eachNode(ReadChildrenEachs.LIST);
+	public List<WriteNode> toList() {
+		return eachNode(WriteChildrenEachs.LIST);
 	}
 
 	public void debugPrint() {
-		eachNode(ReadChildrenEachs.DEBUG);
+		eachNode(WriteChildrenEachs.DEBUG);
 	}
-
 }

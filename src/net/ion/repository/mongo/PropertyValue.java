@@ -1,5 +1,6 @@
 package net.ion.repository.mongo;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +32,19 @@ public class PropertyValue {
 		return NumberUtil.toLong(asString(), 0L);
 	}
 
+	public int asInt() {
+		return NumberUtil.toInt(asString(), 0);
+	}
+
+	public boolean asBoolean() {
+		return Boolean.valueOf(asString());
+	}
+
+	public Date asDate(){
+		return new Date(asLong()) ; 
+	}
+	
+	
 	public Object asObject() {
 		return val;
 	}
@@ -60,4 +74,6 @@ public class PropertyValue {
 	public String toString(){
 		return ToStringBuilder.reflectionToString(this) ;
 	}
+
+
 }

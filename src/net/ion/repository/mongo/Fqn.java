@@ -74,6 +74,10 @@ public class Fqn implements Comparable<Fqn>, Serializable {
 		return new Fqn(Iterables.toArray(Splitter.on(SEPARATOR).trimResults().omitEmptyStrings().split(toMatch), String.class));
 	}
 
+	public Fqn relativeFqn(String childFqn){
+		return Fqn.fromRelativeFqn(this, Fqn.fromString(childFqn)) ;
+	}
+	
 	public Fqn getAncestor(int generation) {
 		if (generation == 0)
 			return root();
@@ -265,9 +269,14 @@ public class Fqn implements Comparable<Fqn>, Serializable {
 		return result ;
 	}
 
+	public DBObject parentQueryObject() {
+		return new BasicDBObject("_parent", getParent().toString()) ;
+	}
+
 	public static Fqn fromDBObject(DBObject dbo) {
 		return Fqn.fromString(dbo.get("_id").toString());
 	}
+
 
 }
 

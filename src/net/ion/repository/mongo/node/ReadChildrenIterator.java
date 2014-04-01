@@ -7,19 +7,20 @@ import com.mongodb.DBObject;
 
 import net.ion.repository.mongo.Fqn;
 import net.ion.repository.mongo.ReadSession;
+import net.ion.repository.mongo.WriteSession;
 
-public class ChildrenIterator implements Iterable<ReadNode>, Iterator<ReadNode>{
+public class ReadChildrenIterator implements Iterable<ReadNode>, Iterator<ReadNode>{
 
 	private ReadSession rsession;
 	private DBCursor cursor;
 
-	ChildrenIterator(ReadSession rsession, DBCursor cursor) {
+	ReadChildrenIterator(ReadSession rsession, DBCursor cursor) {
 		this.rsession = rsession ;
 		this.cursor = cursor ;
 	}
 
-	final static ChildrenIterator create(ReadSession rsession, DBCursor cursor){
-		return new ChildrenIterator(rsession, cursor) ;
+	final static ReadChildrenIterator create(ReadSession rsession, DBCursor cursor){
+		return new ReadChildrenIterator(rsession, cursor) ;
 	}
 	
 	@Override
@@ -42,5 +43,6 @@ public class ChildrenIterator implements Iterable<ReadNode>, Iterator<ReadNode>{
 	public void remove() {
 		throw new UnsupportedOperationException("readonly") ;
 	}
+
 
 }

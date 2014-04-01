@@ -1,5 +1,6 @@
 package net.ion.repository.mongo;
 
+import net.ion.repository.mongo.util.WriteJobs;
 import junit.framework.TestCase;
 
 public class TestBaseReset extends TestCase {
@@ -20,4 +21,8 @@ public class TestBaseReset extends TestCase {
 		super.tearDown();
 	}
 
+	
+	protected void createHelloNode(){
+		session.tranSync(WriteJobs.HELLO) ;
+	}
 }

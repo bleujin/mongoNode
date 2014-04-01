@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.bson.BSONObject;
 
 import net.ion.framework.parse.gson.JsonObject;
 import net.ion.framework.parse.gson.stream.JsonWriter;
@@ -21,8 +24,10 @@ import net.ion.framework.util.DateUtil;
 import net.ion.framework.util.ListUtil;
 import net.ion.repository.mongo.WriteSession.LogRow;
 import net.ion.repository.mongo.exception.NotFoundPath;
+import net.ion.repository.mongo.node.NodeResult;
 import net.ion.repository.mongo.node.ReadChildren;
 import net.ion.repository.mongo.node.ReadNode;
+import net.ion.repository.mongo.node.WriteChildren;
 import net.ion.repository.mongo.node.WriteNode;
 import net.ion.repository.mongo.node.WriteNode.Touch;
 
@@ -31,6 +36,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 
 public class Workspace {
 
@@ -49,17 +55,17 @@ public class Workspace {
 
 	public <T> T tran(ReadSession rsession, WriteJob<T> wjob) {
 		WriteSession wsession = WriteSession.create(rsession);
-		boolean isSuccess = true ;
+		boolean isSuccess = true;
 		try {
 			wsession.beginTran();
 			T result = wjob.handle(wsession);
 			wsession.endTran();
 			return result;
 		} catch (Exception ex) {
-			isSuccess = false ;
+			isSuccess = false;
 			ehandler.handle(wsession, ex);
 		} finally {
-			wsession.completed(isSuccess) ;
+			wsession.completed(isSuccess);
 		}
 		return null;
 	}
@@ -73,7 +79,7 @@ public class Workspace {
 		BasicDBObject query = fqn.idQueryObject();
 		DBObject found = col.findOne(query);
 		if (found == null) {
-			
+
 			col.insert(query);
 			found = query;
 		}
@@ -82,15 +88,23 @@ public class Workspace {
 	}
 
 	public ReadNode pathBy(ReadSession rsession, String fqn) {
-		return pathBy(rsession, Fqn.fromString(fqn)) ;
+		return pathBy(rsession, Fqn.fromString(fqn));
 	}
-	
-	public ReadNode pathBy(ReadSession rsession, Fqn fqn) {
-		DBCollection col = collection(rsession);
-		BasicDBObject query = fqn.idQueryObject();
-		DBObject found = col.findOne(query);
 
-		if (found == null) throw new NotFoundPath(fqn) ;
+	public ReadNode pathBy(ReadSession rsession, Fqn fqn) {
+
+		if (fqn.isRoot()) {
+			BasicDBObject rootDBO = new BasicDBObject();
+			rootDBO.put("_id", "/");
+			rootDBO.put("_parent", "/");
+			return ReadNode.create(rsession, fqn, rootDBO);
+		}
+
+		BasicDBObject query = fqn.idQueryObject();
+		DBObject found = collection(rsession).findOne(query);
+
+		if (found == null)
+			throw new NotFoundPath(fqn);
 		return ReadNode.create(rsession, fqn, found);
 	}
 
@@ -99,24 +113,32 @@ public class Workspace {
 		return col;
 	}
 
-	public boolean exists(ReadSession rsession, String fqn){
-		return exists(rsession, Fqn.fromString(fqn)) ;
+	public boolean exists(ReadSession rsession, String fqn) {
+		return exists(rsession, Fqn.fromString(fqn));
 	}
-	
+
 	public boolean exists(ReadSession rsession, Fqn fqn) {
 		if (Fqn.ROOT.equals(fqn)) {
 			return true;
 		}
-		return collection(rsession).getCount(fqn.idQueryObject()) > 0 ;
+		return collection(rsession).getCount(fqn.idQueryObject()) > 0;
 	}
-	
+
+	public boolean remove(Fqn target) {
+		return true;
+	}
+
+	public boolean removeChildren(Fqn target) {
+		return true;
+	}
+
 	
 	public void dropCollection(ReadSession rsession) {
 		db.getCollection(rsession.colName()).drop();
 	}
 
 	public void writeLog(WriteSession wsession, ReadSession rsession, Set<LogRow> logRows) throws IOException {
-		InstantLogWriter logWriter = new InstantLogWriter(this, wsession, rsession) ;
+		InstantLogWriter logWriter = new InstantLogWriter(this, wsession, rsession);
 		logWriter.beginLog(logRows);
 		for (LogRow row : logRows) {
 			logWriter.writeLog(row);
@@ -124,11 +146,14 @@ public class Workspace {
 		logWriter.endLog();
 		logRows.clear();
 	}
-	
+
 	public ReadChildren children(ReadSession rsession, Fqn parent) {
-		return new ReadChildren(rsession, collection(rsession), parent) ;
+		return new ReadChildren(rsession, collection(rsession), parent);
 	}
 
+	public WriteChildren children(WriteSession wsession, Fqn parent) {
+		return new WriteChildren(wsession, collection(wsession.readSession()), parent);
+	}
 
 	static class InstantLogWriter {
 
@@ -137,6 +162,7 @@ public class Workspace {
 		private final ReadSession rsession;
 
 		private DBCollection col;
+		private WriteResult lastWriteResult;
 
 		public InstantLogWriter(Workspace wspace, WriteSession wsession, ReadSession rsession) throws IOException {
 			this.wspace = wspace;
@@ -146,18 +172,25 @@ public class Workspace {
 
 		public InstantLogWriter beginLog(Set<LogRow> logRows) throws IOException {
 			final long thisTime = System.currentTimeMillis();
-			this.col = wspace.db.getCollection(wsession.colName()) ;
+			this.col = wspace.db.getCollection(wsession.colName());
 
 			return this;
 		}
 
 		public void writeLog(LogRow log) throws IOException {
-			DBObject trow = log.source().dbObject();
-			trow.put("_lastmodified", GregorianCalendar.getInstance().getTimeInMillis()) ;
-			col.update(log.source().fqn().idQueryObject(), trow) ;
+			if (log.touch() == Touch.REMOVE) {
+				col.remove(log.target().idQueryObject()) ;
+			} else if (log.touch() == Touch.REMOVECHILDREN) {
+				col.remove(log.target().parentQueryObject()) ;
+			} else {
+				DBObject trow = log.source().found();
+				trow.put("_lastmodified", GregorianCalendar.getInstance().getTimeInMillis());
+				this.lastWriteResult = col.update(log.source().fqn().idQueryObject(), trow);
+			}
 		}
 
 		public void endLog() throws IOException {
+			rsession.attribute(NodeResult.class.getCanonicalName(), NodeResult.create(lastWriteResult));
 		}
 
 	}

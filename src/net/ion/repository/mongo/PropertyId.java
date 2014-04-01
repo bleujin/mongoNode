@@ -2,6 +2,8 @@ package net.ion.repository.mongo;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import net.ion.framework.util.StringUtil;
 
 public class PropertyId implements Serializable {
@@ -9,7 +11,7 @@ public class PropertyId implements Serializable {
 	private static final long serialVersionUID = 8480711318106901031L;
 
 	public static enum PType implements Serializable {
-		NORMAL, REFER
+		NORMAL, REFER, RESERVED
 	}
 
 	private final PType type;
@@ -36,7 +38,29 @@ public class PropertyId implements Serializable {
 		return name;
 	}
 
+	public String fullString() {
+		return (type() == PType.REFER ? "@" : "") + idString();
+	}
+	
 	public PType type() {
 		return type;
+	}
+	
+	public String toString(){
+		return ToStringBuilder.reflectionToString(this) ;
+	}
+	
+	@Override
+	public int hashCode(){
+		return name.hashCode() ;
+	}
+	
+	@Override
+	public boolean equals(Object _obj){
+		if (getClass().isInstance(_obj)){
+			PropertyId that = (PropertyId) _obj ;
+			return this.type == that.type &&  this.name.equals(that.name) ;
+		}
+		return false ;
 	}
 }
