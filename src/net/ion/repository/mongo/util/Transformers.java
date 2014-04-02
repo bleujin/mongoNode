@@ -2,6 +2,7 @@ package net.ion.repository.mongo.util;
 
 import java.util.Map;
 
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.PropertyValue;
@@ -23,12 +24,24 @@ public class Transformers {
 		@Override
 		public Map<PropertyId, PropertyValue> apply(ReadNode target) {
 			Map<PropertyId, PropertyValue> result = MapUtil.newMap() ;
-			for(PropertyId pid : target.keys()){
+			for(PropertyId pid : target.normalKeys()){
 				result.put(pid, target.propertyId(pid)) ;
 			}
 			return result;
 		}
-		
+	};
+
+	public static Function<ReadNode, Void> READ_DEBUGPRINT = new Function<ReadNode, Void>(){
+		@Override
+		public Void apply(ReadNode target) {
+			Map<String, Object> result = MapUtil.newMap() ;
+			for(PropertyId pid : target.keys()){
+				PropertyValue pvalue = target.propertyId(pid);
+				result.put(pid.fullString(), pvalue.size() <= 1 ? pvalue.asObject() : pvalue.asSet()) ;
+			}
+			Debug.debug(result);
+			return null;
+		}
 	};
 
 	
@@ -43,12 +56,13 @@ public class Transformers {
 		@Override
 		public Map<PropertyId, PropertyValue> apply(WriteNode target) {
 			Map<PropertyId, PropertyValue> result = MapUtil.newMap() ;
-			for(PropertyId pid : target.keys()){
+			for(PropertyId pid : target.normalKeys()){
 				result.put(pid, target.propertyId(pid)) ;
 			}
 			return result;
 		}
 		
 	};
+
 
 }

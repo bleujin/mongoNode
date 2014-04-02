@@ -2,12 +2,11 @@ package net.ion.repository.mongo.node;
 
 import java.util.Iterator;
 
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-
 import net.ion.repository.mongo.Fqn;
 import net.ion.repository.mongo.ReadSession;
-import net.ion.repository.mongo.WriteSession;
+
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 public class ReadChildrenIterator implements Iterable<ReadNode>, Iterator<ReadNode>{
 
@@ -32,6 +31,10 @@ public class ReadChildrenIterator implements Iterable<ReadNode>, Iterator<ReadNo
 	public boolean hasNext() {
 		return cursor.hasNext();
 	}
+	
+	public int count(){
+		return cursor.count() ;
+	}
 
 	@Override
 	public ReadNode next() {
@@ -44,5 +47,9 @@ public class ReadChildrenIterator implements Iterable<ReadNode>, Iterator<ReadNo
 		throw new UnsupportedOperationException("readonly") ;
 	}
 
+	
+	public Explain explain(){
+		return rsession.attribute(Explain.class.getCanonicalName(), Explain.class) ;
+	}
 
 }

@@ -1,29 +1,13 @@
 package net.ion.repository.mongo;
 
-import java.awt.image.RescaleOp;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.bson.BSONObject;
-
-import net.ion.framework.parse.gson.JsonObject;
-import net.ion.framework.parse.gson.stream.JsonWriter;
-import net.ion.framework.parse.html.NotFoundTagException;
-import net.ion.framework.util.CalendarUtils;
-import net.ion.framework.util.DateUtil;
-import net.ion.framework.util.ListUtil;
 import net.ion.repository.mongo.WriteSession.LogRow;
 import net.ion.repository.mongo.exception.NotFoundPath;
+import net.ion.repository.mongo.index.SessionJob;
 import net.ion.repository.mongo.node.NodeResult;
 import net.ion.repository.mongo.node.ReadChildren;
 import net.ion.repository.mongo.node.ReadNode;
@@ -34,7 +18,6 @@ import net.ion.repository.mongo.node.WriteNode.Touch;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 
@@ -108,7 +91,7 @@ public class Workspace {
 		return ReadNode.create(rsession, fqn, found);
 	}
 
-	private DBCollection collection(ReadSession rsession) {
+	public DBCollection collection(ReadSession rsession) {
 		DBCollection col = db.getCollection(rsession.colName());
 		return col;
 	}
@@ -137,7 +120,7 @@ public class Workspace {
 		db.getCollection(rsession.colName()).drop();
 	}
 
-	public void writeLog(WriteSession wsession, ReadSession rsession, Set<LogRow> logRows) throws IOException {
+	public void writeLog(WriteSession wsession, ReadSession rsession, List<SessionJob> sjobs, Set<LogRow> logRows) throws IOException {
 		InstantLogWriter logWriter = new InstantLogWriter(this, wsession, rsession);
 		logWriter.beginLog(logRows);
 		for (LogRow row : logRows) {
@@ -145,10 +128,15 @@ public class Workspace {
 		}
 		logWriter.endLog();
 		logRows.clear();
+		
+		for (SessionJob sjob : sjobs) {
+			sjob.run(this);
+		}
+		
 	}
 
-	public ReadChildren children(ReadSession rsession, Fqn parent) {
-		return new ReadChildren(rsession, collection(rsession), parent);
+	public ReadChildren children(ReadSession rsession, boolean includeSub, Fqn parent) {
+		return new ReadChildren(rsession, includeSub, collection(rsession), parent);
 	}
 
 	public WriteChildren children(WriteSession wsession, Fqn parent) {

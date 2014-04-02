@@ -25,6 +25,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		super(parent);
 		this.session = session;
 		this.collection = collection;
+		put("_parent", parent.toString()) ;
 	}
 
 	public WriteChildren skip(int skip) {
@@ -81,6 +82,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		DBCursor cursor = null;
 		try {
 			cursor = collection.find(filters(), fields(), skip, offset).sort(orderBy).limit(offset);
+			session.attribute(Explain.class.getCanonicalName(), Explain.create(cursor.explain())) ;
 			WriteChildrenIterator citer = WriteChildrenIterator.create(session, cursor);
 			T result = readJob.handle(citer);
 			return result;

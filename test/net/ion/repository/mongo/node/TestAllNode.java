@@ -17,6 +17,14 @@ public class TestAllNode  extends TestCase{
 		suite.addTestSuite(TestAppend.class) ;
 		
 		
+		suite.addTestSuite(TestPropertyValue.class);
+		
+		suite.addTestSuite(TestIndex.class);
+		suite.addTestSuite(TestAdvFind.class);
+		suite.addTestSuite(TestReference.class);
+		
+		suite.addTestSuite(TestWriteSession.class);
+		
 //		suite.addTestSuite(TestColumns.class);
 //		suite.addTestSuite(TestAdvanceColumns.class) ;
 //		suite.addTestSuite(TestNodeCursor.class) ;
@@ -35,8 +43,6 @@ public class TestAllNode  extends TestCase{
 //		suite.addTestSuite(TestInnerNode.class) ;
 //
 //		
-//		// working
-//		suite.addTestSuite(TestLastModified.class) ;
 //		
 		return suite ;
 	}

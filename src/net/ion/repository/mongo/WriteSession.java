@@ -1,27 +1,32 @@
 package net.ion.repository.mongo;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+
+import net.ion.framework.util.ListUtil;
+import net.ion.framework.util.MapUtil;
+import net.ion.repository.mongo.index.IndexHandler;
+import net.ion.repository.mongo.index.SessionJob;
+import net.ion.repository.mongo.node.WriteNode;
+import net.ion.repository.mongo.node.WriteNode.Touch;
 
 import org.apache.commons.collections.set.ListOrderedSet;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import net.ion.framework.util.ListUtil;
-import net.ion.repository.mongo.node.ReadNode;
-import net.ion.repository.mongo.node.WriteNode;
-import net.ion.repository.mongo.node.WriteNode.Touch;
-
-public class WriteSession implements ISession<WriteNode>{
+public class WriteSession implements ISession<WriteNode> {
 
 	private ReadSession rsession;
 	private Workspace workspace;
 	private String colName;
 	private Set<LogRow> logRows = ListOrderedSet.decorate(ListUtil.newList());;
-	private Cache<Fqn, Boolean> cache = CacheBuilder.newBuilder().maximumSize(100).build();
+	private Cache<Fqn, WriteNode> cache = CacheBuilder.newBuilder().build();
+	private Map<String, Object> attrs = MapUtil.newMap();
+	private List<SessionJob> sjobs = ListUtil.newList();
 
 	private WriteSession(ReadSession rsession) {
 		this.rsession = rsession;
@@ -38,32 +43,37 @@ public class WriteSession implements ISession<WriteNode>{
 	}
 
 	public void endTran() throws IOException {
-		rsession.workspace().writeLog(this, rsession, logRows);
+		rsession.workspace().writeLog(this, rsession, this.sjobs, logRows);
 	}
 
 	public WriteNode pathBy(String path) {
-		Fqn fqn = Fqn.fromString(path);
-		Fqn parent = fqn.getParent();
-		try {
-			while (parent != Fqn.ROOT) {
-				final Fqn target = parent ;
-				boolean exists = cache.get(parent, new Callable<Boolean>() {
-					@Override
-					public Boolean call() throws Exception {
-						return workspace.exists(rsession, target);
-					}
-				});
-				if (! exists) workspace.pathBy(this, target) ;
-				parent = parent.getParent();
-			}
-		} catch (ExecutionException e) {
-			throw new IllegalArgumentException(e) ;
-		}
-		return workspace.pathBy(this, fqn);
+		return pathBy(Fqn.fromString(path));
 	}
 
-	public WriteNode pathBy(Fqn path) {
-		return workspace.pathBy(this, path);
+	public WriteNode pathBy(final Fqn fqn) {
+		try {
+			return cache.get(fqn, new Callable<WriteNode>() {
+				@Override
+				public WriteNode call() throws Exception {
+					Fqn parentFqn = fqn.getParent();
+					while (parentFqn != Fqn.ROOT) {
+						final Fqn target = parentFqn;
+						// create parent
+						WriteNode parent = cache.get(parentFqn, new Callable<WriteNode>() {
+							@Override
+							public WriteNode call() throws Exception {
+								return workspace.pathBy(WriteSession.this, target);
+							}
+						});
+						parentFqn = parentFqn.getParent();
+					}
+					return workspace.pathBy(WriteSession.this, fqn);
+				}
+			});
+		} catch (Exception e) {
+			throw new IllegalStateException(e) ;
+		}
+
 	}
 
 	String colName() {
@@ -83,11 +93,11 @@ public class WriteSession implements ISession<WriteNode>{
 	public WriteNode root() {
 		return pathBy("/");
 	}
-	
+
 	public boolean exists(String fqn) {
 		return workspace.exists(rsession, fqn);
 	}
-	
+
 	public boolean exists(Fqn fqn) {
 		return workspace.exists(rsession, fqn);
 	}
@@ -95,11 +105,7 @@ public class WriteSession implements ISession<WriteNode>{
 	public Credential credential() {
 		return rsession.credential();
 	}
-	
-	
-	
-	
-	
+
 	static class LogRow {
 
 		private WriteNode source;
@@ -128,28 +134,24 @@ public class WriteSession implements ISession<WriteNode>{
 			return source;
 		}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (!LogRow.class.isInstance(obj))
-				return false;
-
-			LogRow that = (LogRow) obj;
-			return this.touch == that.touch && this.target.equals(that.target);
-		}
-
-		@Override
-		public int hashCode() {
-			return target.hashCode() + touch.ordinal();
-		}
+		// @Override
+		// public boolean equals(Object obj) {
+		// if (!LogRow.class.isInstance(obj))
+		// return false;
+		//
+		// LogRow that = (LogRow) obj;
+		// return this.touch == that.touch && this.target.equals(that.target);
+		// }
+		//
+		// @Override
+		// public int hashCode() {
+		// return target.hashCode() + touch.ordinal();
+		// }
 
 		public String toString() {
 			return target + ", " + touch;
 		}
 	}
-
-
-
-
 
 	@Override
 	public Workspace workspace() {
@@ -160,10 +162,22 @@ public class WriteSession implements ISession<WriteNode>{
 		return rsession;
 	}
 
+	public <T> T attribute(String name, Class<T> clz) {
+		return clz.cast(attrs.get(name));
+	}
 
+	public WriteSession attribute(String name, Object value) {
+		attrs.put(name, value);
+		return this;
+	}
 
+	public IndexHandler ensureIndex(String indexName) {
+		return IndexHandler.create(this, indexName);
+	}
 
-
-
+	public WriteSession addSessionJob(SessionJob sessionJob) {
+		sjobs.add(sessionJob);
+		return this;
+	}
 
 }

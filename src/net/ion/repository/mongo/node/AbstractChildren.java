@@ -14,13 +14,19 @@ public abstract class AbstractChildren<T extends NodeCommon<T>, C extends Abstra
 	private final Fqn parent;
 
 	protected AbstractChildren(Fqn parent){
-		this.filters.put("_parent", parent.toString()) ;
 		this.parent = parent ;
 	}
 	
 	public DBObject filters(){
 		return filters ;
 	}
+	
+	
+	protected C put(String propId, Object val){
+		filters.put(propId, val) ;
+		return (C) this ;
+	}
+	
 	
 	public C gt(String propId, Object value) {
 		filters.put(propId, new BasicDBObject("$gt", value)) ;

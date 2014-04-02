@@ -2,16 +2,15 @@ package net.ion.repository.mongo.node;
 
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.mongodb.DBObject;
-
 import net.ion.framework.util.SetUtil;
 import net.ion.repository.mongo.ExtendPropertyId;
 import net.ion.repository.mongo.Fqn;
 import net.ion.repository.mongo.PropertyId;
-import net.ion.repository.mongo.PropertyValue;
 import net.ion.repository.mongo.PropertyId.PType;
-import net.ion.repository.mongo.util.Transformers;
+import net.ion.repository.mongo.PropertyValue;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 public abstract class AbstractNode<T extends NodeCommon<T>> implements NodeCommon<T>{
 	
@@ -36,7 +35,7 @@ public abstract class AbstractNode<T extends NodeCommon<T>> implements NodeCommo
 	}
 	
 	public PropertyValue propertyId(PropertyId pid) {
-		return PropertyValue.create(found().get(pid.idString()));
+		return PropertyValue.create(found().get(pid.fullString()));
 	}
 
 
@@ -76,16 +75,27 @@ public abstract class AbstractNode<T extends NodeCommon<T>> implements NodeCommo
 	}
 
 
-	
+
 	@Override
 	public boolean hasRef(String refName) {
-		return hasProperty(PropertyId.refer(refName));
+		return found().containsField(PropertyId.refer(refName).fullString());
 	}
 
 	@Override
 	public boolean hasRef(String refName, Fqn fqn) {
-		// TODO Auto-generated method stub
-		return false;
+		PropertyValue findProp = propertyId(PropertyId.refer(refName)) ;
+		Set<String> set = findProp.asSet() ;
+		
+		return set.contains(fqn.toString());
+	}
+	
+	
+	public int propSize(){
+		return normalKeys().size() ;
 	}
 
+	protected void found(BasicDBObject newOb) {
+		this.found = newOb ;
+	}
+	
 }

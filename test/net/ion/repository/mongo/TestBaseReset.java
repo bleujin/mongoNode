@@ -1,7 +1,7 @@
 package net.ion.repository.mongo;
 
-import net.ion.repository.mongo.util.WriteJobs;
 import junit.framework.TestCase;
+import net.ion.repository.mongo.util.WriteJobs;
 
 public class TestBaseReset extends TestCase {
 

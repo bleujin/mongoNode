@@ -3,7 +3,6 @@ package net.ion.repository.mongo.node;
 import java.util.Iterator;
 
 import net.ion.repository.mongo.Fqn;
-import net.ion.repository.mongo.ReadSession;
 import net.ion.repository.mongo.WriteSession;
 
 import com.mongodb.DBCursor;
@@ -43,6 +42,9 @@ public class WriteChildrenIterator implements Iterable<WriteNode>, Iterator<Writ
 	public void remove() {
 		throw new UnsupportedOperationException("readonly") ;
 	}
-
+	
+	public Explain explain(){
+		return wsession.attribute(Explain.class.getCanonicalName(), Explain.class) ;
+	}
 
 }

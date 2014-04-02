@@ -22,4 +22,9 @@ public class NotFoundPath extends IllegalArgumentException {
 		this("not found path :" + fqn);
 	}
 
+	
+	public static NotFoundPath throwIt(Fqn fqn) {
+		throw new NotFoundPath(fqn) ;
+	}
+
 }

@@ -16,7 +16,7 @@ public interface NodeCommon<T extends NodeCommon<T>>  {
 
 	public Fqn fqn();
 
-	public int dataSize();
+	public int propSize();
 
 	public T parent();
 
@@ -42,7 +42,7 @@ public interface NodeCommon<T extends NodeCommon<T>>  {
 	
 	public Object id() ;
 
-	Map<PropertyId, PropertyValue> toMap();
+	Map<PropertyId, PropertyValue> toPropMap();
 
 	public T ref(String refName) ;
 	

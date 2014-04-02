@@ -47,6 +47,25 @@ public class TestUpdate extends TestBaseReset {
 		assertTrue(StringUtil.isBlank(nresult.errorMessage()));
 	}
 
+	
+	public void testWriteNodeInScope() throws Exception {
+		session.tranSync(new WriteJob<Void>(){
+			@Override
+			public Void handle(WriteSession wsession) {
+				WriteNode f1 = wsession.pathBy("/bleujin").property("name", "bleujin") ;
+				WriteNode f2 = wsession.pathBy("/bleujin").property("age", 20) ;
+				
+				assertEquals(true, f1 == f2);
+				return null;
+			}
+		}) ;
+		
+		assertEquals("bleujin", session.pathBy("/bleujin").property("name").asString());
+		assertEquals(20, session.pathBy("/bleujin").property("age").asInt());
+		
+	}
+	
+	
 	// public void testMultiUpdate() throws Exception {
 	// // update workspace set location = 'seoul' where name = 'bleujin'
 	//

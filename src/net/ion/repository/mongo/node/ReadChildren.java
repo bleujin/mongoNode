@@ -20,11 +20,19 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 
 	private final ReadSession session;
 	private final DBCollection collection;
+	
+	private String hintIndexName;
+	private DBObject hint;
 
-	public ReadChildren(ReadSession session, DBCollection collection, Fqn parent) {
+	public ReadChildren(ReadSession session, boolean includeSub, DBCollection collection, Fqn parent) {
 		super(parent);
 		this.session = session;
 		this.collection = collection;
+		if (includeSub){
+			put("_parent", new BasicDBObject("$gt", parent.toString() + "/")) ;
+		} else { 
+			put("_parent", parent.toString()) ;
+		}
 	}
 
 	public ReadChildren skip(int skip) {
@@ -77,10 +85,25 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 	// return hasNext() ? next() : null;
 	// }
 
+	
+	public ReadChildren hint(String indexName){
+		this.hintIndexName = indexName ;
+		return this ;
+	}
+	
+	public ReadChildren hint(DBObject hint){
+		this.hint = hint ;
+		return this ;
+	}
+	
 	public <T> T eachNode(ReadChildrenEach<T> readJob) {
 		DBCursor cursor = null;
 		try {
 			cursor = collection.find(filters(), fields(), skip, offset).sort(orderBy).limit(offset);
+			if (this.hint != null) cursor.hint(hint) ;
+			else if (this.hintIndexName != null) cursor.hint(hintIndexName) ;
+			
+			session.attribute(Explain.class.getCanonicalName(), Explain.create(cursor.explain())) ;
 			ReadChildrenIterator citer = ReadChildrenIterator.create(session, cursor);
 			T result = readJob.handle(citer);
 			return result;

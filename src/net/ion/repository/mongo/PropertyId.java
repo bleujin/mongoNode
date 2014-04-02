@@ -2,9 +2,9 @@ package net.ion.repository.mongo;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import net.ion.framework.util.StringUtil;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class PropertyId implements Serializable {
 
@@ -34,12 +34,12 @@ public class PropertyId implements Serializable {
 		return idString.startsWith("@") ? new PropertyId(PType.REFER, idString.substring(1)) : new PropertyId(PType.NORMAL, idString);
 	}
 
-	public String idString() {
+	public String name() {
 		return name;
 	}
 
 	public String fullString() {
-		return (type() == PType.REFER ? "@" : "") + idString();
+		return ((type() == PType.REFER) ? "@" : "") + name();
 	}
 	
 	public PType type() {
@@ -52,7 +52,7 @@ public class PropertyId implements Serializable {
 	
 	@Override
 	public int hashCode(){
-		return name.hashCode() ;
+		return name.hashCode() + type.ordinal();
 	}
 	
 	@Override

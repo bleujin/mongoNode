@@ -1,19 +1,14 @@
 package net.ion.repository.mongo.node;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import net.ion.framework.db.Rows;
 import net.ion.framework.parse.gson.JsonObject;
 import net.ion.framework.parse.gson.JsonParser;
-import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
-
-
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.PropertyValue;
-import net.ion.repository.mongo.ReadSession;
 
 import com.google.common.base.Function;
 
@@ -56,11 +51,11 @@ public class Functions {
 			@Override
 			public Map apply(ReadNode node) {
 				Map<String, Object> properties = MapUtil.newMap() ;
-				for(Entry<PropertyId, PropertyValue> entry : node.toMap().entrySet()){
+				for(Entry<PropertyId, PropertyValue> entry : node.toPropMap().entrySet()){
 					final PropertyId pid = entry.getKey();
 					final PropertyValue pvalue = entry.getValue();
 					if (pid.type() == PropertyId.PType.NORMAL){
-						properties.put(pid.idString(), pvalue.size() == 1 ? pvalue.asObject() : pvalue.asSet());
+						properties.put(pid.name(), pvalue.size() == 1 ? pvalue.asObject() : pvalue.asSet());
 					}
 				}
 				return properties ;
@@ -78,11 +73,11 @@ public class Functions {
 				
 				Map<String, Object> properties = MapUtil.newMap() ;
 				Map<String, Set> refs = MapUtil.newMap() ;
-				for(Entry<PropertyId, PropertyValue> entry : node.toMap().entrySet()){
+				for(Entry<PropertyId, PropertyValue> entry : node.toPropMap().entrySet()){
 					if (entry.getKey().type() == PropertyId.PType.NORMAL){
-						properties.put(entry.getKey().idString(), entry.getValue().asSet());
+						properties.put(entry.getKey().name(), entry.getValue().asSet());
 					} else {
-						refs.put(entry.getKey().idString(), entry.getValue().asSet()) ;
+						refs.put(entry.getKey().name(), entry.getValue().asSet()) ;
 					}
 				}
 				
@@ -103,11 +98,11 @@ public class Functions {
 				
 				Map<String, Object> properties = MapUtil.newMap() ;
 				Map<String, Set> refs = MapUtil.newMap() ;
-				for(Entry<PropertyId, PropertyValue> entry : node.toMap().entrySet()){
+				for(Entry<PropertyId, PropertyValue> entry : node.toPropMap().entrySet()){
 					if (entry.getKey().type() == PropertyId.PType.NORMAL){
-						properties.put(entry.getKey().idString(), entry.getValue().asSet());
+						properties.put(entry.getKey().name(), entry.getValue().asSet());
 					} else {
-						refs.put(entry.getKey().idString(), entry.getValue().asSet()) ;
+						refs.put(entry.getKey().name(), entry.getValue().asSet()) ;
 					}
 				}
 				

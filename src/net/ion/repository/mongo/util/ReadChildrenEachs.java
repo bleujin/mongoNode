@@ -6,6 +6,7 @@ import java.util.Set;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.SetUtil;
+import net.ion.repository.mongo.node.ReadChildren;
 import net.ion.repository.mongo.node.ReadChildrenEach;
 import net.ion.repository.mongo.node.ReadChildrenIterator;
 import net.ion.repository.mongo.node.ReadNode;
@@ -39,6 +40,13 @@ public class ReadChildrenEachs {
 				result.add(citer.next().fqn().name()) ;
 			}
 			return result;
+		}
+	};
+	
+	public static final ReadChildrenEach<Integer> COUNT = new ReadChildrenEach<Integer>(){
+		@Override
+		public Integer handle(ReadChildrenIterator citer) {
+			return citer.count();
 		}
 	};
 

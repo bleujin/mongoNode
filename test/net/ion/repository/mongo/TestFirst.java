@@ -1,6 +1,5 @@
 package net.ion.repository.mongo;
 
-import net.ion.framework.util.Debug;
 import junit.framework.TestCase;
 
 public class TestFirst extends TestCase {

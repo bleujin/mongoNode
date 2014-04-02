@@ -8,8 +8,6 @@ import java.util.Set;
 import net.ion.framework.util.ArrayUtil;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.ObjectUtil;
-
-
 import net.ion.repository.mongo.Fqn;
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.node.NodeCommon;
@@ -84,7 +82,7 @@ public class Predicates {
 		return new Predicate<T>() {
 			@Override
 			public boolean apply(T node) {
-				if (node.property(propId).value() == null || value == null) return false ;
+				if (node.property(propId).asObject() == null || value == null) return false ;
 				
 				if (value.getClass().isArray()){
 					Set saved = node.property(propId).asSet();
@@ -181,8 +179,8 @@ public class Predicates {
 		return new Predicate<T>() {
 			@Override
 			public boolean apply(T node) {
-				if (node.property(propId).value() == null ) return false ;
-				return clz.isInstance(node.property(propId).value()) ;
+				if (node.property(propId).asObject() == null ) return false ;
+				return clz.isInstance(node.property(propId).asObject()) ;
 			}
 		} ;
 	}

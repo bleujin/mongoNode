@@ -3,7 +3,6 @@ package net.ion.repository.mongo;
 import java.util.Map;
 
 import net.ion.framework.util.MapUtil;
-import net.ion.repository.mongo.node.NodeResult;
 import net.ion.repository.mongo.node.ReadNode;
 
 public class ReadSession implements ISession<ReadNode> {
@@ -40,14 +39,25 @@ public class ReadSession implements ISession<ReadNode> {
 		return workspace.pathBy(this, fqn);
 	}
 
-
 	@Override
 	public ReadNode pathBy(Fqn fqn) {
 		return workspace.pathBy(this, fqn);
 	}
 
+	public ReadNode ghostBy(String fqnString) {
+		Fqn fqn = Fqn.fromString(fqnString) ;
+		if (exists(fqn)){
+			return pathBy(fqn) ;
+		} 
+		return ReadNode.ghost(this, fqn);
+	}
+	
 	@Override
 	public boolean exists(String fqn) {
+		return workspace.exists(this, fqn);
+	}
+
+	public boolean exists(Fqn fqn) {
 		return workspace.exists(this, fqn);
 	}
 
@@ -73,5 +83,6 @@ public class ReadSession implements ISession<ReadNode> {
 		attrs.put(name, value) ;
 		return this ;
 	}
+
 
 }
