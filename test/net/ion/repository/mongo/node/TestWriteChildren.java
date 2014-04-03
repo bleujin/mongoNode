@@ -155,8 +155,30 @@ public class TestWriteChildren extends TestBaseReset{
 	}
 	
 	
+	public void testIncrease() throws Exception {
+		session.tranSync(new WriteJob<Void>(){
+			@Override
+			public Void handle(WriteSession wsession) {
+				wsession.pathBy("/bleujin").children().between("dummy", 3, 5).increase("dummy", 10).findUpdate(); 
+				return null;
+			}
+		}) ;
+		
+		assertEquals(3, session.pathBy("/bleujin").children().gt("dummy", 10).count()) ;
+	}
 	
 	
+	public void testFindById() throws Exception {
+		session.tranSync(new WriteJob<Void>(){
+			@Override
+			public Void handle(WriteSession wsession) {
+				wsession.pathBy("/bleujin").children().eq("_id", "/bleujin/3").increase("dummy", 10).findUpdate(); 
+				return null;
+			}
+		}) ;
+		
+		assertEquals(13, session.pathBy("/bleujin/3").property("dummy").asInt()) ;
+	}
 	
 	
 	

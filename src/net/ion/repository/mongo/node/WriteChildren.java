@@ -146,6 +146,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 				BasicDBObject forApply = new BasicDBObject();
 				if (set.size() > 0) forApply.put("$set", set) ;
 				if (unset.size() > 0) forApply.put("$unset", unset) ;
+				if (inc.size() > 0) forApply.put("$inc", inc) ;
 				
 				workspace.collection(session.readSession()).update(filters(), forApply, false, true) ;
 			}
@@ -155,6 +156,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 
 	private BasicDBObject set = new BasicDBObject() ;
 	private BasicDBObject unset = new BasicDBObject() ;
+	private BasicDBObject inc = new BasicDBObject() ;
 	
 	private BasicDBObject set(){
 		return set ;
@@ -164,6 +166,11 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		return this ;
 	}
 
+	
+	public WriteChildren increase(String name, int i) {
+		inc.put(StringUtil.lowerCase(name), i) ;
+		return this ;
+	}
 	
 	public WriteChildren property(String name, String value) {
 		return property(PropertyId.fromString(name), value);
@@ -180,6 +187,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 	public WriteChildren property(String name, Date date) {
 		return property(name, date.getTime());
 	}
+
 
 //
 //
@@ -255,6 +263,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		
 		return result ;
 	}
+
 
 
 	

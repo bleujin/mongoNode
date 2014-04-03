@@ -10,6 +10,8 @@ public class TestAllWorkspace {
 		suite.addTestSuite(TestReadSession.class);
 		suite.addTestSuite(TestWriteSession.class);
 		suite.addTestSuite(TestCollection.class);
+		
+		suite.addTestSuite(TestMapReduce.class);
 		return suite;
 	}
 }

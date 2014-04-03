@@ -1,11 +1,17 @@
-package net.ion.repository.mongo;
+package net.ion.repository.mongo.node;
 
 import org.apache.ecs.xhtml.s;
 
 import net.ion.framework.util.Debug;
+import net.ion.framework.util.StringUtil;
+import net.ion.repository.mongo.ReadSession;
+import net.ion.repository.mongo.mr.RowJob;
 
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.MapReduceCommand;
+import com.mongodb.MapReduceCommand.OutputType;
 
 public class SessionCollection {
 
@@ -40,5 +46,11 @@ public class SessionCollection {
 	
 	public void drop() {
 		collection().drop();;
+	}
+
+
+	<T> T mapReduce(MapReduce mapReduce, ReadChildren rchildren, RowJob<T> rowJob) {
+		DBCollection collection = collection() ;
+		return mapReduce.runCommand(collection, rchildren.filters(), rowJob) ;
 	}
 }

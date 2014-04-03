@@ -14,7 +14,7 @@ public abstract class AbstractChildren<T extends NodeCommon<T>, C extends Abstra
 	private DBObject filters = new BasicDBObject() ;
 	private BasicDBObject fields = new BasicDBObject() ;
 
-	protected DBObject filters(){
+	DBObject filters(){
 		return filters ;
 	}
 	

@@ -11,6 +11,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MapReduceCommand.OutputType;
 
 public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 
@@ -133,6 +134,14 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 				return citer.hasNext() ? citer.next() : null ;
 			}
 		}) ;
+	}
+
+	public MapReduce mapreduce() {
+		return MapReduce.create(this);
+	}
+
+	public ReadSession session() {
+		return session ;
 	}
 
 

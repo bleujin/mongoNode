@@ -7,6 +7,7 @@ import com.mongodb.DBCursor;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.repository.mongo.node.ReadNode;
+import net.ion.repository.mongo.node.SessionCollection;
 
 public class ReadSession implements ISession<ReadNode> {
 

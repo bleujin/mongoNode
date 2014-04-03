@@ -11,6 +11,7 @@ import java.util.Set;
 import net.ion.framework.util.ArrayUtil;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.SetUtil;
+import net.ion.framework.util.StringUtil;
 import net.ion.repository.mongo.Fqn;
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.PropertyValue;
@@ -64,8 +65,6 @@ public class WriteNode extends AbstractNode<WriteNode> implements NodeCommon<Wri
 	public WriteNode property(String name, Date date) {
 		return property(name, date.getTime());
 	}
-
-
 
 	public WriteNode unset(String name) {
 		found().removeField(name) ;
@@ -283,6 +282,7 @@ public class WriteNode extends AbstractNode<WriteNode> implements NodeCommon<Wri
 	public ReadNode readNode() {
 		return ReadNode.create(session().readSession(), fqn, found());
 	}
+
 
 
 
