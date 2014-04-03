@@ -20,7 +20,7 @@ public class TestFirst extends TestCase {
 	}
 	
 	public void testFirst() throws Exception {
-		session.dropCollection() ;
+		session.collection().drop() ;
 		
 		session.tranSync(new WriteJob<Void>(){
 			public Void handle(WriteSession wsession) {

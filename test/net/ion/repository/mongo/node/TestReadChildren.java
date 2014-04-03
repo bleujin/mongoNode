@@ -38,10 +38,24 @@ public class TestReadChildren extends TestBaseReset{
 		assertEquals(4, session.pathBy("/bleujin").children().lte("dummy", 3).toList().size()) ;
 		assertEquals(3, session.pathBy("/bleujin").children().lt("dummy", 3).toList().size()) ;
 		assertEquals(3, session.pathBy("/bleujin").children().between("dummy", 3, 5).toList().size()) ;
+		assertEquals(10, session.pathBy("/bleujin").children().exist("dummy").toList().size()) ;
 
 		assertEquals(3, session.pathBy("/bleujin").children().in("dummy", 3, 4, 5, 10).toList().size()) ;
 	}
+
 	
+	public void testFilterCaseInsensitive() throws Exception {
+		assertEquals(1, session.pathBy("/bleujin").children().eq("Dummy", 3).toList().size()) ;
+		assertEquals(3, session.pathBy("/bleujin").children().gte("DUMMY", 7).toList().size()) ;
+		assertEquals(2, session.pathBy("/bleujin").children().gt("DUmmy", 7).toList().size()) ;
+		assertEquals(4, session.pathBy("/bleujin").children().lte("dummY", 3).toList().size()) ;
+		assertEquals(3, session.pathBy("/bleujin").children().lt("DUmmy", 3).toList().size()) ;
+		assertEquals(3, session.pathBy("/bleujin").children().between("DUmmy", 3, 5).toList().size()) ;
+		assertEquals(10, session.pathBy("/bleujin").children().exist("DUmmy").toList().size()) ;
+
+		assertEquals(3, session.pathBy("/bleujin").children().in("DUmmy", 3, 4, 5, 10).toList().size()) ;
+	}
+
 	
 	public void testIncludeSubPath() throws Exception {
 		session.tranSync(new WriteJob<Void>() {

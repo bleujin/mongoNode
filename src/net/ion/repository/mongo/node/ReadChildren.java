@@ -31,7 +31,7 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 		this.parent = parent ;
 		
 		if (includeSub){
-			put("_parent", new BasicDBObject("$gt", parent.toString() + "/")) ;
+			put("_parent", new BasicDBObject("$gt", (parent.isRoot()) ? "/" : (parent.toString() + "/"))) ;
 		} else { 
 			put("_parent", parent.toString()) ;
 		}
@@ -134,6 +134,7 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 			}
 		}) ;
 	}
+
 
 
 }

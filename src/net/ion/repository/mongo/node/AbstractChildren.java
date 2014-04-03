@@ -1,10 +1,12 @@
 package net.ion.repository.mongo.node;
 
+import net.ion.framework.util.StringUtil;
 import net.ion.repository.mongo.Fqn;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryOperators;
 
 public abstract class AbstractChildren<T extends NodeCommon<T>, C extends AbstractChildren> {
 
@@ -16,59 +18,61 @@ public abstract class AbstractChildren<T extends NodeCommon<T>, C extends Abstra
 		return filters ;
 	}
 	
-	
-	protected C put(String propId, Object val){
-		filters.put(propId, val) ;
+	private C putFilter(String propId, Object value){
+		filters.put(StringUtil.lowerCase(propId), value) ;
 		return (C) this ;
 	}
 	
+	protected C put(String propId, Object val){
+		return putFilter(propId, val) ;
+	}
 	
 	public C gt(String propId, Object value) {
-		filters.put(propId, new BasicDBObject("$gt", value)) ;
-		return (C) this ;
+		return putFilter(propId, new BasicDBObject(QueryOperators.GT, value)) ;
 	}
 
 
 	public C gte(String propId, Object value) {
-		filters.put(propId, new BasicDBObject("$gte", value)) ;
-		return (C) this ;
+		return putFilter(propId, new BasicDBObject(QueryOperators.GTE, value)) ;
 	}
 
 
 	public C lt(String propId, Object value) {
-		filters.put(propId, new BasicDBObject("$lt", value)) ;
-		return (C) this ;
+		return putFilter(propId, new BasicDBObject(QueryOperators.LT, value)) ;
 	}
 
 
 	public C lte(String propId, Object value) {
-		filters.put(propId, new BasicDBObject("$lte", value)) ;
-		return (C) this ;
+		return putFilter(propId, new BasicDBObject(QueryOperators.LTE, value)) ;
 	}
 
 
 	public C eq(String propId, Object value) {
-		filters.put(propId, value) ;
-		return (C) this ;
+		return putFilter(propId, value) ;
 	}
 
 
 	public C between(String propId, Object min, Object max){
 		BasicDBObject between = new BasicDBObject() ;
-		between.put("$gte", min) ;
-		between.put("$lte", max) ;
-		filters.put(propId, between) ;
-		return (C) this ;
+		between.put(QueryOperators.GTE, min) ;
+		between.put(QueryOperators.LTE, max) ;
+		return putFilter(propId, between) ;
 	}
 
-	
+	public C exist(String propId) {
+		return putFilter(propId, new BasicDBObject(QueryOperators.EXISTS, true)) ;
+	}
+
+	public C notExist(String propId) {
+		return putFilter(propId, new BasicDBObject(QueryOperators.EXISTS, false)) ;
+	}
+
 	public C in(String propId, Object... values){
 		BasicDBList blist = new BasicDBList() ;
 		for (Object val : values) {
 			blist.add(val) ;
 		}
-		filters.put(propId, new BasicDBObject("$in", blist)) ;
-		return (C) this ;
+		return putFilter(propId, new BasicDBObject(QueryOperators.IN, blist)) ;
 	}
 	
 	

@@ -14,6 +14,7 @@ import net.ion.framework.util.SetUtil;
 import net.ion.repository.mongo.Fqn;
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.PropertyValue;
+import net.ion.repository.mongo.ReadSession;
 import net.ion.repository.mongo.Workspace;
 import net.ion.repository.mongo.WriteSession;
 import net.ion.repository.mongo.exception.NotFoundPath;
@@ -277,6 +278,10 @@ public class WriteNode extends AbstractNode<WriteNode> implements NodeCommon<Wri
 
 	public void debugPrint() {
 		transformer(Transformers.WRITE_DEBUGPRINT) ;
+	}
+
+	public ReadNode readNode() {
+		return ReadNode.create(session().readSession(), fqn, found());
 	}
 
 

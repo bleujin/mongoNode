@@ -8,6 +8,7 @@ import net.ion.framework.util.ArrayUtil;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.IOUtil;
 import net.ion.framework.util.SetUtil;
+import net.ion.framework.util.StringUtil;
 import net.ion.repository.mongo.Fqn;
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.Workspace;
@@ -102,6 +103,16 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		}
 	}
 
+	public WriteNode findOne() {
+		return eachNode(new WriteChildrenEach<WriteNode>(){
+			@Override
+			public WriteNode handle(WriteChildrenIterator citer) {
+				return citer.hasNext() ? citer.next() : null ;
+			}
+		});
+	}
+
+	
 	public List<WriteNode> toList() {
 		return eachNode(WriteChildrenEachs.LIST);
 	}
@@ -123,17 +134,37 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		}) ;
 	}
 
+	
+	
+	
+	
 	public void findUpdate() {
 		session.addSessionJob(new SessionJob() {
 			@Override
 			public void run(Workspace workspace) {
-				fields().put("_lastmodified", GregorianCalendar.getInstance().getTimeInMillis());
-				workspace.collection(session.readSession()).update(filters(), new BasicDBObject("$set", fields()), false, true) ;
+				set().put("_lastmodified", GregorianCalendar.getInstance().getTimeInMillis());
+				BasicDBObject forApply = new BasicDBObject();
+				if (set.size() > 0) forApply.put("$set", set) ;
+				if (unset.size() > 0) forApply.put("$unset", unset) ;
+				
+				workspace.collection(session.readSession()).update(filters(), forApply, false, true) ;
 			}
 		}) ;
 	}
 	
 
+	private BasicDBObject set = new BasicDBObject() ;
+	private BasicDBObject unset = new BasicDBObject() ;
+	
+	private BasicDBObject set(){
+		return set ;
+	}
+	public WriteChildren unset(String name){
+		unset.put(StringUtil.lowerCase(name), 1) ;
+		return this ;
+	}
+
+	
 	public WriteChildren property(String name, String value) {
 		return property(PropertyId.fromString(name), value);
 	}
@@ -181,25 +212,28 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 //	}
 
 	
-	public WriteChildren append(String name, Object... values) {
-		return append(PropertyId.fromString(name), values) ;
-	}
+//	public WriteChildren append(String name, Object... values) {
+//		return append(PropertyId.fromString(name), values) ;
+//	}
+//	
+//	public WriteChildren append(PropertyId pId, Object... values) {
+//		set().put(pId.fullString(), mergedList(pId, values)) ;
+//		return this;
+//	}
+//
+//	public WriteChildren refTos(String name, String... refPaths) {
+//		PropertyId pId = PropertyId.refer(name);
+//		return property(pId, mergedList(pId, refPaths)) ;
+//	}
 	
-	public WriteChildren append(PropertyId pId, Object... values) {
-		fields().put(pId.fullString(), mergedList(pId, values)) ;
-		return this;
-	}
 
+	
 	public WriteChildren refTo(String name, String refPath) {
 		return property(PropertyId.refer(name), refPath) ;
 	}
 
-	public WriteChildren refTos(String name, String... refPaths) {
-		return append(PropertyId.refer(name), refPaths) ;
-	}
-	
 	private WriteChildren property(PropertyId pid, Object value) {
-		fields().put(pid.fullString(), value) ;
+		set().put(pid.fullString(), value) ;
 		return this;
 	}
 	
@@ -221,6 +255,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		
 		return result ;
 	}
+
 
 	
 //	public WriteNode clear(){

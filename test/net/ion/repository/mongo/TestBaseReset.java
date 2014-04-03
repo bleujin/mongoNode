@@ -16,7 +16,7 @@ public class TestBaseReset extends TestCase {
 	
 	@Override
 	protected void tearDown() throws Exception {
-		session.dropCollection() ;
+		session.collection().drop() ;
 		session.workspace().repository().shutdown() ;
 		super.tearDown();
 	}

@@ -68,11 +68,6 @@ public class ReadSession implements ISession<ReadNode> {
 	public Credential credential() {
 		return credential;
 	}
-	
-	public ReadSession dropCollection() {
-		workspace.dropCollection(this) ;
-		return this ;
-	}
 
 	public ReadNode root() {
 		return pathBy(Fqn.ROOT);
@@ -87,15 +82,8 @@ public class ReadSession implements ISession<ReadNode> {
 		return this ;
 	}
 
-	public void debugPrint() {
-		DBCursor cursor = workspace().collection(this).find() ;
-		try {
-			while(cursor.hasNext()){
-				Debug.println(cursor.next()) ;
-			}
-		} finally {
-			cursor.close(); 
-		}
+	public SessionCollection collection() {
+		return SessionCollection.create(this);
 	}
 
 
