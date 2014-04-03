@@ -22,6 +22,34 @@ public class TestReference extends TestBaseReset{
 		assertEquals("develop", dept.property("name").asString());
 	}
 	
+	public void testRefs() throws Exception {
+		int refCount = session.tranSync(new WriteJob<Integer>() {
+			@Override
+			public Integer handle(WriteSession wsession) {
+				wsession.pathBy("/dept/dev").property("name", "develop").refTos("emps", "/emps/bleujin", "/emps/hero") ;
+				
+				wsession.pathBy("/emps/bleujin").property("name", "bleujin").refTo("dept", "/dept/dev") ;
+				wsession.pathBy("/emps/hero").property("name", "hero").refTo("dept", "/dept/dev") ;
+				wsession.pathBy("/emps/jin").property("name", "jin").refTo("dept", "/dept/dev") ;
+				
+				wsession.pathBy("/dept/dev").refTos("emps", "/emps/jin") ;
+				
+				return wsession.pathBy("/dept/dev").refs("emps").toList().size() ;
+			}
+		}) ;
+		
+		assertEquals(3, refCount); 
+		
+		
+		assertEquals(true, session.tranSync(new WriteJob<Integer>(){
+			@Override
+			public Integer handle(WriteSession wsession) {
+				return wsession.pathBy("/dept/dev").refs("emps").toList().size() ;
+			}
+		}) == 3) ;
+	}
+	
+	
 	public void testRefTos() throws Exception {
 		session.tranSync(new WriteJob<Void>() {
 			@Override

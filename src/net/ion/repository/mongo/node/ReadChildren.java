@@ -23,11 +23,13 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 	
 	private String hintIndexName;
 	private DBObject hint;
+	private final Fqn parent;
 
 	public ReadChildren(ReadSession session, boolean includeSub, DBCollection collection, Fqn parent) {
-		super(parent);
 		this.session = session;
 		this.collection = collection;
+		this.parent = parent ;
+		
 		if (includeSub){
 			put("_parent", new BasicDBObject("$gt", parent.toString() + "/")) ;
 		} else { 
@@ -119,5 +121,19 @@ public class ReadChildren extends AbstractChildren<ReadNode, ReadChildren> {
 	public void debugPrint() {
 		eachNode(ReadChildrenEachs.DEBUG);
 	}
+
+	public int count() {
+		return eachNode(ReadChildrenEachs.COUNT) ;
+	}
+
+	public ReadNode findOne() {
+		return eachNode(new ReadChildrenEach<ReadNode>() {
+			@Override
+			public ReadNode handle(ReadChildrenIterator citer) {
+				return citer.hasNext() ? citer.next() : null ;
+			}
+		}) ;
+	}
+
 
 }

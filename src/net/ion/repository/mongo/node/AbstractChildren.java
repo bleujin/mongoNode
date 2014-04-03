@@ -11,13 +11,8 @@ public abstract class AbstractChildren<T extends NodeCommon<T>, C extends Abstra
 
 	private DBObject filters = new BasicDBObject() ;
 	private BasicDBObject fields = new BasicDBObject() ;
-	private final Fqn parent;
 
-	protected AbstractChildren(Fqn parent){
-		this.parent = parent ;
-	}
-	
-	public DBObject filters(){
+	protected DBObject filters(){
 		return filters ;
 	}
 	
@@ -77,12 +72,12 @@ public abstract class AbstractChildren<T extends NodeCommon<T>, C extends Abstra
 	}
 	
 	
-	public C exclude(String... propIds){
-		for (String propId : propIds) {
-			fields.put(propId, 0) ;
-		}
-		return (C) this ;
-	}
+//	public C exclude(String... propIds){
+//		for (String propId : propIds) {
+//			fields().put(propId, 0) ;
+//		}
+//		return (C) this ;
+//	}
 	
 	protected DBObject fields(){
 		return fields ;

@@ -2,6 +2,9 @@ package net.ion.repository.mongo;
 
 import java.util.Map;
 
+import com.mongodb.DBCursor;
+
+import net.ion.framework.util.Debug;
 import net.ion.framework.util.MapUtil;
 import net.ion.repository.mongo.node.ReadNode;
 
@@ -82,6 +85,17 @@ public class ReadSession implements ISession<ReadNode> {
 	public ReadSession attribute(String name, Object value){
 		attrs.put(name, value) ;
 		return this ;
+	}
+
+	public void debugPrint() {
+		DBCursor cursor = workspace().collection(this).find() ;
+		try {
+			while(cursor.hasNext()){
+				Debug.println(cursor.next()) ;
+			}
+		} finally {
+			cursor.close(); 
+		}
 	}
 
 

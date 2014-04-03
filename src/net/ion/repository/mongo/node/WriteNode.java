@@ -268,7 +268,16 @@ public class WriteNode extends AbstractNode<WriteNode> implements NodeCommon<Wri
 	public WriteChildren children(){
 		return workspace().children(wsession, this.fqn()) ;
 	}
+	
+	
+	@Override
+	public String toString(){
+		return transformer(Transformers.WRITE_TOSTRING) ;
+	}
 
+	public void debugPrint() {
+		transformer(Transformers.WRITE_DEBUGPRINT) ;
+	}
 
 
 

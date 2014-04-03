@@ -7,7 +7,7 @@ import net.ion.repository.mongo.util.WriteJobs;
 
 public class TestRemove extends TestBaseReset {
 
-	public void testNodeRemove() throws Exception {
+	public void testRemoveChild() throws Exception {
 		session.tranSync(WriteJobs.HELLO) ;
 		
 		session.tranSync(new WriteJob<Void>() {
@@ -21,7 +21,7 @@ public class TestRemove extends TestBaseReset {
 		assertEquals(false, session.exists("/bleujin"));
 	}
 
-	public void testQueryRemove() throws Exception {
+	public void testRemoveChildren() throws Exception {
 
 		session.tranSync(WriteJobs.HELLO) ;
 		
@@ -36,6 +36,29 @@ public class TestRemove extends TestBaseReset {
 		assertEquals(false, session.exists("/bleujin"));
 	}
 
+	public void testRemoveChildrenWithDecendant() throws Exception {
+		session.tranSync(new WriteJob<Void>() {
+			@Override
+			public Void handle(WriteSession wsession) {
+				wsession.pathBy("/bleujin").property("name", "bleujin").child("address").property("city", "seoul") ;
+				return null;
+			}
+		}) ;
+		
+		assertEquals(true, session.exists("/bleujin")) ;
+		assertEquals(true, session.exists("/bleujin/address")) ;
+		
+		session.tranSync(new WriteJob<Void>(){
+			@Override
+			public Void handle(WriteSession wsession) {
+				wsession.root().removeChildren(); 
+				return null;
+			}
+		}) ;
+		
+		assertEquals(false, session.exists("/bleujin")) ;
+		assertEquals(false, session.exists("/bleujin/address")) ;
+	}
 
 	
 }

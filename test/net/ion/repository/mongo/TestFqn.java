@@ -9,4 +9,11 @@ public class TestFqn extends TestCase{
 		assertEquals("/", root.toString());
 		assertEquals("/", root.getParent().toString());
 	}
+	
+	public void testDepth() throws Exception {
+		assertEquals(0, Fqn.ROOT.depth()) ; 
+		assertEquals(0, Fqn.fromString("/").depth()) ; 
+		assertEquals(1, Fqn.fromString("/emps").depth()) ; 
+		assertEquals(2, Fqn.fromString("/emps/bleujin").depth()) ; 
+	}
 }

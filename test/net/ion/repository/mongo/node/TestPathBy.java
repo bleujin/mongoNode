@@ -5,7 +5,7 @@ import net.ion.repository.mongo.TestBaseReset;
 import net.ion.repository.mongo.WriteJob;
 import net.ion.repository.mongo.WriteSession;
 
-public class TestFind extends TestBaseReset {
+public class TestPathBy extends TestBaseReset {
 
 	public void testFind() throws Exception {
 		createHelloNode();
@@ -28,11 +28,5 @@ public class TestFind extends TestBaseReset {
 		assertEquals("hero", session.pathBy("/bleu/jin/hero").property("name").asString());
 	}
 
-	public void testGhostBy() throws Exception {
-		createHelloNode();
-		assertEquals("bleujin", session.ghostBy("/bleujin").property("name").asString());
-
-		assertEquals(PropertyValue.NotFound, session.ghostBy("/notfound").property("name"));
-	}
 
 }

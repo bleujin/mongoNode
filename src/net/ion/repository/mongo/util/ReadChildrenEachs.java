@@ -27,7 +27,8 @@ public class ReadChildrenEachs {
 		@Override
 		public Void handle(ReadChildrenIterator citer) {
 			while(citer.hasNext()){
-				Debug.debug(citer.next()) ;
+				ReadNode next = citer.next();
+				Debug.debug(next.fqn(), next.transformer(Transformers.READ_TOFLATMAP)) ;
 			}
 			return null;
 		}
@@ -49,5 +50,5 @@ public class ReadChildrenEachs {
 			return citer.count();
 		}
 	};
-
+	
 }

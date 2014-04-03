@@ -32,6 +32,10 @@ public class WriteChildrenIterator implements Iterable<WriteNode>, Iterator<Writ
 		return cursor.hasNext();
 	}
 
+	public int count(){
+		return cursor.count() ;
+	}
+
 	@Override
 	public WriteNode next() {
 		DBObject dbo = cursor.next() ;

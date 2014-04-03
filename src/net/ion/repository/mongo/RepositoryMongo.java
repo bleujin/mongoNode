@@ -26,6 +26,19 @@ public class RepositoryMongo {
 		return create(SimpleCredential.BLANK, InetAddress.getLocalHost(), 27017);
 	}
 
+	public static RepositoryMongo testLocalWithShutdownHook() throws IOException {
+		final RepositoryMongo result = create(SimpleCredential.BLANK, InetAddress.getLocalHost(), 27017);
+		
+		Runtime.getRuntime().addShutdownHook(new Thread(){
+			public void run(){
+				result.shutdown(); 
+			}
+		});
+		
+		return result;
+	}
+
+	
 	private static RepositoryMongo create(ICredential credential, InetAddress saddress, int port) throws IOException {
 		Mongo mongo = new Mongo(saddress.getHostAddress(), port);
 

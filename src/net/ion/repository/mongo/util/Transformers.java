@@ -16,7 +16,7 @@ public class Transformers {
 	public static final Function<ReadNode, String> READ_TOSTRING = new Function<ReadNode, String>(){
 		@Override
 		public String apply(ReadNode target) {
-			return "fqn:" + target.fqn() ;
+			return "ReadNode:fqn[" + target.fqn() + "]" ;
 		}
 	};
 	
@@ -31,6 +31,18 @@ public class Transformers {
 		}
 	};
 
+	public static final Function<ReadNode, Map<String, Object>> READ_TOFLATMAP = new Function<ReadNode, Map<String, Object>>(){
+		@Override
+		public Map<String, Object> apply(ReadNode target) {
+			Map<String, Object> result = MapUtil.newMap() ;
+			for(PropertyId pid : target.normalKeys()){
+				result.put(pid.name(), target.propertyId(pid).asObject()) ;
+			}
+			return result;
+		}
+	} ;
+
+	
 	public static Function<ReadNode, Void> READ_DEBUGPRINT = new Function<ReadNode, Void>(){
 		@Override
 		public Void apply(ReadNode target) {
@@ -45,10 +57,15 @@ public class Transformers {
 	};
 
 	
+	
+	
+	
+	
+	
 	public static final Function<WriteNode, String> WRITE_TOSTRING = new Function<WriteNode, String>(){
 		@Override
 		public String apply(WriteNode target) {
-			return "fqn:" + target.fqn() ;
+			return "WriteNode:fqn[" + target.fqn() + "]" ;
 		}
 	};
 	
@@ -63,6 +80,31 @@ public class Transformers {
 		}
 		
 	};
+	public static final Function<WriteNode, Map<String, Object>> WRITE_TOFLATMAP = new Function<WriteNode, Map<String, Object>>(){
+		@Override
+		public Map<String, Object> apply(WriteNode target) {
+			Map<String, Object> result = MapUtil.newMap() ;
+			for(PropertyId pid : target.normalKeys()){
+				result.put(pid.name(), target.propertyId(pid).asObject()) ;
+			}
+			return result;
+		}
+	} ;
+
+	
+	public static Function<WriteNode, Void> WRITE_DEBUGPRINT = new Function<WriteNode, Void>(){
+		@Override
+		public Void apply(WriteNode target) {
+			Map<String, Object> result = MapUtil.newMap() ;
+			for(PropertyId pid : target.keys()){
+				PropertyValue pvalue = target.propertyId(pid);
+				result.put(pid.fullString(), pvalue.size() <= 1 ? pvalue.asObject() : pvalue.asSet()) ;
+			}
+			Debug.debug(result);
+			return null;
+		}
+	};
+
 
 
 }

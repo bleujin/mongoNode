@@ -36,6 +36,12 @@ public class Workspace {
 		return new Workspace(repository, db);
 	}
 
+	
+	public String name() {
+		return db.getName();
+	}
+
+	
 	public <T> T tran(ReadSession rsession, WriteJob<T> wjob) {
 		WriteSession wsession = WriteSession.create(rsession);
 		boolean isSuccess = true;
@@ -76,18 +82,17 @@ public class Workspace {
 
 	public ReadNode pathBy(ReadSession rsession, Fqn fqn) {
 
-		if (fqn.isRoot()) {
+		BasicDBObject query = fqn.idQueryObject();
+		DBObject found = collection(rsession).findOne(query);
+
+		if (found == null) {
+			if (! fqn.isRoot()) throw new NotFoundPath(fqn);
+
 			BasicDBObject rootDBO = new BasicDBObject();
 			rootDBO.put("_id", "/");
 			rootDBO.put("_parent", "/");
 			return ReadNode.create(rsession, fqn, rootDBO);
-		}
-
-		BasicDBObject query = fqn.idQueryObject();
-		DBObject found = collection(rsession).findOne(query);
-
-		if (found == null)
-			throw new NotFoundPath(fqn);
+		} 
 		return ReadNode.create(rsession, fqn, found);
 	}
 
@@ -169,7 +174,7 @@ public class Workspace {
 			if (log.touch() == Touch.REMOVE) {
 				col.remove(log.target().idQueryObject()) ;
 			} else if (log.touch() == Touch.REMOVECHILDREN) {
-				col.remove(log.target().parentQueryObject()) ;
+				col.remove(log.target().childrenQueryObject()) ;
 			} else {
 				DBObject trow = log.source().found();
 				trow.put("_lastmodified", GregorianCalendar.getInstance().getTimeInMillis());
@@ -182,6 +187,7 @@ public class Workspace {
 		}
 
 	}
+
 
 
 }

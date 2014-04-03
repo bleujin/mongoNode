@@ -1,5 +1,6 @@
 package net.ion.repository.mongo.node;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import net.ion.repository.mongo.TestBaseReset;
@@ -9,7 +10,7 @@ import net.ion.repository.mongo.util.WriteJobs;
 
 public class TestCreate extends TestBaseReset {
 
-	public void testNewNode() throws Exception {
+	public void testCreateNode() throws Exception {
 		session.tranSync(new WriteJob<Void>() {
 			@Override
 			public Void handle(WriteSession wsession) {
@@ -42,7 +43,7 @@ public class TestCreate extends TestBaseReset {
 		assertEquals(new Date().getDay(), found.property("date").asDate().getDay());
 	}
 
-	public void testCaseSentive() {
+	public void testCaseInSentiveWhenRead() {
 		session.tranSync(new WriteJob<Void>() {
 			@Override
 			public Void handle(WriteSession wsession) {
@@ -64,7 +65,7 @@ public class TestCreate extends TestBaseReset {
 
 	}
 
-	public void testCaseInSentiveWrite() throws Exception {
+	public void testCaseInSentiveWhenWrite() throws Exception {
 		session.tranSync(new WriteJob<Void>() {
 			@Override
 			public Void handle(WriteSession wsession) {
@@ -76,7 +77,7 @@ public class TestCreate extends TestBaseReset {
 		assertEquals("bleujin", session.pathBy("/bleujin").property("NAME").asString());
 	}
 
-	public void testChildNode() throws Exception {
+	public void testCreateChildNode() throws Exception {
 		session.tranSync(new WriteJob<Void>() {
 			@Override
 			public Void handle(WriteSession wsession) {
@@ -112,7 +113,7 @@ public class TestCreate extends TestBaseReset {
 		assertEquals("hero", session.pathBy("/bleujin").property("name").asString());
 	}
 
-	public void testReserved() throws Exception {
+	public void testReservedProperty() throws Exception {
 		session.tranSync(WriteJobs.HELLO);
 
 		ReadNode found = session.pathBy("/bleujin");
@@ -120,6 +121,7 @@ public class TestCreate extends TestBaseReset {
 		assertEquals("/bleujin", found.fqn().toString());
 		assertEquals("/bleujin", found.id().toString());
 		assertEquals("/bleujin", found.property("_id").asString());
+		assertEquals("/", found.property("_parent").asString());
 	}
 
 }

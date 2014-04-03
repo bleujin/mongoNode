@@ -6,7 +6,7 @@ import net.ion.repository.mongo.WriteSession;
 
 public class TestPropertyValue extends TestBaseReset{
 
-	public void testAs() throws Exception {
+	public void testAsType() throws Exception {
 		session.tranSync(new WriteJob<Void>(){
 			@Override
 			public Void handle(WriteSession wsession) {
@@ -15,12 +15,17 @@ public class TestPropertyValue extends TestBaseReset{
 			}
 		}) ;
 		
+		
+		
 		ReadNode found = session.pathBy("/bleujin") ;
 		assertEquals("bleujin", found.property("name").asString());
 		assertEquals(20, found.property("age").asInt());
 		assertEquals("red", found.property("color").asString());
 		assertEquals(3, found.property("color").asSet().size());
 		assertEquals(4, found.property("color").asList().size());
+		
+		assertEquals(false, found.property("color").isNotFound());
+		assertEquals(true, found.property("notfound").isNotFound());
 	}
 	
 	

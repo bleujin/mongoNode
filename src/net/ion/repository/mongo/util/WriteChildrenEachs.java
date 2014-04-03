@@ -6,6 +6,9 @@ import java.util.Set;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.SetUtil;
+import net.ion.repository.mongo.node.ReadChildrenEach;
+import net.ion.repository.mongo.node.ReadChildrenIterator;
+import net.ion.repository.mongo.node.ReadNode;
 import net.ion.repository.mongo.node.WriteChildrenEach;
 import net.ion.repository.mongo.node.WriteChildrenIterator;
 import net.ion.repository.mongo.node.WriteNode;
@@ -26,11 +29,13 @@ public class WriteChildrenEachs {
 		@Override
 		public Void handle(WriteChildrenIterator citer) {
 			while(citer.hasNext()){
-				Debug.debug(citer.next()) ;
+				WriteNode next = citer.next();
+				Debug.debug(next.fqn(), next.transformer(Transformers.WRITE_TOFLATMAP)) ;
 			}
 			return null;
 		}
 	};
+	
 	public static final WriteChildrenEach<Set<String>> CHILDREN_NAME = new WriteChildrenEach<Set<String>>(){
 		@Override
 		public Set<String> handle(WriteChildrenIterator citer) {
@@ -39,6 +44,13 @@ public class WriteChildrenEachs {
 				result.add(citer.next().fqn().name()) ;
 			}
 			return result;
+		}
+	};
+	
+	public static final WriteChildrenEach<Integer> COUNT = new WriteChildrenEach<Integer>(){
+		@Override
+		public Integer handle(WriteChildrenIterator citer) {
+			return citer.count();
 		}
 	};
 

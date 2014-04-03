@@ -7,8 +7,9 @@ import net.ion.repository.mongo.PropertyValue;
 import net.ion.repository.mongo.TestBaseReset;
 import net.ion.repository.mongo.WriteJob;
 import net.ion.repository.mongo.WriteSession;
+import net.ion.repository.mongo.util.Transformers;
 
-public class TestToMap extends TestBaseReset{
+public class TestToPropMap extends TestBaseReset{
 
 
 	public void testToPropMap() throws Exception {
@@ -45,13 +46,24 @@ public class TestToMap extends TestBaseReset{
 		
 	}
 	
-//	public void testGet() throws Exception {
-//		INode node = session.tempNode().put("name", "bleujin").append("color", 128).append("color", 134).inner("address").put("city", "seoul").getParent() ;
-//		
-//		assertEquals(134, node.get("color", 1));
-//		assertEquals("seoul", node.get("address.city"));
-//	}
-//	
+	public void testFlatMap() throws Exception {
+		session.tranSync(new WriteJob<Void>() {
+			@Override
+			public Void handle(WriteSession wsession) {
+				wsession.pathBy("/bleujin").property("name", "bleujin").append("color", "red", "white").property("city", "seoul").refTo("friend", "/hero") ;
+				return null;
+			}
+		}) ;
+		ReadNode found = session.pathBy("/bleujin") ;
+		
+		Map<String, Object> flatMap = found.transformer(Transformers.READ_TOFLATMAP) ;
+		assertEquals(3, flatMap.size());
+		assertEquals("bleujin", flatMap.get("name"));
+		assertEquals("red", flatMap.get("color"));
+		assertEquals("seoul", flatMap.get("city"));
+	}
+	
+	
 //	public void testInList() throws Exception {
 //		TempNode node = session.tempNode();
 //		InListNode in = node.put("name", "bleujin").append("color", 128).append("color", 134).inlist("people") ;

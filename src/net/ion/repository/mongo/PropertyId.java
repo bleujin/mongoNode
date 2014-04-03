@@ -11,8 +11,27 @@ public class PropertyId implements Serializable {
 	private static final long serialVersionUID = 8480711318106901031L;
 
 	public static enum PType implements Serializable {
-		NORMAL, REFER, RESERVED
+		NORMAL{
+			public boolean isNormal() {
+				return true ;
+			}
+			public boolean isReference() {
+				return false ;
+			}
+		}, REFER{
+			public boolean isNormal() {
+				return false ;
+			}
+			public boolean isReference() {
+				return true ;
+			}
+		};
+
+		public abstract boolean isNormal()  ;
+		public abstract boolean isReference()  ;
 	}
+	
+	
 
 	private final PType type;
 	private final String name;

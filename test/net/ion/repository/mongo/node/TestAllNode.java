@@ -8,22 +8,25 @@ public class TestAllNode  extends TestCase{
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("To Use Node") ;
+		suite.addTestSuite(TestPathBy.class);
 		suite.addTestSuite(TestCreate.class) ;
 		suite.addTestSuite(TestUpdate.class);
 		suite.addTestSuite(TestRemove.class);
-		suite.addTestSuite(TestRootNode.class);
-		suite.addTestSuite(TestFind.class);
-		suite.addTestSuite(TestToMap.class) ;
 		suite.addTestSuite(TestAppend.class) ;
 		
-		
+
+		suite.addTestSuite(TestRootNode.class);
+		suite.addTestSuite(TestGhostBy.class);
+		suite.addTestSuite(TestReadNode.class) ;
+		suite.addTestSuite(TestWriteNode.class);
+
 		suite.addTestSuite(TestPropertyValue.class);
 		
 		suite.addTestSuite(TestIndex.class);
-		suite.addTestSuite(TestAdvFind.class);
 		suite.addTestSuite(TestReference.class);
-		
-		suite.addTestSuite(TestWriteSession.class);
+		suite.addTestSuite(TestReadChildren.class);
+		suite.addTestSuite(TestWriteChildren.class) ;
+		suite.addTestSuite(TestToPropMap.class) ;
 		
 //		suite.addTestSuite(TestColumns.class);
 //		suite.addTestSuite(TestAdvanceColumns.class) ;

@@ -4,9 +4,14 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import net.ion.framework.parse.gson.JsonPrimitive;
+import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.ObjectUtil;
+import net.ion.radon.util.uriparser.URIPattern;
+import net.ion.radon.util.uriparser.URIResolveResult;
+import net.ion.radon.util.uriparser.URIResolver;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -273,11 +278,34 @@ public class Fqn implements Comparable<Fqn>, Serializable {
 		return new BasicDBObject("_parent", getParent().toString()) ;
 	}
 
+	public DBObject childrenQueryObject() {
+		return new BasicDBObject("_id", new BasicDBObject("$gt", (getParent().isRoot() ? "" : getParent().toString()) + "/")) ;
+	}
+
 	public static Fqn fromDBObject(DBObject dbo) {
 		return Fqn.fromString(dbo.get("_id").toString());
 	}
 
+	public int depth() {
+		return elements.length;
+	}
 
+
+	public boolean isPattern(String fqnPattern) {
+		return new URIPattern(fqnPattern).match(this.toString());
+	}
+	
+	public Map<String, String> resolve(String fqnPattern){
+		URIResolveResult resolver = new URIResolver(toString()).resolve(new URIPattern(fqnPattern));
+		Map<String, String> result = MapUtil.newMap() ;
+		
+		for(String name : resolver.names()){
+			result.put(name, ObjectUtil.toString(resolver.get(name))) ;
+		}
+		
+		return result ;
+	}
+	
 }
 
 class FqnComparator implements Comparator<Fqn>, Serializable {
