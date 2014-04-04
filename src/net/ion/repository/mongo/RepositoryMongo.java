@@ -26,6 +26,10 @@ public class RepositoryMongo {
 		return create(SimpleCredential.BLANK, InetAddress.getLocalHost(), 27017);
 	}
 
+	public static RepositoryMongo test(String address, int port) throws IOException {
+		return create(SimpleCredential.BLANK, InetAddress.getByName(address), 27017);
+	}
+	
 	public static RepositoryMongo testLocalWithShutdownHook() throws IOException {
 		final RepositoryMongo result = create(SimpleCredential.BLANK, InetAddress.getLocalHost(), 27017);
 		

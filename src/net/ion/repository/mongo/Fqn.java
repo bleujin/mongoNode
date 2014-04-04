@@ -279,7 +279,7 @@ public class Fqn implements Comparable<Fqn>, Serializable {
 	}
 
 	public DBObject childrenQueryObject() {
-		return new BasicDBObject("_id", new BasicDBObject("$gt", (getParent().isRoot() ? "" : getParent().toString()) + "/")) ;
+		return new BasicDBObject("_id", new BasicDBObject("$gt", isRoot() ? "/" : (toString() + "/"))) ;
 	}
 
 	public static Fqn fromDBObject(DBObject dbo) {

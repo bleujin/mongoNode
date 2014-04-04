@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import net.ion.framework.util.Debug;
 import net.ion.repository.mongo.mr.RowJob;
-import net.ion.repository.mongo.util.WriteJobs;
 
 import com.mongodb.DBObject;
 import com.mongodb.MapReduceOutput;
@@ -38,8 +37,11 @@ public class TestMapReduce extends TestBaseReset{
 		
 		String reduceFn = ""
 				+ "function(key, values){"
-				+ " var result = {sum : 0} ; "
-				+ " values.forEach(function(doc){ result.sum += doc.sum ;});"
+				+ " var result = {name:'', sum : 0} ; "
+				+ " values.forEach(function(doc){ "
+				+ "		result.sum += doc.sum ;"
+				+ "		result.name += doc.name + ',' ;"
+				+ "	});"
 				+ " return result ;"
 				+ "}" ;
 		

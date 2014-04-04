@@ -15,6 +15,7 @@ import net.ion.repository.mongo.PropertyValue;
 import net.ion.repository.mongo.ReadSession;
 import net.ion.repository.mongo.Workspace;
 import net.ion.repository.mongo.exception.NotFoundPath;
+import net.ion.repository.mongo.util.Functions;
 import net.ion.repository.mongo.util.ReadChildrenEachs;
 import net.ion.repository.mongo.util.Transformers;
 
@@ -171,6 +172,10 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 
 	public void debugPrint() {
 		transformer(Transformers.READ_DEBUGPRINT) ;
+	}
+
+	public <T> T toBean(Class<T> clz) {
+		return transformer(Functions.beanCGIFunction(clz)) ;
 	}
 
 

@@ -1,4 +1,4 @@
-package net.ion.repository.mongo.node;
+package net.ion.repository.mongo.util;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,6 +9,9 @@ import net.ion.framework.parse.gson.JsonParser;
 import net.ion.framework.util.MapUtil;
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.PropertyValue;
+import net.ion.repository.mongo.convert.ToBeanStrategy;
+import net.ion.repository.mongo.node.NodeCommon;
+import net.ion.repository.mongo.node.ReadNode;
 
 import com.google.common.base.Function;
 
@@ -28,23 +31,23 @@ public class Functions {
 //		} ;
 //	}
 //	
-//	public final static <T> Function<ReadNode, T> beanCGIFunction(final Class<T> clz){
-//		return new Function<ReadNode, T>(){
-//			@Override
-//			public T apply(ReadNode node) {
-//				return ToBeanStrategy.ProxyByCGLib.toBean(node, clz) ;
-//			}
-//		} ;
-//	}
-//
-//	public final static <T> Function<ReadNode, T> beanReflectionFunction(final Class<T> clz){
-//		return new Function<ReadNode, T>(){
-//			@Override
-//			public T apply(ReadNode node) {
-//				return ToBeanStrategy.EasyByJson.toBean(node, clz) ;
-//			}
-//		} ;
-//	}
+	public final static <T> Function<ReadNode, T> beanCGIFunction(final Class<T> clz){
+		return new Function<ReadNode, T>(){
+			@Override
+			public T apply(ReadNode node) {
+				return ToBeanStrategy.ProxyByCGLib.toBean(node, clz) ;
+			}
+		} ;
+	}
+
+	public final static <T> Function<ReadNode, T> beanReflectionFunction(final Class<T> clz){
+		return new Function<ReadNode, T>(){
+			@Override
+			public T apply(ReadNode node) {
+				return ToBeanStrategy.EasyByJson.toBean(node, clz) ;
+			}
+		} ;
+	}
 	
 	public static Function<ReadNode, Map> toPropertyValueMap(){
 		return new Function<ReadNode, Map>(){

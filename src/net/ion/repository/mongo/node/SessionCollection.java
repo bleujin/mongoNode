@@ -32,7 +32,7 @@ public class SessionCollection {
 		DBCursor cursor = collection().find() ;
 		try {
 			while(cursor.hasNext()){
-				Debug.println(cursor.next()) ;
+				Debug.debug(cursor.next()) ;
 			}
 		} finally {
 			cursor.close(); 

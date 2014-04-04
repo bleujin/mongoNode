@@ -22,9 +22,29 @@ public class TestRemove extends TestBaseReset {
 	}
 
 	public void testRemoveChildren() throws Exception {
-
-		session.tranSync(WriteJobs.HELLO) ;
+		session.tranSync(new WriteJob<Void>(){
+			@Override
+			public Void handle(WriteSession wsession) {
+				wsession.pathBy("/bleujin").property("name", "bleujin").child("address").property("city","seoul") ;
+				return null;
+			}
+		}) ;
 		
+		session.tranSync(new WriteJob<Void>(){
+			@Override
+			public Void handle(WriteSession wsession) {
+				wsession.pathBy("/bleujin").removeChildren(); 
+				return null;
+			}
+		}) ;
+		
+		assertEquals(false, session.exists("/bleujin/address")) ;
+		assertEquals(true, session.exists("/bleujin")) ;
+	}
+	
+	
+	public void testRemoveChildrenRootSub() throws Exception {
+		session.tranSync(WriteJobs.HELLO) ;
 		session.tranSync(new WriteJob<Void>() {
 			@Override
 			public Void handle(WriteSession wsession) {
