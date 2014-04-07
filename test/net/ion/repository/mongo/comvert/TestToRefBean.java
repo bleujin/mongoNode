@@ -34,7 +34,6 @@ public class TestToRefBean extends TestBaseReset {
 		assertEquals(20, devBean.deptNo()) ;
 		
 		assertEquals("bleujin", devBean.manager().name()) ;
-		Debug.line(devBean.emps()) ;
 		assertEquals(2, devBean.emps().size()) ;
 	}
 	

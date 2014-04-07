@@ -144,8 +144,8 @@ public class Workspace {
 		return new ReadChildren(rsession, includeSub, collection(rsession), parent);
 	}
 
-	public WriteChildren children(WriteSession wsession, Fqn parent) {
-		return new WriteChildren(wsession, collection(wsession.readSession()), parent);
+	public WriteChildren children(WriteSession wsession, boolean includeSub, Fqn parent) {
+		return new WriteChildren(wsession, includeSub, collection(wsession.readSession()), parent);
 	}
 
 	static class InstantLogWriter {
@@ -187,6 +187,7 @@ public class Workspace {
 		}
 
 	}
+
 
 
 

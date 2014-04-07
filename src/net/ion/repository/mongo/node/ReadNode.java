@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.ion.framework.db.Rows;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.framework.util.SetUtil;
@@ -138,6 +139,14 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 			}
 		};
 	}
+	
+	public ReadChildren refChildren(String refName) {
+		PropertyValue findProp = propertyId(PropertyId.refer(refName)) ;
+		String[] refs = (String[]) findProp.asSet().toArray(new String[0]) ;
+		
+		return workspace().children(session, true, fqn.ROOT).in("_id", refs) ;
+	}
+
 
 	@Override
 	public <R> R transformer(Function<ReadNode, R> transformer) {
@@ -178,6 +187,9 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 		return transformer(Functions.beanCGIFunction(clz)) ;
 	}
 
+	public Rows toRows(String expr){
+		return transformer(Functions.rowsFunction(session, expr)) ;
+	}
 
 
 }

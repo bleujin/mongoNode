@@ -1,5 +1,6 @@
 package net.ion.repository.mongo;
 
+import net.ion.script.rhino.TestScript;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

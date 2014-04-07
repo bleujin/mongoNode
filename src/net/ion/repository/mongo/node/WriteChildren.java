@@ -33,11 +33,17 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 
 	private final WriteSession session;
 	private final DBCollection collection;
+	private final Fqn parent;
 
-	public WriteChildren(WriteSession session, DBCollection collection, Fqn parent) {
+	public WriteChildren(WriteSession session, boolean includeSub, DBCollection collection, Fqn parent) {
 		this.session = session;
 		this.collection = collection;
-		put("_parent", parent.toString()) ;
+		this.parent = parent ;
+		if (includeSub){
+			put("_parent", new BasicDBObject("$gt", (parent.isRoot()) ? "/" : (parent.toString() + "/"))) ;
+		} else { 
+			put("_parent", parent.toString()) ;
+		}
 	}
 
 	public WriteChildren skip(int skip) {
@@ -103,7 +109,7 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		}
 	}
 
-	public WriteNode findOne() {
+	public WriteNode firstNode() {
 		return eachNode(new WriteChildrenEach<WriteNode>(){
 			@Override
 			public WriteNode handle(WriteChildrenIterator citer) {

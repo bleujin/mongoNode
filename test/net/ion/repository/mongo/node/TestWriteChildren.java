@@ -31,7 +31,7 @@ public class TestWriteChildren extends TestBaseReset{
 		ReadNode foundNode = session.tranSync(new WriteJob<ReadNode>() {
 			@Override
 			public ReadNode handle(WriteSession wsession) {
-				WriteNode found = wsession.pathBy("/bleujin").children().between("dummy", 3, 5).descending("dummy").findOne() ;
+				WriteNode found = wsession.pathBy("/bleujin").children().between("dummy", 3, 5).descending("dummy").firstNode() ;
 				assertEquals(5, found.property("dummy").asInt());
 				
 				found.property("dummy", -1) ;
@@ -66,7 +66,7 @@ public class TestWriteChildren extends TestBaseReset{
 		}) ;
 		assertEquals(3, session.pathBy("/bleujin").children().eq("mod", 10).count()) ;
 		
-		ReadNode findOne = session.pathBy("/bleujin").children().eq("mod", 10).descending("dummy").findOne() ;
+		ReadNode findOne = session.pathBy("/bleujin").children().eq("mod", 10).descending("dummy").firstNode() ;
 		assertEquals(5, findOne.property("dummy").asInt());
 		assertEquals(10, findOne.property("mod").asInt());
 		assertEquals("dummy", findOne.property("name").asString());

@@ -266,9 +266,12 @@ public class WriteNode extends AbstractNode<WriteNode> implements NodeCommon<Wri
 	}
 
 	public WriteChildren children(){
-		return workspace().children(wsession, this.fqn()) ;
+		return children(false) ;
 	}
 	
+	public WriteChildren children(boolean includeSub) {
+		return workspace().children(wsession, includeSub, this.fqn()) ;
+	}
 	
 	@Override
 	public String toString(){
@@ -281,6 +284,13 @@ public class WriteNode extends AbstractNode<WriteNode> implements NodeCommon<Wri
 
 	public ReadNode readNode() {
 		return ReadNode.create(session().readSession(), fqn, found());
+	}
+
+	public WriteChildren refChildren(String refName) {
+		PropertyValue findProp = propertyId(PropertyId.refer(refName)) ;
+		String[] refs = (String[]) findProp.asSet().toArray(new String[0]) ;
+		
+		return workspace().children(wsession, true, fqn.ROOT).in("_id", refs) ;
 	}
 
 

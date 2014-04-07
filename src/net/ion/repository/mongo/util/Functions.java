@@ -4,14 +4,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.ion.framework.db.Rows;
 import net.ion.framework.parse.gson.JsonObject;
 import net.ion.framework.parse.gson.JsonParser;
+import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.MapUtil;
 import net.ion.repository.mongo.PropertyId;
 import net.ion.repository.mongo.PropertyValue;
+import net.ion.repository.mongo.ReadSession;
 import net.ion.repository.mongo.convert.ToBeanStrategy;
+import net.ion.repository.mongo.convert.rows.AdNodeRows;
+import net.ion.repository.mongo.expression.ExpressionParser;
+import net.ion.repository.mongo.expression.SelectProjection;
+import net.ion.repository.mongo.expression.TerminalParser;
 import net.ion.repository.mongo.node.NodeCommon;
 import net.ion.repository.mongo.node.ReadNode;
+import net.ion.rosetta.Parser;
 
 import com.google.common.base.Function;
 
@@ -113,6 +121,20 @@ public class Functions {
 				result.add("references", JsonObject.fromObject(refs)) ;
 				
 				return result ;
+			}
+		} ;
+	}
+
+	public static Function<ReadNode, Rows> rowsFunction(final ReadSession session, final String expr) {
+		return new Function<ReadNode, Rows>(){
+			@Override
+			public Rows apply(ReadNode node) {
+//				ColumnParser cparser = session.workspace().getAttribute(ColumnParser.class.getCanonicalName(), ColumnParser.class);
+//				return CrakenNodeRows.create(session, ListUtil.toList(node).iterator() , cparser.parse(cols)) ;
+				
+				Parser<SelectProjection> parser = ExpressionParser.selectProjection();
+				SelectProjection sp = TerminalParser.parse(parser, expr);
+				return AdNodeRows.create(session, ListUtil.toList(node).iterator(), sp);
 			}
 		} ;
 	}
