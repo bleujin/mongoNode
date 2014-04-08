@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import net.ion.repository.mongo.WriteSession.LogRow;
 import net.ion.repository.mongo.exception.NotFoundPath;
@@ -26,37 +29,50 @@ public class Workspace {
 	private final RepositoryMongo repository;
 	private final DB db;
 	private TranExceptionHandler ehandler = TranExceptionHandler.PRINT;
+	private ExecutorService es ; 
 
-	private Workspace(RepositoryMongo repository, DB db) {
+	private Workspace(RepositoryMongo repository, DB db, ExecutorService es) {
 		this.repository = repository;
-		this.db = db;
+		this.db = db ;
+		this.es = es ;
 	}
 
-	static Workspace create(RepositoryMongo repository, DB db) {
-		return new Workspace(repository, db);
+	static Workspace create(RepositoryMongo repository, DB db, ExecutorService es) {
+		return new Workspace(repository, db, es);
 	}
 
 	
 	public String name() {
 		return db.getName();
 	}
+	
+	public synchronized Workspace executorService(ExecutorService es){
+		this.es = es ;
+		return this ;
+	}
 
 	
-	public <T> T tran(ReadSession rsession, WriteJob<T> wjob) {
-		WriteSession wsession = WriteSession.create(rsession);
-		boolean isSuccess = true;
-		try {
-			wsession.beginTran();
-			T result = wjob.handle(wsession);
-			wsession.endTran();
-			return result;
-		} catch (Exception ex) {
-			isSuccess = false;
-			ehandler.handle(wsession, ex);
-		} finally {
-			wsession.completed(isSuccess);
-		}
-		return null;
+	public <T> Future<T> tran(final ReadSession rsession, final WriteJob<T> wjob) {
+		return es.submit(new Callable<T>(){
+			@Override
+			public T call() throws Exception {
+				WriteSession wsession = WriteSession.create(rsession);
+				boolean isSuccess = true;
+				try {
+					wsession.beginTran();
+					T result = wjob.handle(wsession);
+					wsession.endTran();
+					return result;
+				} catch (Exception ex) {
+					isSuccess = false;
+					ehandler.handle(wsession, ex);
+				} finally {
+					wsession.completed(isSuccess);
+				}
+				return null;
+			}
+		}) ;
+
 	}
 
 	public RepositoryMongo repository() {

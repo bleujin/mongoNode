@@ -1,6 +1,9 @@
 package net.ion.repository.mongo;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import com.mongodb.DBCursor;
 
@@ -27,9 +30,20 @@ public class ReadSession implements ISession<ReadNode> {
 	}
 
 	
-	public <T> T tranSync(WriteJob<T> job) {
+	public <T> T tranSync(WriteJob<T> job) throws IOException {
+		try {
+			return workspace.tran(this, job).get() ;
+		} catch (InterruptedException e) {
+			throw new IOException(e) ;
+		} catch (ExecutionException e) {
+			throw new IOException(e) ;
+		}
+	}
+
+	public <T> Future<T> tranAsync(WriteJob<T> job) {
 		return workspace.tran(this, job) ;
 	}
+
 
 	public Workspace workspace() {
 		return workspace;
@@ -86,6 +100,7 @@ public class ReadSession implements ISession<ReadNode> {
 	public SessionCollection collection() {
 		return SessionCollection.create(this);
 	}
+
 
 
 }

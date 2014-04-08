@@ -43,7 +43,7 @@ public class TestCreate extends TestBaseReset {
 		assertEquals(new Date().getDay(), found.property("date").asDate().getDay());
 	}
 
-	public void testCaseInSentiveWhenRead() {
+	public void testCaseInSentiveWhenRead() throws Exception{
 		session.tranSync(new WriteJob<Void>() {
 			@Override
 			public Void handle(WriteSession wsession) {

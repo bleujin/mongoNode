@@ -1,5 +1,6 @@
 package net.ion.repository.mongo.vfs;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -59,7 +60,7 @@ public class TestNodeVfs extends TestBaseReset {
 		assertEquals(0, children.size()) ;
 	}
 	
-	private void createSampleNode() {
+	private void createSampleNode() throws IOException {
 		session.tranSync(new WriteJob<Void>() {
 			@Override
 			public Void handle(WriteSession wsession) {
@@ -173,21 +174,21 @@ public class TestNodeVfs extends TestBaseReset {
 		VFile def2File = entry.resolveFile("node://dept/dev2/dev2.node") ;
 		assertEquals(true, def2File.exists()) ;
 		
-		IOUtil.copyNClose(new StringReader("{name:'dev2 team', desc:'µ¥ºêÆÀ', date:" + new Date().getTime() + "}"), def2File.getOutputStream(), "UTF-8") ;
+		IOUtil.copyNClose(new StringReader("{name:'dev2 team', desc:'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½', date:" + new Date().getTime() + "}"), def2File.getOutputStream(), "UTF-8") ;
 
 		ReadNode found = session.pathBy("/dept/dev2");
 		assertEquals("dev2 team", found.property("name").asString()) ;
-		assertEquals("µ¥ºêÆÀ", found.property("desc").asString()) ;
+		assertEquals("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", found.property("desc").asString()) ;
 	}
 	
 	public void testModify() throws Exception {
 		createSampleNode();
 		
 		VFile dept = entry.resolveFile("node://dept/dept.node");
-		IOUtil.copyNClose(new StringReader("{greeting:'ÇÑ±Û', age:20}"), dept.getOutputStream(), "UTF-8") ;
+		IOUtil.copyNClose(new StringReader("{greeting:'ï¿½Ñ±ï¿½', age:20}"), dept.getOutputStream(), "UTF-8") ;
 		
 		ReadNode node = session.pathBy("/dept");
-		assertEquals("ÇÑ±Û", node.property("greeting").asString()) ;
+		assertEquals("ï¿½Ñ±ï¿½", node.property("greeting").asString()) ;
 	}
 	
 	

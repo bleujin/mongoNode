@@ -57,7 +57,7 @@ public class RepositoryMongo {
 			Workspace ws = wss.get(dbName, new Callable<Workspace>() {
 				public Workspace call() throws Exception {
 					DB db = mongo.getDB(dbName);
-					return Workspace.create(RepositoryMongo.this, db);
+					return Workspace.create(RepositoryMongo.this, db, new WithInExecutorService());
 				}
 			});
 			return ReadSession.create(ws, Credential.ADMIN, colName);

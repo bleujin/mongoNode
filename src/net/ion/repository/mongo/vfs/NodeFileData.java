@@ -1,5 +1,6 @@
 package net.ion.repository.mongo.vfs;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map.Entry;
 
@@ -62,7 +63,7 @@ class NodeFileData implements Serializable {
 		this.buffer = newBuf;
 	}
 	
-	void save(ReadSession session) throws FileSystemException {
+	void save(ReadSession session) throws IOException {
 		final JsonObject jsonObject = NodeFileUtil.toJSONObject(getBuffer());
 		
 		session.tranSync(new WriteJob<Void>() {

@@ -1,5 +1,7 @@
 package net.ion.repository.mongo;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 import net.ion.repository.mongo.util.WriteJobs;
 
@@ -22,7 +24,7 @@ public class TestBaseReset extends TestCase {
 	}
 
 	
-	protected void createHelloNode(){
+	protected void createHelloNode() throws IOException{
 		session.tranSync(WriteJobs.HELLO) ;
 	}
 }
