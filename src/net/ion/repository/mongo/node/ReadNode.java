@@ -99,45 +99,12 @@ public class ReadNode extends AbstractNode<ReadNode> implements NodeCommon<ReadN
 
 	@Override
 	public ReadNode ref(String refName) {
-		PropertyValue findProp = propertyId(PropertyId.refer(refName)) ;
-		if (findProp == PropertyValue.NotFound) throw new NotFoundPath("not found ref : " + refName);
-		return workspace().pathBy(session, Fqn.fromString(findProp.asString()));
+		return refChildren(refName).firstNode() ;
 	}
 
 	@Override
 	public IteratorList<ReadNode> refs(String refName) {
-		PropertyValue findProp = propertyId(PropertyId.refer(refName)) ;
-		Set<String> set = findProp.asSet() ;
-		final ArrayList<String> refs = new ArrayList<String>(set) ;
-		
-		
-		return new IteratorList<ReadNode>() {
-			
-			private Iterator<ReadNode> inter = iterator() ;
-			@Override
-			public Iterator<ReadNode> iterator() {
-				return toList().iterator();
-			}
-			
-			@Override
-			public ReadNode next() {
-				return inter.next();
-			}
-			
-			@Override
-			public boolean hasNext() {
-				return inter.hasNext();
-			}
-			
-			@Override
-			public List<ReadNode> toList() {
-				List<ReadNode> result = ListUtil.newList() ;
-				for (String ref : refs) {
-					result.add(workspace().pathBy(session, Fqn.fromString(ref))) ;
-				}
-				return result;
-			}
-		};
+		return refChildren(refName).iterator() ;
 	}
 	
 	public ReadChildren refChildren(String refName) {

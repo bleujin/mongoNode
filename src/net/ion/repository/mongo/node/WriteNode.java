@@ -219,44 +219,12 @@ public class WriteNode extends AbstractNode<WriteNode> implements NodeCommon<Wri
 
 	@Override
 	public WriteNode ref(String refName) {
-		PropertyValue findProp = propertyId(PropertyId.refer(refName)) ;
-		if (findProp == PropertyValue.NotFound) throw new NotFoundPath("not found ref : " + refName);
-		return session().pathBy(Fqn.fromString(findProp.asString()));
+		return refChildren(refName).firstNode() ;
 	}
 
 	@Override
 	public IteratorList<WriteNode> refs(String refName) {
-		PropertyValue findProp = propertyId(PropertyId.refer(refName)) ;
-		Set<String> set = findProp.asSet() ;
-		
-		final ArrayList<String> refs = new ArrayList<String>(set) ;
-		return new IteratorList<WriteNode>() {
-			
-			private Iterator<WriteNode> inter = iterator() ;
-			@Override
-			public Iterator<WriteNode> iterator() {
-				return toList().iterator();
-			}
-			
-			@Override
-			public WriteNode next() {
-				return inter.next();
-			}
-			
-			@Override
-			public boolean hasNext() {
-				return inter.hasNext();
-			}
-			
-			@Override
-			public List<WriteNode> toList() {
-				List<WriteNode> result = ListUtil.newList() ;
-				for (String ref : refs) {
-					result.add(workspace().pathBy(session(), Fqn.fromString(ref))) ;
-				}
-				return result;
-			}
-		};
+		return refChildren(refName).iterator() ;
 	}
 	
 	

@@ -15,6 +15,7 @@ import net.ion.repository.mongo.Workspace;
 import net.ion.repository.mongo.WriteSession;
 import net.ion.repository.mongo.index.SessionJob;
 import net.ion.repository.mongo.node.WriteNode.Touch;
+import net.ion.repository.mongo.util.ReadChildrenEachs;
 import net.ion.repository.mongo.util.WriteChildrenEachs;
 
 import com.mongodb.BasicDBList;
@@ -269,6 +270,11 @@ public class WriteChildren extends AbstractChildren<WriteNode, WriteChildren> {
 		
 		return result ;
 	}
+
+	public IteratorList<WriteNode> iterator(){
+		return eachNode(WriteChildrenEachs.ITERATOR) ;
+	}
+
 
 
 

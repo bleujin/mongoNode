@@ -1,11 +1,13 @@
 package net.ion.repository.mongo.util;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 import net.ion.framework.util.SetUtil;
+import net.ion.repository.mongo.node.IteratorList;
 import net.ion.repository.mongo.node.ReadChildrenEach;
 import net.ion.repository.mongo.node.ReadChildrenIterator;
 import net.ion.repository.mongo.node.ReadNode;
@@ -51,6 +53,38 @@ public class WriteChildrenEachs {
 		@Override
 		public Integer handle(WriteChildrenIterator citer) {
 			return citer.count();
+		}
+	};
+	public static final WriteChildrenEach<IteratorList<WriteNode>> ITERATOR = new WriteChildrenEach<IteratorList<WriteNode>>() {
+
+		@Override
+		public IteratorList<WriteNode> handle(final WriteChildrenIterator citer) {
+			return new IteratorList<WriteNode>() {
+				
+				@Override
+				public Iterator<WriteNode> iterator() {
+					return citer;
+				}
+				
+				@Override
+				public WriteNode next() {
+					return citer.next();
+				}
+				
+				@Override
+				public boolean hasNext() {
+					return citer.hasNext();
+				}
+				
+				@Override
+				public List<WriteNode> toList() {
+					List<WriteNode> result = ListUtil.newList() ;
+					while(hasNext()){
+						result.add(citer.next()) ;
+					}
+					return result;
+				}
+			};
 		}
 	};
 
